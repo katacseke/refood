@@ -1,0 +1,34 @@
+settings:
+  react:
+    version: detect
+env:
+  browser: true
+  es2021: true
+  node: true
+extends:
+  - airbnb
+  - prettier  
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: 12
+  sourceType: module
+plugins:
+  - react
+  - prettier
+rules: 
+  react/prop-types: 'off'
+  react/react-in-jsx-scope: 'off'
+  react/jsx-filename-extension: 'off'
+  semi: 
+    - error
+    - always
+  quotes:
+    - error
+    - single
+  prettier/prettier:
+    - error
+    - trailingComma: es5
+      singleQuote: true
+      printWidth: 120
+      endOfLine: auto
