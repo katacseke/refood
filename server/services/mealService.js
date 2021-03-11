@@ -13,7 +13,7 @@ import connectDb from '../db';
 const getMealById = async (id) => {
   await connectDb();
 
-  const meal = Meal.findById(id).exec();
+  const meal = await Meal.findById(id).exec();
 
   if (!meal) {
     return {
@@ -30,13 +30,13 @@ const getMealById = async (id) => {
 
 /**
  * Get all meals.
- * @returns {Array} Array of all dogs.
+ * @returns {Array} Array of all meals.
  */
 const getMeals = async () => {
   await connectDb();
 
-  const meals = Meal.find({}).exec();
-  return meals;
+  const meals = await Meal.find({}).exec();
+  return { success: true, data: meals };
 };
 
 /**
@@ -49,7 +49,9 @@ const createMeal = async (meal) => {
 
   const result = await Meal.create(meal);
 
-  return result ? { success: true, meal } : { success: false, error: 'Unable to insert data.' };
+  return result
+    ? { success: true, data: meal }
+    : { success: false, error: 'Unable to insert data.' };
 };
 
 /**
@@ -63,7 +65,9 @@ const updateMeal = async (id, meal) => {
 
   const result = await Meal.findByIdAndUpdate(id, meal, { new: true });
 
-  return result ? { success: true, meal } : { success: false, error: 'Unable to update data.' };
+  return result
+    ? { success: true, data: meal }
+    : { success: false, error: 'Unable to update data.' };
 };
 
 export default {

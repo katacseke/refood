@@ -6,8 +6,10 @@ export default Yup.object({
     .positive('Portion number must be positive.')
     .required('Portion number is required'),
   restaurantId: Yup.string().required('Restaurant id is required.'),
-  startTime: Yup.date().required('Start time is required'),
-  endTime: Yup.date().required('End time is required'),
+  startTime: Yup.date()
+    .min(new Date(), 'Date must be later than now.')
+    .required('Start time is required'),
+  endTime: Yup.date().min(Yup.ref('startTime')).required('End time is required'),
   price: Yup.number().positive('Price must be positive.').required('Price is required'),
   donateable: Yup.boolean(),
   dailyMenu: Yup.boolean(),

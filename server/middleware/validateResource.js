@@ -6,7 +6,7 @@ const validateResource = (resourceSchema) => async (req, res, next) => {
     await resourceSchema.validate(resource);
     next();
   } catch (e) {
-    res.status(422).join({ error: e.errors.join(', ') });
+    res.status(422).json({ error: e.errors.join(', ') });
   }
 };
 

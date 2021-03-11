@@ -1,20 +1,17 @@
 import nextConnect from 'next-connect';
-import validateResource from '../../../server/middleware/validateResource';
 import { mealService } from '../../../server/services';
-import mealCreationSchema from '../../../server/validation/mealCreationSchema';
 
-const validation = nextConnect().post('/api/meals', validateResource(mealCreationSchema));
-
-const handler = nextConnect().use(validation);
+const handler = nextConnect();
 
 handler.get(async (req, res) => {
-  const meal = await mealService.getMealById(req.params.id);
+  const meal = await mealService.getMealById(req.query.id);
 
   if (!meal.success) {
     res.status(404).json({ error: meal.error });
+    return;
   }
 
-  res.status(200).json(meal);
+  res.status(200).json(meal.data);
 });
 
 export default handler;
