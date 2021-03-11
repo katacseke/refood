@@ -11,10 +11,11 @@ handler.get(async (req, res) => {
   const meals = await mealService.getMeals();
 
   if (!meals.success) {
-    res.status(404).json({ error: meals.error });
+    res.status(500).json({ error: meals.error });
+    return;
   }
 
-  res.status(200).json(meals);
+  res.status(200).json(meals.data);
 });
 
 handler.post(async (req, res) => {
@@ -22,9 +23,10 @@ handler.post(async (req, res) => {
 
   if (!meal.success) {
     res.status(500).json({ error: meal.error });
+    return;
   }
 
-  res.status(201).json(meal);
+  res.status(201).json(meal.data);
 });
 
 export default handler;

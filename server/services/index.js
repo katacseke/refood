@@ -1,4 +1,4 @@
 import mealService from './mealService';
+import restaurantService from './restaurantService';
 
-// eslint-disable-next-line import/prefer-default-export
-export { mealService };
+export { mealService, restaurantService };
