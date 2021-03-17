@@ -45,9 +45,9 @@ const getUserById = async (id) => {
 const getUserByEmail = async (email) => {
   await connectDb();
 
-  const user = await User.find({ email }).exec();
+  const user = await User.findOne({ email }).exec();
 
-  if (!user || user.length === 0) {
+  if (!user) {
     return {
       success: false,
     };
@@ -126,7 +126,7 @@ const deleteUser = async (id) => {
  * @returns Returns an object with error message or success and user data
  */
 const checkCredentials = async (email, password) => {
-  const user = getUserByEmail(email);
+  const user = await getUserByEmail(email);
 
   if (!user.success) {
     return {
