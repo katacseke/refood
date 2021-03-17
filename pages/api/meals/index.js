@@ -1,7 +1,7 @@
 import nextConnect from 'next-connect';
 import validateResource from '../../../server/middleware/validateResource';
 import { mealService } from '../../../server/services';
-import mealCreationSchema from '../../../server/validation/mealCreationSchema';
+import mealCreationSchema from '../../../validation/mealCreationSchema';
 
 const validation = nextConnect().post('/api/meals', validateResource(mealCreationSchema));
 
