@@ -148,6 +148,21 @@ const checkCredentials = async (email, password) => {
 
 const createToken = (user) => jwt.sign(user, process.env.SECRET, { expiresIn: '14d' });
 
+const verifyToken = (token) => {
+  try {
+    const user = jwt.verify(token, process.env.SECRET);
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error: err.message,
+    };
+  }
+};
+
 export default {
   getUserByEmail,
   getUserById,
@@ -157,4 +172,5 @@ export default {
   deleteUser,
   checkCredentials,
   createToken,
+  verifyToken,
 };

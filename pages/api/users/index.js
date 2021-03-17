@@ -1,11 +1,12 @@
 import nextConnect from 'next-connect';
 import { userService } from '../../../server/services';
 import registrationSchema from '../../../validation/registrationSchema';
-import validateResource from '../../../server/middleware/validateResource';
+import { validateResource, authorize } from '../../../server/middleware';
 
 const validation = nextConnect().post('/api/users', validateResource(registrationSchema));
+const authorization = nextConnect().get('/api/users', authorize('admin'));
 
-const handler = nextConnect().use(validation);
+const handler = nextConnect().use(validation).use(authorization);
 
 handler.get(async (req, res) => {
   const users = await userService.getUsers();
