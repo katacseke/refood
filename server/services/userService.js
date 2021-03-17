@@ -150,8 +150,19 @@ const checkCredentials = async (email, password) => {
   return match ? { success: true, data } : { success: false, error: 'Password does not match' };
 };
 
+/**
+ * Generate jwt token
+ * @param {User} user
+ * @returns {String} jwt token
+ */
 const createToken = (user) => jwt.sign(user, process.env.SECRET, { expiresIn: '14d' });
 
+/**
+ * Verify jwt token
+ * @param {String} token
+ * @returns {Object} at success: object containing user infromation
+ *                   when the token does not match: error message
+ */
 const verifyToken = (token) => {
   try {
     const user = jwt.verify(token, process.env.SECRET);
