@@ -27,10 +27,9 @@ const getUserById = async (id) => {
     };
   }
 
-  user.password = undefined;
   return {
     success: true,
-    data: user,
+    data: { ...user.toObject(), password: undefined },
   };
 };
 
@@ -68,7 +67,8 @@ const getUsers = async () => {
   await connectDb();
 
   const users = await User.find({}).exec();
-  return { success: true, data: { ...users, password: undefined } };
+  const data = users.map((user) => ({ ...user.toObject(), password: undefined }));
+  return { success: true, data };
 };
 
 /**
@@ -79,16 +79,12 @@ const getUsers = async () => {
 const createUser = async (user) => {
   await connectDb();
 
-  const data = {
-    email: user.email,
-    name: user.name,
-    role: user.role,
-  };
-
   const hash = await bcrypt.hash(user.password, saltRounds);
   const result = await User.create({ ...user, password: hash, role: 'user' });
 
-  return result ? { success: true, data } : { success: false, error: 'Unable to insert data.' };
+  return result
+    ? { success: true, data: { ...result.toObject(), password: undefined } }
+    : { success: false, error: 'Unable to insert data.' };
 };
 
 /**
@@ -100,15 +96,11 @@ const createUser = async (user) => {
 const updateUser = async (id, user) => {
   await connectDb();
 
-  const data = {
-    email: user.email,
-    name: user.name,
-    role: user.role,
-  };
-
   const result = await User.findByIdAndUpdate(id, user, { new: true });
 
-  return result ? { success: true, data } : { success: false, error: 'Unable to update data.' };
+  return result
+    ? { success: true, data: { ...result.toObject(), password: undefined } }
+    : { success: false, error: 'Unable to update data.' };
 };
 
 /**
