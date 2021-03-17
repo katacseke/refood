@@ -1,10 +1,12 @@
 import nextConnect from 'next-connect';
 import { userService } from '../../../server/services';
+import authorize, { hasRole, isSelf } from '../../../server/middleware/authorize';
 
-const handler = nextConnect();
+const authorization = nextConnect().get('/api/users/:id', authorize(hasRole('admin'), isSelf()));
+const handler = nextConnect().use(authorization);
 
 handler.get(async (req, res) => {
-  const user = await userService.getUserById(req.params.id);
+  const user = await userService.getUserById(req.query.id);
 
   if (!user.success) {
     res.status(404).json({ error: user.error });

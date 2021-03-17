@@ -1,6 +1,10 @@
 import { userService } from '../services';
 
-const authorize = (role) => async (req, res, next) => {
+export const hasRole = (role) => (user) => user.data.role === role;
+
+export const isSelf = () => (user, req) => user.data.id === req.query.id;
+
+const authorize = (...conditions) => async (req, res, next) => {
   const token = req.cookies.access_token;
   if (!token) {
     res.status(401).json({ error: 'Missing credentials.' });
@@ -13,12 +17,12 @@ const authorize = (role) => async (req, res, next) => {
     return;
   }
 
-  if (user.data.role !== role) {
-    res.status(403).json({ error: 'No permission for this action' });
+  if (conditions.some((condition) => condition(user, req))) {
+    next();
     return;
   }
 
-  next();
+  res.status(403).json({ error: 'No permission for this action' });
 };
 
 export default authorize;

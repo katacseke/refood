@@ -18,7 +18,7 @@ const saltRounds = 10;
 const getUserById = async (id) => {
   await connectDb();
 
-  const user = await (await User.findById(id)).exec();
+  const user = await User.findById(id);
 
   if (!user) {
     return {
@@ -27,6 +27,7 @@ const getUserById = async (id) => {
     };
   }
 
+  user.password = undefined;
   return {
     success: true,
     data: user,
@@ -67,7 +68,7 @@ const getUsers = async () => {
   await connectDb();
 
   const users = await User.find({}).exec();
-  return { success: true, data: users };
+  return { success: true, data: { ...users, password: undefined } };
 };
 
 /**
@@ -99,11 +100,15 @@ const createUser = async (user) => {
 const updateUser = async (id, user) => {
   await connectDb();
 
+  const data = {
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  };
+
   const result = await User.findByIdAndUpdate(id, user, { new: true });
 
-  return result
-    ? { success: true, data: user }
-    : { success: false, error: 'Unable to update data.' };
+  return result ? { success: true, data } : { success: false, error: 'Unable to update data.' };
 };
 
 /**
@@ -135,7 +140,6 @@ const checkCredentials = async (email, password) => {
     };
   }
   const data = {
-    id: user.data.id,
     email: user.data.email,
     name: user.data.name,
     role: user.data.role,
