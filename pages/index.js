@@ -1,68 +1,33 @@
-import Head from 'next/head';
+import { Layout } from '../components';
 import { mealService } from '../server/services';
-import styles from '../styles/Home.module.css';
 
-export default function Home({ meals }) {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+const Home = ({ meals }) => (
+  <Layout>
+    <p>Meals: {meals.map((meal) => meal.name).join(', ')}</p>
+    <p>
+      Food waste is a major problem that is concerning modern world and affects all developed
+      countries. Many international organisations tries to implement programs to reduce the food
+      waste because it concerns the environment, social and economic issues. Romania doesn’t have a
+      food waste in the same size as other countries from European Union, but also doesn’t have a
+      high standard of living and high income per capita. In this paper we conduct a qualitative
+      research through structured interview with NGOs that are present in the food waste problem to
+      discover good practice for developing a method of cooperation between companies that are
+      producing and selling food and NGOs that are donating food for poor people or for people that
+      have social care. Some of the findings suggest developing the concept of food bank in Romania,
+      which is only a beginning, develop information campaigns for population, build canteen near
+      retailer and develop partnership with universities. The study is limited by small number of
+      NGOs questioned and should be continued with focus group and quantitative research among
+      population.
+    </p>
+  </Layout>
+);
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p>Meals: {meals.map((meal) => meal.name).join(', ')}</p>
-        <p className={styles.description}>
-          Get started by editing <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a href="https://github.com/vercel/next.js/tree/master/examples" className={styles.card}>
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  );
-}
+export default Home;
 
 export async function getStaticProps() {
   const meals = await mealService.getMeals();
 
   return {
-    props: { meals: JSON.parse(JSON.stringify(meals)) },
+    props: { meals: JSON.parse(JSON.stringify(meals.data)) },
   };
 }
