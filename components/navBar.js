@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Router from 'next/router';
 import {
   Navbar,
   NavbarToggler,
@@ -18,6 +19,17 @@ const NavBar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [navbarOpen, setNavbarOpen] = useState(false);
 
+  const handleKeyPress = (e) => {
+    if (e.key !== 'Enter' && e.keyCode !== 13) {
+      return;
+    }
+
+    const text = e.target.value;
+    if (text !== '') {
+      Router.push(`/search/${text}`);
+    }
+  };
+
   return (
     <Navbar type="dark" theme="primary" expand="md">
       <NavbarBrand href="#">Project name</NavbarBrand>
@@ -25,7 +37,15 @@ const NavBar = () => {
 
       <Collapse open={navbarOpen} navbar>
         <Nav navbar>
-          <FormInput size="sm" seamless className="border-0" placeholder="Keresés..." />
+          <FormInput
+            size="sm"
+            seamless
+            className="border-0"
+            placeholder="Keresés..."
+            name="searchBar"
+            id="searchBar"
+            onKeyPress={handleKeyPress}
+          />
         </Nav>
 
         <Nav navbar className="ml-auto">

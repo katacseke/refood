@@ -40,6 +40,26 @@ const getRestaurants = async () => {
 };
 
 /**
+ * Get restaurants with a specific name
+ * @returns {Array} Array of all restaurants.
+ */
+const getRestaurantsWithName = async (text) => {
+  await connectDb();
+
+  const regex = new RegExp(text, 'i');
+  const restaurants = await Restaurant.find({ name: { $regex: regex } }).exec();
+
+  /* if (!meals || !meals.length) {
+    return {
+      success: false,
+      error: 'No meals found with this name.',
+    };
+  } */
+
+  return { success: true, data: restaurants };
+};
+
+/**
  * Insert restaurant.
  * @param {Restaurant} restaurant
  * @returns {Object} Returns an object with error message or success
@@ -73,6 +93,7 @@ const updateRestaurant = async (id, restaurant) => {
 export default {
   getRestaurantById,
   getRestaurants,
+  getRestaurantsWithName,
   createRestaurant,
   updateRestaurant,
 };

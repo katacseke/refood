@@ -40,6 +40,26 @@ const getMeals = async () => {
 };
 
 /**
+ * Get meals with a specific name
+ * @returns {Array} Array of all meals.
+ */
+const getMealsWithName = async (text) => {
+  await connectDb();
+
+  const regex = new RegExp(text, 'i');
+  const meals = await Meal.find({ name: { $regex: regex } }).exec();
+
+  /* if (!meals || !meals.length) {
+    return {
+      success: false,
+      error: 'No meals found with this name.',
+    };
+  } */
+
+  return { success: true, data: meals };
+};
+
+/**
  * Insert meal.
  * @param {Meal} meal
  * @returns {Object} Returns an object with error message or success
@@ -73,6 +93,7 @@ const updateMeal = async (id, meal) => {
 export default {
   getMealById,
   getMeals,
+  getMealsWithName,
   createMeal,
   updateMeal,
 };
