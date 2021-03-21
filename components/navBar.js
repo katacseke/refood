@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Router from 'next/router';
+import { IoExitOutline } from 'react-icons/io5';
 import {
   Navbar,
   NavbarToggler,
@@ -67,7 +68,10 @@ const NavBar = () => {
               <DropdownItem>Kosár</DropdownItem>
               <DropdownItem>Rendelések</DropdownItem>
               <DropdownItem>Saját profil</DropdownItem>
-              <DropdownItem>Kilépés</DropdownItem>
+              <DropdownItem className="text-danger d-flex align-items-center">
+                <IoExitOutline className="mr-1" />
+                Kilépés
+              </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </Nav>

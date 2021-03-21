@@ -50,6 +50,7 @@ const getUserByEmail = async (email) => {
   if (!user) {
     return {
       success: false,
+      error: 'Ismeretlen email.',
     };
   }
 
@@ -128,7 +129,7 @@ const checkCredentials = async (email, password) => {
   if (!user.success) {
     return {
       success: false,
-      error: user.error,
+      error: 'Az email és jelszó páros nem talál!',
     };
   }
   const data = {
@@ -139,7 +140,9 @@ const checkCredentials = async (email, password) => {
 
   const match = await bcrypt.compare(password, user.data.password);
 
-  return match ? { success: true, data } : { success: false, error: 'Password does not match' };
+  return match
+    ? { success: true, data }
+    : { success: false, error: 'Az email és jelszó páros nem talál!' };
 };
 
 /**

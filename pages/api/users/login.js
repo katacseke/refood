@@ -15,7 +15,7 @@ handler.post(async (req, res) => {
     return;
   }
 
-  res.status(401).json({ error: match.error });
+  res.status(401).json({ general: { message: match.error } });
 });
 
 export default handler;

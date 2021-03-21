@@ -13,21 +13,22 @@ import {
   CardTitle,
 } from 'shards-react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import registrationSchema from '../../validation/registrationSchema';
+import loginSchema from '../../validation/loginSchema';
 import { Layout } from '../../components';
-import styles from './registration.module.scss';
+import styles from './login.module.scss';
 
-const Registration = () => {
+const Login = () => {
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
-  const { register, handleSubmit, errors, setError } = useForm({
-    resolver: yupResolver(registrationSchema),
+  const { register, handleSubmit, errors } = useForm({
+    resolver: yupResolver(loginSchema),
   });
+
   const onSubmit = async (data) => {
     setAlertVisible(false);
 
-    const res = await fetch('/api/users', {
+    const res = await fetch('/api/users/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,14 +38,10 @@ const Registration = () => {
 
     if (!res.ok) {
       const err = await res.json();
-      Object.keys(err)
-        .filter((field) => field !== 'general')
-        .forEach((field) => setError(field, { message: err[field].message }));
 
-      if (err.general) {
-        setAlertMessage(err.general.message);
-        setAlertVisible(true);
-      }
+      setAlertMessage(err.general.message);
+      setAlertVisible(true);
+
       return;
     }
 
@@ -55,7 +52,7 @@ const Registration = () => {
     <Layout>
       <Card className={styles.card}>
         <CardBody>
-          <CardTitle>Regisztráció</CardTitle>
+          <CardTitle>Lépj be!</CardTitle>
           <Alert
             className="mb-3"
             dismissible={() => setAlertVisible(false)}
@@ -77,17 +74,6 @@ const Registration = () => {
               <FormFeedback>{errors?.email?.message}</FormFeedback>
             </FormGroup>
             <FormGroup>
-              <label htmlFor="name">Név</label>
-              <FormInput
-                id="name"
-                name="name"
-                placeholder="Név"
-                innerRef={register}
-                invalid={!!errors?.name}
-              />
-              <FormFeedback>{errors?.name?.message}</FormFeedback>
-            </FormGroup>
-            <FormGroup>
               <label htmlFor="password">Jelszó</label>
               <FormInput
                 type="password"
@@ -99,7 +85,7 @@ const Registration = () => {
               />
               <FormFeedback>{errors?.password?.message}</FormFeedback>
             </FormGroup>
-            <Button type="submit">Regisztráció</Button>
+            <Button type="submit">Belépés</Button>
           </Form>
         </CardBody>
       </Card>
@@ -107,4 +93,4 @@ const Registration = () => {
   );
 };
 
-export default Registration;
+export default Login;
