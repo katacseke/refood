@@ -25,7 +25,7 @@ handler.post(async (req, res) => {
 
   const findUser = await userService.getUserByEmail(email);
   if (findUser.success) {
-    res.status(400).json({ error: 'User with this email already exists!' });
+    res.status(400).json({ email: { message: 'User with this email already exists!' } });
     return;
   }
 
@@ -35,10 +35,9 @@ handler.post(async (req, res) => {
 
     res.setHeader('Set-Cookie', `access_token=${token}; Max-Age=${14 * 24 * 60 * 60}; HttpOnly`);
     res.status(201).json(user.data);
-
     return;
   }
-  res.status(500).json({ error: user.error });
+  res.status(500).json({ general: { message: user.error } });
 });
 
 export default handler;

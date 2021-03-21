@@ -32,7 +32,7 @@ const NavBar = () => {
 
   return (
     <Navbar type="dark" theme="primary" expand="md">
-      <NavbarBrand href="#">Project name</NavbarBrand>
+      <NavbarBrand href="/">Project name</NavbarBrand>
       <NavbarToggler onClick={() => setNavbarOpen(!navbarOpen)} />
 
       <Collapse open={navbarOpen} navbar>

@@ -1,4 +1,5 @@
 $primary: rgb(22, 95, 100);
+$background: rgb(240, 240, 240);
 $special: rgb(3, 40, 43);
 
 @import "shards-ui/src/scss/shards";
@@ -9,6 +10,7 @@ html,
 body {
   padding: 0;
   margin: 0;
+  background-color: $background;
   font-family: Rubik, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
