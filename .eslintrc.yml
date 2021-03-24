@@ -21,6 +21,7 @@ rules:
   react/react-in-jsx-scope: 'off'
   react/jsx-filename-extension: 'off'
   jsx-a11y/label-has-associated-control: 'off'
+  jsx-a11y/anchor-is-valid: 'off'
   no-console: 'off'
   semi: 
     - error
