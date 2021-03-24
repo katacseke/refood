@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import useInterval from 'use-interval';
 
 const AuthContext = React.createContext();
 
@@ -15,8 +16,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const refreshToken = async () => {
-    console.log('Refreshing token');
+  const login = async (data) => {
+    const res = await fetch('/api/users/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      setUser(await res.json());
+    }
+
+    return res;
+  };
+
+  const refreshToken = async (strict = true) => {
+    if (strict && !user) {
+      return;
+    }
+
     const res = await fetch('/api/users/refreshToken', {
       method: 'POST',
     });
@@ -27,15 +47,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    refreshToken();
+  useEffect(() => refreshToken(false), []);
+  useInterval(refreshToken, 30 * 60 * 1000);
 
-    const interval = setInterval(refreshToken, 30 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return <AuthContext.Provider value={{ user, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;

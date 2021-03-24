@@ -4,7 +4,7 @@ import { mealService } from '../server/services';
 import AuthContext from '../context/authContext';
 
 const Home = ({ meals }) => {
-  const user = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   return (
     <Layout>

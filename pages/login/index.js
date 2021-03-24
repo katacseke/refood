@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Router from 'next/router';
 import { useForm } from 'react-hook-form';
 import {
@@ -16,10 +16,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import loginSchema from '../../validation/loginSchema';
 import { Layout } from '../../components';
 import styles from './login.module.scss';
+import AuthContext from '../../context/authContext';
 
 const Login = () => {
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const { login } = useContext(AuthContext);
 
   const { register, handleSubmit, errors } = useForm({
     resolver: yupResolver(loginSchema),
@@ -28,13 +30,7 @@ const Login = () => {
   const onSubmit = async (data) => {
     setAlertVisible(false);
 
-    const res = await fetch('/api/users/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const res = await login(data);
 
     if (!res.ok) {
       const err = await res.json();

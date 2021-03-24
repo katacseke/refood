@@ -79,7 +79,9 @@ const NavBar = () => {
   return (
     <Navbar type="dark" theme="primary" expand="md">
       <Link href="/">
-        <NavbarBrand style={{ cursor: 'pointer' }}>Project name</NavbarBrand>
+        <span>
+          <NavbarBrand style={{ cursor: 'pointer' }}>Project name</NavbarBrand>
+        </span>
       </Link>
       <NavbarToggler onClick={() => setNavbarOpen(!navbarOpen)} />
 
