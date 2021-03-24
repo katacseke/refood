@@ -19,7 +19,7 @@ import {
 } from 'shards-react';
 import AuthContext from '../context/authContext';
 
-const AuthenticatedSection = () => {
+const AuthenticatedSection = ({ logout }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
@@ -31,43 +31,38 @@ const AuthenticatedSection = () => {
         <DropdownItem>Kosár</DropdownItem>
         <DropdownItem>Rendelések</DropdownItem>
         <DropdownItem>Saját profil</DropdownItem>
-        <Link href="/">
-          <DropdownItem className="text-danger d-flex align-items-center">
-            <IoExitOutline className="mr-1" />
-            Kilépés
-          </DropdownItem>
-        </Link>
+        <DropdownItem className="text-danger d-flex align-items-center" onClick={logout}>
+          <IoExitOutline className="mr-1" />
+          Kilépés
+        </DropdownItem>
       </DropdownMenu>
     </Dropdown>
   );
 };
 
-const GuestSection = () => {
-  console.log('valami');
-  return (
-    <>
-      <NavItem>
-        <Link href="/login">
-          <NavLink active>
-            <Button outline theme="light">
-              Belépés
-            </Button>
-          </NavLink>
-        </Link>
-      </NavItem>
-      <Link href="/registration">
+const GuestSection = () => (
+  <>
+    <NavItem>
+      <Link href="/login">
         <NavLink active>
           <Button outline theme="light">
-            Regisztráció
+            Belépés
           </Button>
         </NavLink>
       </Link>
-    </>
-  );
-};
+    </NavItem>
+    <Link href="/registration">
+      <NavLink active>
+        <Button outline theme="light">
+          Regisztráció
+        </Button>
+      </NavLink>
+    </Link>
+  </>
+);
 
 const NavBar = () => {
-  const user = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const [navbarOpen, setNavbarOpen] = useState(false);
 
   const handleKeyPress = (e) => {
@@ -112,7 +107,7 @@ const NavBar = () => {
               Vendéglők
             </NavLink>
           </NavItem>
-          {user ? <AuthenticatedSection /> : <GuestSection />}
+          {user ? <AuthenticatedSection logout={logout} /> : <GuestSection />}
         </Nav>
       </Collapse>
     </Navbar>
