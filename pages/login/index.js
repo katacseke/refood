@@ -14,7 +14,7 @@ import {
 } from 'shards-react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import loginSchema from '../../validation/loginSchema';
-import { Layout } from '../../components';
+import Layout from '../../components/layout';
 import styles from './login.module.scss';
 import AuthContext from '../../context/authContext';
 

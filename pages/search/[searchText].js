@@ -1,5 +1,6 @@
 import { Container } from 'shards-react';
-import { Layout, Card } from '../../components';
+import Layout from '../../components/layout';
+import Card from '../../components/card';
 import { mealService, restaurantService } from '../../server/services';
 
 const SearchResultPage = ({ meals, restaurants }) => (

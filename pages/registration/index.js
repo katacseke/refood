@@ -14,7 +14,7 @@ import {
 } from 'shards-react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import registrationSchema from '../../validation/registrationSchema';
-import { Layout } from '../../components';
+import Layout from '../../components/layout';
 import styles from './registration.module.scss';
 
 const Registration = () => {

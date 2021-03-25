@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { Layout } from '../components';
+import Layout from '../components/layout';
 import { mealService } from '../server/services';
 import AuthContext from '../context/authContext';
 
