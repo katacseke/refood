@@ -149,7 +149,7 @@ $secondary-color: rgb(94, 91, 89);
       list-style: none;
       padding: initial 2rem;
 
-      li::before {
+      .mealLi::before {
         content: '\2713';
         color: green;
         display: inline-block; 

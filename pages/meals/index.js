@@ -5,11 +5,11 @@ import { mealService } from '../../server/services';
 
 const MealsPage = ({ meals }) => (
   <Layout>
-    <h1>Jelenleg elérhető ajánlatok:</h1>
+    <h1>Jelenleg elérhető ajánlatok</h1>
     {meals.length ? (
       <Container className="d-flex flex-wrap align-content-md-stretch">
         {meals.map((meal) => (
-          <Card meal={meal} />
+          <Card data={meal} type="meal" />
         ))}
       </Container>
     ) : (
