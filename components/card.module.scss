@@ -144,9 +144,20 @@ $secondary-color: rgb(94, 91, 89);
     
 
     .moreInformation {
-      margin: 2rem 1rem;
-      font-size: ms(-1);
+      margin: 2rem .5rem;
+      font-size: .85rem;
       color: $secondary-color;
+      list-style: none;
+      padding: initial 2rem;
+
+      li::before {
+        content: '\2713';
+        color: green;
+        display: inline-block; 
+        width: 1em; 
+        margin-left: -1em; 
+      }
+  
     }
   }
 
