@@ -24,7 +24,7 @@ const Card = ({ meal }) => {
         <Link href={link}>
           <a className={styles.title}>{meal.name}</a>
         </Link>
-        <p className={styles.subtitle}>{meal.price} lei</p>
+        <p>{meal.price} lei</p>
       </div>
 
       <div className={styles.sometimesVisible}>

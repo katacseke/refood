@@ -9,6 +9,7 @@ const mealSchema = new mongoose.Schema({
   price: Number,
   donateable: Boolean,
   dailyMenu: Boolean,
+  tags: [String],
 });
 
 mongoose.models = {};

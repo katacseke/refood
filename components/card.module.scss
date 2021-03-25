@@ -15,8 +15,8 @@ $modularscale: (
 $transition-duration: .3s;
 $width: 300px;
 $hidden-height: 110px;
-$bg-cotlor: #fcf6f1;
 $bg-color: #f0f0f0;
+$tag-color: #e4e1e1;
 $main-color: #212529;
 $secondary-color: rgb(94, 91, 89);
 
@@ -132,7 +132,6 @@ $secondary-color: rgb(94, 91, 89);
     height: $hidden-height;
     width: 100%;
     overflow: hidden;
-    display: flex;
     justify-content: center;
     align-items: center;
     
