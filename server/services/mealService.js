@@ -49,12 +49,20 @@ const getMealsWithName = async (text) => {
   const regex = new RegExp(text, 'i');
   const meals = await Meal.find({ name: { $regex: regex } }).exec();
 
-  /* if (!meals || !meals.length) {
-    return {
-      success: false,
-      error: 'No meals found with this name.',
-    };
-  } */
+  return { success: true, data: meals };
+};
+
+/**
+ * Get meals that are available now
+ * @returns {Array} Array of all meals.
+ */
+const getCurrentMeals = async () => {
+  await connectDb();
+
+  const meals = await Meal.find({
+    startTime: { $lte: Date.now() },
+    endTime: { $gte: Date.now() },
+  }).exec();
 
   return { success: true, data: meals };
 };
@@ -94,6 +102,7 @@ export default {
   getMealById,
   getMeals,
   getMealsWithName,
+  getCurrentMeals,
   createMeal,
   updateMeal,
 };

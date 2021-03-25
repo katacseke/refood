@@ -100,9 +100,11 @@ const NavBar = () => {
 
         <Nav navbar className="ml-auto d-flex align-items-center">
           <NavItem>
-            <NavLink active href="#">
-              Ajánlatok
-            </NavLink>
+            <Link href="/meals">
+              <NavLink active style={{ cursor: 'pointer' }}>
+                Ajánlatok
+              </NavLink>
+            </Link>
           </NavItem>
           <NavItem>
             <NavLink active href="#">
