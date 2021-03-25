@@ -107,9 +107,11 @@ const NavBar = () => {
             </Link>
           </NavItem>
           <NavItem>
-            <NavLink active href="#">
-              Vendéglők
-            </NavLink>
+            <Link href="/restaurants">
+              <NavLink active style={{ cursor: 'pointer' }}>
+                Vendéglők
+              </NavLink>
+            </Link>
           </NavItem>
           {user ? <AuthenticatedSection logout={logout} /> : <GuestSection />}
         </Nav>
