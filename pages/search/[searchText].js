@@ -10,6 +10,8 @@ const SearchResultPage = ({ meals, restaurants, text }) => (
       {meals.map((meal) => (
         <Card data={meal} type="meal" />
       ))}
+    </Container>
+    <Container className="d-flex flex-wrap align-content-md-stretch">
       {restaurants.map((restaurant) => (
         <Card data={restaurant} type="restaurant" />
       ))}
