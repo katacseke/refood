@@ -132,16 +132,11 @@ const checkCredentials = async (email, password) => {
       error: 'Az email és jelszó páros nem talál!',
     };
   }
-  const data = {
-    email: user.data.email,
-    name: user.data.name,
-    role: user.data.role,
-  };
 
   const match = await bcrypt.compare(password, user.data.password);
 
   return match
-    ? { success: true, data }
+    ? { success: true, data: { ...user.data.toObject(), password: undefined } }
     : { success: false, error: 'Az email és jelszó páros nem talál!' };
 };
 

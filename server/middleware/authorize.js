@@ -29,7 +29,10 @@ const authorize = (...conditions) => async (req, res, next) => {
 
   // checks wether the user matches at least one of the conditions
   if (conditions.some((condition) => condition(user, req))) {
-    req.user = { name: user.data.name, email: user.data.email, role: user.data.role };
+    req.user = user.data;
+    delete req.user.exp;
+    delete req.user.iat;
+
     next();
     return;
   }

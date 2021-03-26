@@ -8,7 +8,7 @@ const handler = nextConnect().use(authorization);
 handler.post(async (req, res) => {
   const token = userService.createToken(req.user);
 
-  res.setHeader('Set-Cookie', `access_token=${token}; Max-Age=${60 * 60}; HttpOnly`);
+  res.setHeader('Set-Cookie', `access_token=${token}; Path=/api; Max-Age=${60 * 60}; HttpOnly`);
   res.status(200).json(req.user);
 });
 
