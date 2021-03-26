@@ -7,7 +7,7 @@ const mealSchema = new mongoose.Schema({
   startTime: Date,
   endTime: Date,
   price: Number,
-  donateable: Boolean,
+  donatable: Boolean,
   dailyMenu: Boolean,
   tags: [String],
 });

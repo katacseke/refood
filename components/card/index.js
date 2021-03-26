@@ -13,7 +13,7 @@ const MealInfromation = ({ data }) => {
       <li className={styles.mealLi}>
         Elérhető: {start} - {end}
       </li>
-      {data?.donateable && <li className={styles.mealLi}>Adományozható</li>}
+      {data?.donatable && <li className={styles.mealLi}>Adományozható</li>}
       {data?.dailyMenu && <li className={styles.mealLi}>Napi menü</li>}
     </ul>
   );
