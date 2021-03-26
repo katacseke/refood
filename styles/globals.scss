@@ -1,6 +1,8 @@
 $primary: rgb(22, 95, 100);
 $background: rgb(240, 240, 240);
 $special: rgb(3, 40, 43);
+$custom-toggle-checked-background: $primary;
+$custom-toggle-checked-border-color: $primary;
 
 @import "shards-ui/src/scss/shards";
 @import "bootstrap";
