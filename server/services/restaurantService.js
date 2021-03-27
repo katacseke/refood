@@ -1,4 +1,4 @@
-import { Restaurant } from '../models';
+import { Restaurant, Application } from '../models';
 import connectDb from '../db';
 
 /**
@@ -90,10 +90,66 @@ const updateRestaurant = async (id, restaurant) => {
     : { success: false, error: 'Unable to update data.' };
 };
 
+/**
+ * Get application by id.
+ * @param {string} id
+ * @returns {
+ *   success: Boolean,
+ *   ?application: Application,
+ *   ?error: String,
+ * } Returns an object containing the Application instance or an error message
+ */
+const getApplicationById = async (id) => {
+  await connectDb();
+
+  const application = await Application.findById(id).exec();
+
+  if (!application) {
+    return {
+      success: false,
+      error: 'Application not found',
+    };
+  }
+
+  return {
+    success: true,
+    data: application,
+  };
+};
+
+/**
+ * Get all applications.
+ * @returns {Array} Array of all applications.
+ */
+const getApplications = async () => {
+  await connectDb();
+
+  const applications = await Application.find({}).exec();
+  return { success: true, data: applications };
+};
+
+/**
+ * Insert application.
+ * @param {Application} application
+ * @returns {Object} Returns an object with error message or success
+ */
+const createApplication = async (application) => {
+  await connectDb();
+
+  const result = await Application.create(application);
+
+  return result
+    ? { success: true, data: application }
+    : { success: false, error: 'Unable to insert data.' };
+};
+
 export default {
   getRestaurantById,
   getRestaurants,
   getRestaurantsWithName,
   createRestaurant,
   updateRestaurant,
+  getApplicationById,
+  getApplications,
+  createApplication,
 };
