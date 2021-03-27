@@ -3,7 +3,7 @@ import Layout from '../../components/layout';
 import Card from '../../components/card';
 import { restaurantService } from '../../server/services';
 
-const MealsPage = ({ restaurants }) => (
+const RestaurantsPage = ({ restaurants }) => (
   <Layout>
     <h1>Vendéglők</h1>
     {restaurants.length ? (
@@ -17,7 +17,7 @@ const MealsPage = ({ restaurants }) => (
     )}
   </Layout>
 );
-export default MealsPage;
+export default RestaurantsPage;
 
 export async function getStaticProps() {
   const restaurants = await restaurantService.getRestaurants();
