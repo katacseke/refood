@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Router from 'next/router';
 import { useForm } from 'react-hook-form';
 import {
@@ -15,11 +15,13 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import registrationSchema from '../../validation/registrationSchema';
 import Layout from '../../components/layout';
+import AuthContext from '../../context/authContext';
 import styles from './registration.module.scss';
 
 const Registration = () => {
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const { registration } = useContext(AuthContext);
 
   const { register, handleSubmit, errors, setError } = useForm({
     resolver: yupResolver(registrationSchema),
@@ -27,13 +29,7 @@ const Registration = () => {
   const onSubmit = async (data) => {
     setAlertVisible(false);
 
-    const res = await fetch('/api/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const res = await registration(data);
 
     if (!res.ok) {
       const err = await res.json();

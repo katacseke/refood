@@ -32,6 +32,22 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
+  const registration = async (data) => {
+    const res = await fetch('/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      setUser(await res.json());
+    }
+
+    return res;
+  };
+
   const refreshToken = async (strict = true) => {
     if (strict && !user) {
       return;
@@ -50,7 +66,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => refreshToken(false), []);
   useInterval(refreshToken, 30 * 60 * 1000);
 
-  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, login, logout, registration }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export default AuthContext;
