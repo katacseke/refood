@@ -1,3 +1,4 @@
+import userService from './userService';
 import { Restaurant, Application } from '../models';
 import connectDb from '../db';
 
@@ -64,12 +65,22 @@ const getRestaurantsWithName = async (text) => {
  * @param {Restaurant} restaurant
  * @returns {Object} Returns an object with error message or success
  */
-const createRestaurant = async (restaurant) => {
+const createRestaurant = async (data) => {
   await connectDb();
 
-  const result = await Restaurant.create(restaurant);
+  const { name, email, phone, url, description, address, loginEmail, password } = data;
+  const user = { name, email: loginEmail, password };
 
-  return result
+  const userResult = await userService.createUser(user, 'restaurant');
+
+  if (!userResult.success) {
+    return userResult;
+  }
+
+  const restaurant = { name, email, phone, url, description, address, ownerId: userResult.data.id };
+  const restaurantResult = await Restaurant.create(restaurant);
+
+  return restaurantResult
     ? { success: true, data: restaurant }
     : { success: false, error: 'Unable to insert data.' };
 };
@@ -118,6 +129,33 @@ const getApplicationById = async (id) => {
 };
 
 /**
+ * Get pending application by token.
+ * @param {string} token
+ * @returns {
+ *   success: Boolean,
+ *   ?application: Application,
+ *   ?error: String,
+ * } Returns an object containing the Application instance or an error message
+ */
+const getPendingApplicationByToken = async (token) => {
+  await connectDb();
+
+  const application = await Application.findOne({ token, status: 'pending' }).exec();
+
+  if (!application) {
+    return {
+      success: false,
+      error: 'Application not found',
+    };
+  }
+
+  return {
+    success: true,
+    data: application,
+  };
+};
+
+/**
  * Get all applications.
  * @returns {Array} Array of all applications.
  */
@@ -136,7 +174,7 @@ const getApplications = async () => {
 const createApplication = async (application) => {
   await connectDb();
 
-  const result = await Application.create(application);
+  const result = await Application.create({ ...application, status: 'pending' });
 
   return result
     ? { success: true, data: application }
@@ -150,6 +188,7 @@ export default {
   createRestaurant,
   updateRestaurant,
   getApplicationById,
+  getPendingApplicationByToken,
   getApplications,
   createApplication,
 };

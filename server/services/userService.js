@@ -75,13 +75,14 @@ const getUsers = async () => {
 /**
  * Insert user.
  * @param {User} user
+ * @param {String} role The role of the user (admin, restaurant, user)
  * @returns {Object} Returns an object with error message or success
  */
-const createUser = async (user) => {
+const createUser = async (user, role = 'user') => {
   await connectDb();
 
   const hash = await bcrypt.hash(user.password, saltRounds);
-  const result = await User.create({ ...user, password: hash, role: 'user' });
+  const result = await User.create({ ...user, password: hash, role });
 
   return result
     ? { success: true, data: { ...result.toObject(), password: undefined } }
