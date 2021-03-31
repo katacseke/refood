@@ -2,13 +2,14 @@ import {
   Container,
   Badge,
   Button,
-  Form,
   FormInput,
-  FormGroup,
+  Row,
+  Col,
   Modal,
   ModalBody,
   ModalHeader,
 } from 'shards-react';
+import { IoCartOutline } from 'react-icons/io5';
 import Image from 'next/image';
 import { useEffect } from 'react';
 import styles from './mealModal.module.scss';
@@ -65,10 +66,11 @@ const MealModal = ({ meal, open, setOpen }) => {
             ))}
           </Container>
 
-          <Form>
-            <FormGroup>
-              <label htmlFor="quantitiy">Mennyiség</label>
+          <label htmlFor="quantitiy">Mennyiség</label>
+          <Row>
+            <Col xs="4">
               <FormInput
+                className="col"
                 type="number"
                 name="quantity"
                 id="quantity"
@@ -76,10 +78,14 @@ const MealModal = ({ meal, open, setOpen }) => {
                 min="1"
                 max={meal.portionNumber}
               />
-            </FormGroup>
-          </Form>
-
-          <Button block>Kosárba</Button>
+            </Col>
+            <Col>
+              <Button className="col d-inline-flex align-items-center justify-content-center">
+                <IoCartOutline className="mr-1" />
+                Kosárba
+              </Button>
+            </Col>
+          </Row>
         </div>
       </ModalBody>
     </Modal>
