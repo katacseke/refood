@@ -17,6 +17,10 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
+body.modal-open {
+  overflow-y: hidden;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -28,4 +32,12 @@ a {
 
 .highlightedText {
   font-size: 1.5rem;
+}
+
+.modal-header .close {
+  padding-right: 0;
+}
+
+.modal-backdrop.show {
+  opacity: 0.5;
 }

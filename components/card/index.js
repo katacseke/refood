@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { Button } from 'shards-react';
 import { IoCall, IoMail, IoLocationSharp } from 'react-icons/io5';
 import styles from './card.module.scss';
 
@@ -33,7 +34,7 @@ const RestaurantInformation = ({ data }) => (
   </ul>
 );
 
-const Card = ({ data, type }) => {
+const Card = ({ data, type, onClick }) => {
   const link = `meals/${data.id}`;
 
   return (
@@ -44,16 +45,16 @@ const Card = ({ data, type }) => {
           src="https://discovernative.org/wp-content/uploads/2020/05/food.jpg"
           alt=""
         />
-        <Link href={link}>
-          <a className={styles.button}>Bővebben</a>
-        </Link>
+        <Button onClick={onClick} className={styles.button}>
+          Bővebben
+        </Button>
       </div>
 
       <div className={styles.alwaysVisible}>
-        <Link href={link}>
-          <a className={styles.title}>{data.name}</a>
-        </Link>
-        {type === 'meal' && <p>{data.price} lei</p>}
+        <a className={styles.title} onClick={onClick}>
+          {data.name}
+        </a>
+        {type === 'meal' && <p>{data.price} lej</p>}
       </div>
 
       <div className={styles.sometimesVisible}>
