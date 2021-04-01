@@ -53,8 +53,24 @@ const getMealsWithName = async (text) => {
 };
 
 /**
+ * Get meals from a certain restaurant, at a certain time
+ * @returns {Array} Array of meals that fit the criteria.
+ */
+const getCurrentMealsByRestaurant = async (id) => {
+  await connectDb();
+
+  const meals = await Meal.find({
+    restaurantId: id,
+    startTime: { $lte: Date.now() },
+    endTime: { $gte: Date.now() },
+  }).exec();
+
+  return { success: true, data: meals };
+};
+
+/**
  * Get meals that are available now
- * @returns {Array} Array of all meals.
+ * @returns {Array} Array of meals that fit the criteria.
  */
 const getCurrentMeals = async () => {
   await connectDb();
@@ -101,6 +117,7 @@ const updateMeal = async (id, meal) => {
 export default {
   getMealById,
   getMeals,
+  getMealsByRestaurant: getCurrentMealsByRestaurant,
   getMealsWithName,
   getCurrentMeals,
   createMeal,

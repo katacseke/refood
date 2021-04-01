@@ -3,6 +3,18 @@ import { Restaurant, Application } from '../models';
 import connectDb from '../db';
 
 /**
+ * Get restaurant ids.
+ * @returns {Array} Array of restauratn ids.
+ */
+const getRestaurantIds = async () => {
+  await connectDb();
+
+  const restaurants = await Restaurant.find({}).select('_id').exec();
+
+  return restaurants.map((restaurant) => restaurant._id.toString());
+};
+
+/**
  * Get restaurant by id.
  * @param {string} id
  * @returns {
@@ -182,6 +194,7 @@ const createApplication = async (application) => {
 };
 
 export default {
+  getRestaurantIds,
   getRestaurantById,
   getRestaurants,
   getRestaurantsWithName,
