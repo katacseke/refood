@@ -13,7 +13,7 @@ const DeletableBadge = ({ onDelete, children }) => (
 );
 
 // eslint-disable-next-line no-unused-vars
-const ChipInput = React.forwardRef(({ value, onChange }, ref) => {
+const ChipInput = React.forwardRef(({ value, onChange, placeholder }, ref) => {
   const handleKeyDown = (e) => {
     if (['Enter', 'Tab', ','].includes(e.key)) {
       e.preventDefault();
@@ -33,6 +33,7 @@ const ChipInput = React.forwardRef(({ value, onChange }, ref) => {
     onChange(updatedValue);
   };
 
+  console.log(placeholder);
   return (
     <>
       <Container className="pl-0 mb-1">
@@ -42,13 +43,19 @@ const ChipInput = React.forwardRef(({ value, onChange }, ref) => {
           </DeletableBadge>
         ))}
       </Container>
-      <FormInput type="text" onKeyDown={handleKeyDown} />
+      <FormInput type="text" placeholder={placeholder} onKeyDown={handleKeyDown} />
     </>
   );
 });
 
-const ChipInputController = ({ name, control }) => (
-  <Controller name={name} control={control} defaultValue={[]} as={ChipInput} />
+const ChipInputController = ({ name, control, placeholder }) => (
+  <Controller
+    name={name}
+    control={control}
+    placeholder={placeholder}
+    defaultValue={[]}
+    as={ChipInput}
+  />
 );
 
 export default ChipInputController;

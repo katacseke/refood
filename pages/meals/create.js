@@ -145,7 +145,7 @@ const CreateMealPage = () => {
 
             <FormGroup>
               <label className="d-block">Tagek</label>
-              <ChipInput name="tags" control={control} />
+              <ChipInput name="tags" placeholder="Tag hozzáadása..." control={control} />
             </FormGroup>
 
             <FormGroup>
