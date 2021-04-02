@@ -117,7 +117,7 @@ const updateMeal = async (id, meal) => {
 export default {
   getMealById,
   getMeals,
-  getMealsByRestaurant: getCurrentMealsByRestaurant,
+  getCurrentMealsByRestaurant,
   getMealsWithName,
   getCurrentMeals,
   createMeal,

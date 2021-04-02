@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Button } from 'shards-react';
 import { IoCall, IoMail, IoLocationSharp } from 'react-icons/io5';
 import styles from './card.module.scss';
@@ -33,7 +34,32 @@ const RestaurantInformation = ({ data }) => (
   </ul>
 );
 
-const Card = ({ data, type, onClick }) => (
+const RestaurantCard = ({ data }) => (
+  <div className={styles.card}>
+    <div className={styles.imageContainer}>
+      <img
+        className={styles.image}
+        src="https://discovernative.org/wp-content/uploads/2020/05/food.jpg"
+        alt=""
+      />
+      <Link href={`/restaurants/${data._id}`}>
+        <a className={styles.button}>Bővebben</a>
+      </Link>
+    </div>
+
+    <div className={styles.alwaysVisible}>
+      <Link href={`/restaurants/${data._id}`}>
+        <a className={styles.title}>{data.name}</a>
+      </Link>
+    </div>
+
+    <div className={styles.sometimesVisible}>
+      <RestaurantInformation data={data} />
+    </div>
+  </div>
+);
+
+const MealCard = ({ data, onClick }) => (
   <div className={styles.card}>
     <div className={styles.imageContainer}>
       <img
@@ -51,13 +77,19 @@ const Card = ({ data, type, onClick }) => (
       <span className={styles.title} onClick={onClick} role="button" tabIndex="-1">
         {data.name}
       </span>
-      {type === 'meal' && <p>{data.price} lej</p>}
+      <p>{data.price} lej</p>
     </div>
 
     <div className={styles.sometimesVisible}>
-      {type === 'meal' ? <MealInfromation data={data} /> : <RestaurantInformation data={data} />}
+      <MealInfromation data={data} />
     </div>
   </div>
+);
+
+const Card = ({ data, type, onClick }) => (
+  <>
+    {type === 'meal' ? <MealCard data={data} onClick={onClick} /> : <RestaurantCard data={data} />}
+  </>
 );
 
 export default Card;
