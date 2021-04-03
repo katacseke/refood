@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Card, CardBody, CardTitle, Container } from 'shards-react';
 import { IoCall, IoMail, IoLocationSharp, IoEarth } from 'react-icons/io5';
-import MealCard from '../../components/card';
+import MealCard from '../../components/cards/mealCard';
 import MealModal from '../../components/mealModal';
 import Layout from '../../components/layout';
 import { mealService, restaurantService } from '../../server/services';
@@ -63,7 +63,7 @@ const RestauantPage = ({ restaurant, meals }) => {
       {meals.length ? (
         <Container className="d-flex flex-wrap align-content-md-stretch p-0 mx-0">
           {meals.map((meal) => (
-            <MealCard key={meal._id} data={meal} type="meal" onClick={() => showMeal(meal)} />
+            <MealCard key={meal._id} data={meal} onClick={() => showMeal(meal)} />
           ))}
         </Container>
       ) : (

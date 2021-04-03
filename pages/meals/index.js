@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import Router from 'next/router';
-import { useForm } from 'react-hook-form';
-import { Container, FormInput, FormGroup, Badge } from 'shards-react';
+import { Container, Button } from 'shards-react';
 import Layout from '../../components/layout';
-import Card from '../../components/card';
+import MealCard from '../../components/cards/mealCard';
 import MealModal from '../../components/mealModal';
+import FilterCollapse from '../../components/filterCollapse';
 import { mealService } from '../../server/services';
-import ChipInput from '../../components/chipInput';
 
 const MealsPage = ({ meals }) => {
   const tags = [
@@ -24,9 +22,8 @@ const MealsPage = ({ meals }) => {
     'pékáru',
   ];
 
-  const { control } = useForm();
-
   const [modalOpen, setModalOpen] = useState(false);
+  const [collapseOpen, setCollapseOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState();
   const [selectedTags, setSelectedTags] = useState([]);
 
@@ -35,57 +32,25 @@ const MealsPage = ({ meals }) => {
     setModalOpen(true);
   };
 
-  const handleSearch = (e) => {
-    if (e.key !== 'Enter' && e.keyCode !== 13) {
-      return;
-    }
-
-    const text = e.target.value;
-    if (text !== '') {
-      Router.push(`/search/${text}`);
-    }
-  };
-
   return (
     <Layout>
       <MealModal meal={selectedMeal} open={modalOpen} setOpen={setModalOpen} />
       <h1>Jelenleg elérhető ajánlatok</h1>
       <div>
-        <h3>Szűrés</h3>
-        <FormInput
-          placeholder="Keress név, vagy vendéglő szerint..."
-          name="searchBar"
-          id="searchBar"
-          onKeyPress={handleSearch}
-        />
-
-        <Container className="m-0 mb-2 mt-2 p-0 d-flex justify-content-sm-between">
-          {tags.map((tag) => (
-            <Badge
-              style={{ cursor: 'pointer' }}
-              key={tag}
-              onClick={() => setSelectedTags([...selectedTags, tag])}
-            >
-              {tag}
-            </Badge>
-          ))}
-        </Container>
-
-        <FormGroup>
-          <label className="d-block">Szűrés személyre szabott kulcsszó alapján</label>
-          <ChipInput name="tags" control={control} placeholder="Kulcsszó hozzáadása..." />
-        </FormGroup>
+        <Button onClick={() => setCollapseOpen(!collapseOpen)}>Szűrés</Button>
+        <FilterCollapse open={collapseOpen} />
       </div>
+
       {meals.length ? (
-        <Container className="m-0 p-0 d-flex flex-wrap align-content-md-stretch">
+        <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
           {selectedTags.length
             ? meals
                 .filter((meal) => selectedTags.some((tag) => meal.tags.includes(tag)))
                 .map((meal) => (
-                  <Card key={meal._id} data={meal} type="meal" onClick={() => showMeal(meal)} />
+                  <MealCard key={meal._id} data={meal} onClick={() => showMeal(meal)} />
                 ))
             : meals.map((meal) => (
-                <Card key={meal._id} data={meal} type="meal" onClick={() => showMeal(meal)} />
+                <MealCard key={meal._id} data={meal} onClick={() => showMeal(meal)} />
               ))}
         </Container>
       ) : (

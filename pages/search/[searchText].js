@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Container } from 'shards-react';
 import Layout from '../../components/layout';
-import Card from '../../components/card';
+import MealCard from '../../components/cards/mealCard';
+import RestaurantCard from '../../components/cards/restaurantCard';
 import MealModal from '../../components/mealModal';
 import { mealService, restaurantService } from '../../server/services';
 
@@ -20,12 +21,12 @@ const SearchResultPage = ({ meals, restaurants, text }) => {
       <h1>Találatok a következőre: {text}</h1>
       <Container className="d-flex flex-wrap align-content-md-stretch">
         {meals.map((meal) => (
-          <Card data={meal} type="meal" onClick={() => showMeal(meal)} />
+          <MealCard data={meal} onClick={() => showMeal(meal)} />
         ))}
       </Container>
       <Container className="d-flex flex-wrap align-content-md-stretch">
         {restaurants.map((restaurant) => (
-          <Card data={restaurant} type="restaurant" />
+          <RestaurantCard data={restaurant} />
         ))}
       </Container>
     </Layout>

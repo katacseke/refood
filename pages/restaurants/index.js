@@ -1,6 +1,6 @@
 import { Container } from 'shards-react';
 import Layout from '../../components/layout';
-import Card from '../../components/card';
+import RestaurantCard from '../../components/cards/restaurantCard';
 import { restaurantService } from '../../server/services';
 
 const RestaurantsPage = ({ restaurants }) => (
@@ -9,7 +9,7 @@ const RestaurantsPage = ({ restaurants }) => (
     {restaurants.length ? (
       <Container className="d-flex flex-wrap align-content-md-stretch">
         {restaurants.map((restaurant) => (
-          <Card data={restaurant} type="restaurant" />
+          <RestaurantCard data={restaurant} />
         ))}
       </Container>
     ) : (
