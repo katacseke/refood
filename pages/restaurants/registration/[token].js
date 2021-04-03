@@ -187,7 +187,7 @@ export default RestaurantRegistration;
 
 export async function getServerSideProps({ res, params }) {
   const { token } = params;
-  const application = await restaurantService.getPendingApplicationByToken(token);
+  const application = await restaurantService.getAcceptedApplicationByToken(token);
 
   if (!application.success) {
     res.writeHead(302, { Location: '/404' });

@@ -11,7 +11,7 @@ const validation = nextConnect().post(
 const handler = nextConnect().use(validation);
 
 handler.post(async (req, res) => {
-  const findApplication = await restaurantService.getPendingApplicationByToken(req.query.token);
+  const findApplication = await restaurantService.getAcceptedApplicationByToken(req.query.token);
   if (!findApplication.success) {
     res.status(400).json({ email: { message: 'The application token is not valid.' } });
     return;
@@ -20,6 +20,16 @@ handler.post(async (req, res) => {
   const restaurant = await restaurantService.createRestaurant(req.body);
 
   if (!restaurant.success) {
+    res.status(500).json({ error: restaurant.error });
+    return;
+  }
+
+  const result = await restaurantService.updateApplicationStatus(
+    findApplication.data.id,
+    'registered'
+  );
+
+  if (!result.success) {
     res.status(500).json({ error: restaurant.error });
     return;
   }

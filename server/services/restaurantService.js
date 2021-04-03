@@ -62,13 +62,6 @@ const getRestaurantsWithName = async (text) => {
   const regex = new RegExp(text, 'i');
   const restaurants = await Restaurant.find({ name: { $regex: regex } }).exec();
 
-  /* if (!meals || !meals.length) {
-    return {
-      success: false,
-      error: 'No meals found with this name.',
-    };
-  } */
-
   return { success: true, data: restaurants };
 };
 
@@ -149,10 +142,10 @@ const getApplicationById = async (id) => {
  *   ?error: String,
  * } Returns an object containing the Application instance or an error message
  */
-const getPendingApplicationByToken = async (token) => {
+const getAcceptedApplicationByToken = async (token) => {
   await connectDb();
 
-  const application = await Application.findOne({ token, status: 'pending' }).exec();
+  const application = await Application.findOne({ token, status: 'accepted' }).exec();
 
   if (!application) {
     return {
@@ -179,6 +172,22 @@ const getApplications = async () => {
 };
 
 /**
+ * Get applications with a given status.
+ * @returns {Array} Array of applications that match the criteria.
+ */
+const getApplicationsWithStatus = async (status = null) => {
+  await connectDb();
+
+  if (status) {
+    const applications = await Application.find({ status }).exec();
+    return { success: true, data: applications };
+  }
+
+  const applications = await Application.find({}).exec();
+  return { success: true, data: applications };
+};
+
+/**
  * Insert application.
  * @param {Application} application
  * @returns {Object} Returns an object with error message or success
@@ -193,6 +202,25 @@ const createApplication = async (application) => {
     : { success: false, error: 'Unable to insert data.' };
 };
 
+/**
+ * Update application status.
+ * @param {String} status
+ * @param {String} id
+ * @returns {Object} Returns an object with error message or success
+ */
+const updateApplicationStatus = async (id, status) => {
+  await connectDb();
+
+  const applicationData =
+    status === 'accepted' ? { status, token: Math.random().toString(36).substring(2) } : { status };
+  console.log(applicationData);
+
+  const result = await Application.findByIdAndUpdate(id, applicationData, { new: true });
+  return result
+    ? { success: true, data: result }
+    : { success: false, error: 'Unable to update data.' };
+};
+
 export default {
   getRestaurantIds,
   getRestaurantById,
@@ -201,7 +229,9 @@ export default {
   createRestaurant,
   updateRestaurant,
   getApplicationById,
-  getPendingApplicationByToken,
+  getAcceptedApplicationByToken,
   getApplications,
+  getApplicationsWithStatus,
   createApplication,
+  updateApplicationStatus,
 };

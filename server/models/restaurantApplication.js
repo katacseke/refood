@@ -6,6 +6,7 @@ const restaurantApplicationSchema = new mongoose.Schema({
   phone: String,
   description: String,
   status: String,
+  token: String,
 });
 
 mongoose.models = {};
