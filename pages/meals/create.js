@@ -19,7 +19,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import mealCreationSchema from '../../validation/mealCreationSchema';
 import Layout from '../../components/layout';
 import styles from './create.module.scss';
-import Checkbox from '../../components/checkbox';
+import Togllebox from '../../components/togglebox';
 import ChipInput from '../../components/chipInput';
 
 const CreateMealPage = () => {
@@ -150,12 +150,12 @@ const CreateMealPage = () => {
 
             <FormGroup>
               <label className="d-block">Egyéb tulajdonságok</label>
-              <Checkbox name="dailyMenu" innerRef={register}>
+              <Togllebox name="dailyMenu" innerRef={register}>
                 Napi menü
-              </Checkbox>
-              <Checkbox name="donatable" innerRef={register}>
+              </Togllebox>
+              <Togllebox name="donatable" innerRef={register}>
                 Adományozható
-              </Checkbox>
+              </Togllebox>
             </FormGroup>
 
             <Button type="submit">Feltöltés</Button>

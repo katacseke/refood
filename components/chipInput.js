@@ -33,7 +33,6 @@ const ChipInput = React.forwardRef(({ value, onChange, placeholder }, ref) => {
     onChange(updatedValue);
   };
 
-  console.log(placeholder);
   return (
     <>
       <Container className="pl-0 mb-1">
