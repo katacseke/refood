@@ -1,6 +1,6 @@
 import nextConnect from 'next-connect';
 import validateResource from '../../../../server/middleware/validateResource';
-import { restaurantService } from '../../../../server/services';
+import { restaurantService, applicationService } from '../../../../server/services';
 import restaurantCreationSchema from '../../../../validation/restaurantCreationSchema';
 
 const validation = nextConnect().post(
@@ -11,7 +11,7 @@ const validation = nextConnect().post(
 const handler = nextConnect().use(validation);
 
 handler.post(async (req, res) => {
-  const findApplication = await restaurantService.getAcceptedApplicationByToken(req.query.token);
+  const findApplication = await applicationService.getAcceptedApplicationByToken(req.query.token);
   if (!findApplication.success) {
     res.status(400).json({ email: { message: 'The application token is not valid.' } });
     return;

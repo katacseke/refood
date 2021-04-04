@@ -1,7 +1,7 @@
 import nextConnect from 'next-connect';
 import validateResource from '../../../../server/middleware/validateResource';
 import authorize, { hasRole } from '../../../../server/middleware/authorize';
-import { restaurantService } from '../../../../server/services';
+import { applicationService } from '../../../../server/services';
 import restaurantApplicationSchema from '../../../../validation/restaurantApplicationSchema';
 
 const validation = nextConnect().post(
@@ -17,7 +17,7 @@ const authorization = nextConnect().get(
 const handler = nextConnect().use(validation).use(authorization);
 
 handler.get(async (req, res) => {
-  const applications = await restaurantService.getApplications();
+  const applications = await applicationService.getApplications();
 
   if (!applications.success) {
     res.status(500).json({ error: applications.error });
@@ -28,7 +28,7 @@ handler.get(async (req, res) => {
 });
 
 handler.post(async (req, res) => {
-  const application = await restaurantService.createApplication(req.body);
+  const application = await applicationService.createApplication(req.body);
 
   if (!application.success) {
     res.status(500).json({ error: application.error });

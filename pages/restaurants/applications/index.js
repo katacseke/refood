@@ -1,5 +1,5 @@
 import { Container, FormSelect, Button, Row, Col } from 'shards-react';
-import { restaurantService } from '../../../server/services';
+import { applicationService } from '../../../server/services';
 import Layout from '../../../components/layout';
 import ApplicationCard from '../../../components/applicationCard';
 import styles from './applications.module.scss';
@@ -36,7 +36,7 @@ const ApplicationsPage = ({ applications }) => {
 export default ApplicationsPage;
 
 export async function getStaticProps() {
-  const applications = await restaurantService.getApplications();
+  const applications = await applicationService.getApplications();
 
   return {
     props: {

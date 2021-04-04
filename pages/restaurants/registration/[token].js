@@ -17,7 +17,7 @@ import toast from 'react-hot-toast';
 import FormCard from '../../../components/formCard';
 import restaurantCreationSchema from '../../../validation/restaurantCreationSchema';
 import Layout from '../../../components/layout';
-import { restaurantService } from '../../../server/services';
+import { applicationService } from '../../../server/services';
 
 const RestaurantRegistration = ({ application, token }) => {
   const [isAlertVisible, setAlertVisible] = useState(false);
@@ -187,7 +187,7 @@ export default RestaurantRegistration;
 
 export async function getServerSideProps({ res, params }) {
   const { token } = params;
-  const application = await restaurantService.getAcceptedApplicationByToken(token);
+  const application = await applicationService.getAcceptedApplicationByToken(token);
 
   if (!application.success) {
     res.writeHead(302, { Location: '/404' });
