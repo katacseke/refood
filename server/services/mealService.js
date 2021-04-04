@@ -29,13 +29,39 @@ const getMealById = async (id) => {
 };
 
 /**
- * Get all meals.
- * @returns {Array} Array of all meals.
+ * Get meals that match certain filters.
+ * @param {Object} filters Object containing different filters
+ * @returns {Array} Array of all meals that match the criteria.
  */
-const getMeals = async () => {
+const getMeals = async (filters = {}) => {
   await connectDb();
 
-  const meals = await Meal.find({}).exec();
+  const mongoFilters = {};
+
+  if (filters.name) {
+    const regex = new RegExp(filters.name, 'i');
+    mongoFilters.name = { $regex: regex };
+  }
+
+  if (filters.donatable === 'true') {
+    mongoFilters.donatable = true;
+  }
+
+  if (filters.dailyMenu === 'true') {
+    mongoFilters.dailyMenu = true;
+  }
+
+  if (filters.startTime) {
+    mongoFilters.endTime = { $gte: filters.startTime };
+  }
+
+  if (filters.endTime) {
+    mongoFilters.startTime = { $lte: filters.endTime };
+  }
+
+  console.log(mongoFilters);
+
+  const meals = await Meal.find(mongoFilters).exec();
   return { success: true, data: meals };
 };
 

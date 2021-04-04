@@ -2,16 +2,11 @@ import nextConnect from 'next-connect';
 import authorize, { hasRole } from '../../../../server/middleware/authorize';
 import { restaurantService } from '../../../../server/services';
 
-const getAuthorization = nextConnect().get(
-  '/api/restaurants/applications/:id',
-  authorize(hasRole('admin'))
-);
-const patchAuthorization = nextConnect().get(
-  '/api/restaurants/applications/:id',
-  authorize(hasRole('admin'))
-);
+const authorization = nextConnect()
+  .get('/api/restaurants/applications/:id', authorize(hasRole('admin')))
+  .patch('/api/restaurants/applications/:id', authorize(hasRole('admin')));
 
-const handler = nextConnect().use(getAuthorization).use(patchAuthorization);
+const handler = nextConnect().use(authorization);
 
 handler.get(async (req, res) => {
   const application = await restaurantService.getApplicationById(req.query.id);

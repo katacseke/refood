@@ -17,19 +17,9 @@ handler.post(async (req, res) => {
     return;
   }
 
-  const restaurant = await restaurantService.createRestaurant(req.body);
+  const restaurant = await restaurantService.createRestaurant(req.body, findApplication.data);
 
   if (!restaurant.success) {
-    res.status(500).json({ error: restaurant.error });
-    return;
-  }
-
-  const result = await restaurantService.updateApplicationStatus(
-    findApplication.data.id,
-    'registered'
-  );
-
-  if (!result.success) {
     res.status(500).json({ error: restaurant.error });
     return;
   }

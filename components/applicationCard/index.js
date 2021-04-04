@@ -45,7 +45,7 @@ const ApplicationCard = ({ application }) => {
             <Button
               active
               theme="success"
-              onClick={async () => handleApplication('accepted')}
+              onClick={() => handleApplication('accepted')}
               className={styles.button}
             >
               <IoCheckmarkCircleOutline className="mr-1" /> Elfogad
@@ -54,7 +54,7 @@ const ApplicationCard = ({ application }) => {
             <Button
               active
               theme="danger"
-              onClick={async () => handleApplication('denied')}
+              onClick={() => handleApplication('denied')}
               className={styles.button}
             >
               <IoAlertCircleOutline className="mr-1" /> Elutasít

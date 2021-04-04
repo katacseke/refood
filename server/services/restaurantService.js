@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import userService from './userService';
 import { Restaurant, Application } from '../models';
 import connectDb from '../db';
@@ -66,28 +67,59 @@ const getRestaurantsWithName = async (text) => {
 };
 
 /**
+ * Update application status.
+ * @param {String} status
+ * @param {String} id
+ * @returns {Object} Returns an object with error message or success
+ */
+const updateApplicationStatus = async (id, status) => {
+  await connectDb();
+
+  const applicationData =
+    status === 'accepted' ? { status, token: await bcrypt.genSalt() } : { status };
+
+  const result = await Application.findByIdAndUpdate(id, applicationData, { new: true });
+  return result
+    ? { success: true, data: result }
+    : { success: false, error: 'Unable to update data.' };
+};
+
+/**
  * Insert restaurant.
  * @param {Restaurant} restaurant
  * @returns {Object} Returns an object with error message or success
  */
-const createRestaurant = async (data) => {
-  await connectDb();
+const createRestaurant = async (restaurantData, application) => {
+  const connection = await connectDb();
 
-  const { name, email, phone, url, description, address, loginEmail, password } = data;
+  const { name, email, phone, url, description, address, loginEmail, password } = restaurantData;
   const user = { name, email: loginEmail, password };
 
-  const userResult = await userService.createUser(user, 'restaurant');
+  try {
+    const data = await connection.transaction(async () => {
+      const userResult = await userService.createUser(user, 'restaurant');
 
-  if (!userResult.success) {
-    return userResult;
+      const restaurant = {
+        name,
+        email,
+        phone,
+        url,
+        description,
+        address,
+        ownerId: userResult.data.id,
+      };
+      const restaurantResult = await Restaurant.create(restaurant);
+
+      await updateApplicationStatus(application.id, 'registered');
+
+      return restaurantResult;
+    });
+
+    return { success: true, data };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: 'Unable to create restaurant.' };
   }
-
-  const restaurant = { name, email, phone, url, description, address, ownerId: userResult.data.id };
-  const restaurantResult = await Restaurant.create(restaurant);
-
-  return restaurantResult
-    ? { success: true, data: restaurant }
-    : { success: false, error: 'Unable to insert data.' };
 };
 
 /**
@@ -200,25 +232,6 @@ const createApplication = async (application) => {
   return result
     ? { success: true, data: application }
     : { success: false, error: 'Unable to insert data.' };
-};
-
-/**
- * Update application status.
- * @param {String} status
- * @param {String} id
- * @returns {Object} Returns an object with error message or success
- */
-const updateApplicationStatus = async (id, status) => {
-  await connectDb();
-
-  const applicationData =
-    status === 'accepted' ? { status, token: Math.random().toString(36).substring(2) } : { status };
-  console.log(applicationData);
-
-  const result = await Application.findByIdAndUpdate(id, applicationData, { new: true });
-  return result
-    ? { success: true, data: result }
-    : { success: false, error: 'Unable to update data.' };
 };
 
 export default {

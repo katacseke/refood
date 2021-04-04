@@ -60,7 +60,7 @@ const MealModal = ({ meal, open, setOpen }) => {
 
           <Container className="mb-3 pl-0">
             {meal.tags.map((tag) => (
-              <Badge className="mr-1" key={meal.tag} theme="light">
+              <Badge className="mr-1" key={tag} theme="light">
                 {tag}
               </Badge>
             ))}
