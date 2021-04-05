@@ -59,8 +59,6 @@ const getMeals = async (filters = {}) => {
     mongoFilters.startTime = { $lte: filters.endTime };
   }
 
-  console.log(mongoFilters);
-
   const meals = await Meal.find(mongoFilters).exec();
   return { success: true, data: meals };
 };

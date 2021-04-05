@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Container, Button } from 'shards-react';
+import { IoFilter } from 'react-icons/io5';
 import Router, { useRouter } from 'next/router';
 import Layout from '../../components/layout';
 import MealCard from '../../components/cards/mealCard';
@@ -26,9 +27,15 @@ const MealsPage = ({ meals }) => {
   return (
     <Layout>
       <MealModal meal={selectedMeal} open={modalOpen} setOpen={setModalOpen} />
-      <h1>Jelenleg elérhető ajánlatok</h1>
-      <div>
-        <Button onClick={() => setCollapseOpen(!collapseOpen)}>Szűrés</Button>
+      <h1 className="mb-3">Jelenleg elérhető ajánlatok</h1>
+      <div className="mb-2">
+        <Button
+          className="d-flex justify-content-center"
+          onClick={() => setCollapseOpen(!collapseOpen)}
+        >
+          <IoFilter className="mr-1" />
+          Szűrés
+        </Button>
         <FilterCollapse open={collapseOpen} onSubmit={onFilter} values={defaultFilters} />
       </div>
 
