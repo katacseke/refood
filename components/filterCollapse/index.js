@@ -13,8 +13,8 @@ const filterCollapse = ({ open, onSubmit, values }) => {
   const { register, handleSubmit } = useForm({ defaultValues });
 
   return (
-    <Collapse open={open} className="bg-white">
-      <div className="p-3 mt-3 border rounded">
+    <Collapse open={open}>
+      <div className="p-3 mt-3 border rounded bg-white">
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Container>
             <Row>
