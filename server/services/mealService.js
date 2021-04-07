@@ -58,7 +58,11 @@ const getMeals = async (filters = {}) => {
     mongoFilters.startTime = { $lte: filters.endTime };
   }
 
-  const meals = (await Meal.find(mongoFilters).exec()).map((meal) => meal.toObject());
+  const meals = (
+    await Meal.find(mongoFilters, { score: { $meta: 'textScore' } })
+      .sort({ score: { $meta: 'textScore' } })
+      .exec()
+  ).map((meal) => meal.toObject());
   return { success: true, data: meals };
 };
 
