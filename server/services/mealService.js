@@ -39,8 +39,7 @@ const getMeals = async (filters = {}) => {
   const mongoFilters = {};
 
   if (filters.name) {
-    const regex = new RegExp(filters.name, 'i');
-    mongoFilters.name = { $regex: regex };
+    mongoFilters.$text = { $search: filters.name };
   }
 
   if (filters.donatable === 'true') {
