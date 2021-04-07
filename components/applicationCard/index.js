@@ -5,7 +5,7 @@ import styles from './applicationCard.module.scss';
 
 const ApplicationCard = ({ application }) => {
   const handleApplication = async (status) => {
-    const res = await fetch(`/api/restaurants/applications/${application._id}`, {
+    const res = await fetch(`/api/restaurants/applications/${application.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

@@ -13,7 +13,7 @@ import connectDb from '../db';
 const getMealById = async (id) => {
   await connectDb();
 
-  const meal = await Meal.findById(id).exec();
+  const meal = (await Meal.findById(id).exec()).toObject();
 
   if (!meal) {
     return {
@@ -59,7 +59,7 @@ const getMeals = async (filters = {}) => {
     mongoFilters.startTime = { $lte: filters.endTime };
   }
 
-  const meals = await Meal.find(mongoFilters).exec();
+  const meals = (await Meal.find(mongoFilters).exec()).map((meal) => meal.toObject());
   return { success: true, data: meals };
 };
 
@@ -71,7 +71,9 @@ const getMealsWithName = async (text) => {
   await connectDb();
 
   const regex = new RegExp(text, 'i');
-  const meals = await Meal.find({ name: { $regex: regex } }).exec();
+  const meals = (await Meal.find({ name: { $regex: regex } }).exec()).map((meal) =>
+    meal.toObject()
+  );
 
   return { success: true, data: meals };
 };
@@ -83,11 +85,13 @@ const getMealsWithName = async (text) => {
 const getCurrentMealsByRestaurant = async (id) => {
   await connectDb();
 
-  const meals = await Meal.find({
-    restaurantId: id,
-    startTime: { $lte: Date.now() },
-    endTime: { $gte: Date.now() },
-  }).exec();
+  const meals = (
+    await Meal.find({
+      restaurantId: id,
+      startTime: { $lte: Date.now() },
+      endTime: { $gte: Date.now() },
+    }).exec()
+  ).map((meal) => meal.toObject());
 
   return { success: true, data: meals };
 };
@@ -99,10 +103,12 @@ const getCurrentMealsByRestaurant = async (id) => {
 const getCurrentMeals = async () => {
   await connectDb();
 
-  const meals = await Meal.find({
-    startTime: { $lte: Date.now() },
-    endTime: { $gte: Date.now() },
-  }).exec();
+  const meals = (
+    await Meal.find({
+      startTime: { $lte: Date.now() },
+      endTime: { $gte: Date.now() },
+    }).exec()
+  ).map((meal) => meal.toObject());
 
   return { success: true, data: meals };
 };
@@ -115,7 +121,7 @@ const getCurrentMeals = async () => {
 const createMeal = async (meal) => {
   await connectDb();
 
-  const result = await Meal.create(meal);
+  const result = (await Meal.create(meal)).toObject();
 
   return result
     ? { success: true, data: meal }
@@ -131,7 +137,7 @@ const createMeal = async (meal) => {
 const updateMeal = async (id, meal) => {
   await connectDb();
 
-  const result = await Meal.findByIdAndUpdate(id, meal, { new: true });
+  const result = (await Meal.findByIdAndUpdate(id, meal, { new: true }).exec()).toObject();
 
   return result
     ? { success: true, data: meal }

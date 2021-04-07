@@ -40,7 +40,7 @@ const RestauantPage = ({ user }) => {
     try {
       await userUpdateSchema.validate({ [name]: state.value });
 
-      const res = await fetch(`/api/users/${user._id}`, {
+      const res = await fetch(`/api/users/${user.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ const RestauantPage = ({ user }) => {
 export default RestauantPage;
 
 export const getServerSideProps = withAuthSSR(async ({ user }) => {
-  const userModel = await userService.getUserById(user._id);
+  const userModel = await userService.getUserById(user.id);
 
   if (!userModel.success) {
     return {

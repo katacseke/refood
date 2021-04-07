@@ -14,23 +14,15 @@ import connectDb from '../db';
 const getApplicationById = async (id) => {
   await connectDb();
 
-  const application = await Application.findById(id).exec();
+  const application = (await Application.findById(id).exec()).toObject();
 
-  if (!application) {
-    return {
-      success: false,
-      error: 'Application not found',
-    };
-  }
-
-  return {
-    success: true,
-    data: application,
-  };
+  return application
+    ? { success: true, data: application }
+    : { success: false, error: 'Application not found' };
 };
 
 /**
- * Get pending application by token.
+ * Get accepted application by token.
  * @param {string} token
  * @returns {
  *   success: Boolean,
@@ -41,19 +33,11 @@ const getApplicationById = async (id) => {
 const getAcceptedApplicationByToken = async (token) => {
   await connectDb();
 
-  const application = await Application.findOne({ token, status: 'accepted' }).exec();
+  const application = (await Application.findOne({ token, status: 'accepted' }).exec()).toObject();
 
-  if (!application) {
-    return {
-      success: false,
-      error: 'Application not found',
-    };
-  }
-
-  return {
-    success: true,
-    data: application,
-  };
+  return application
+    ? { success: true, data: application }
+    : { success: false, error: 'Application not found' };
 };
 
 /**
@@ -63,7 +47,10 @@ const getAcceptedApplicationByToken = async (token) => {
 const getApplications = async () => {
   await connectDb();
 
-  const applications = await Application.find({}).exec();
+  const applications = (await Application.find({}).exec()).map((application) =>
+    application.toObject()
+  );
+
   return { success: true, data: applications };
 };
 
@@ -75,11 +62,16 @@ const getApplicationsWithStatus = async (status = null) => {
   await connectDb();
 
   if (status) {
-    const applications = await Application.find({ status }).exec();
+    const applications = (await Application.find({ status }).exec()).map((application) =>
+      application.toObject()
+    );
+
     return { success: true, data: applications };
   }
 
-  const applications = await Application.find({}).exec();
+  const applications = await (await Application.find({}).exec()).map((application) =>
+    application.toObject()
+  );
   return { success: true, data: applications };
 };
 
@@ -91,7 +83,7 @@ const getApplicationsWithStatus = async (status = null) => {
 const createApplication = async (application) => {
   await connectDb();
 
-  const result = await Application.create({ ...application, status: 'pending' });
+  const result = (await Application.create({ ...application, status: 'pending' })).toObject();
 
   return result
     ? { success: true, data: application }
@@ -110,7 +102,10 @@ const updateApplicationStatus = async (id, status) => {
   const applicationData =
     status === 'accepted' ? { status, token: await bcrypt.genSalt() } : { status };
 
-  const result = await Application.findByIdAndUpdate(id, applicationData, { new: true });
+  const result = (
+    await Application.findByIdAndUpdate(id, applicationData, { new: true }).exec()
+  ).toObject();
+
   return result
     ? { success: true, data: result }
     : { success: false, error: 'Unable to update data.' };

@@ -9,7 +9,7 @@ const RestaurantsPage = ({ restaurants }) => (
     {restaurants.length ? (
       <Container className="d-flex flex-wrap align-content-md-stretch">
         {restaurants.map((restaurant) => (
-          <RestaurantCard data={restaurant} />
+          <RestaurantCard key={restaurant.id} data={restaurant} />
         ))}
       </Container>
     ) : (

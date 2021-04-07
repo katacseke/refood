@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   role: String,
 });
 
+userSchema.set('toObject', { getters: true });
+
 mongoose.models = {};
 
 const User = mongoose.model('User', userSchema);

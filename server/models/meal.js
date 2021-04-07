@@ -12,6 +12,8 @@ const mealSchema = new mongoose.Schema({
   tags: [String],
 });
 
+mealSchema.set('toObject', { getters: true });
+
 mongoose.models = {};
 
 const Meal = mongoose.model('Meal', mealSchema);

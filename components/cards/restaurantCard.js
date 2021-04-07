@@ -25,13 +25,13 @@ const RestaurantCard = ({ data }) => (
         src="https://discovernative.org/wp-content/uploads/2020/05/food.jpg"
         alt=""
       />
-      <Link href={`/restaurants/${data._id}`}>
+      <Link href={`/restaurants/${data.id}`}>
         <a className={styles.button}>Bővebben</a>
       </Link>
     </div>
 
     <div className={styles.alwaysVisible}>
-      <Link href={`/restaurants/${data._id}`}>
+      <Link href={`/restaurants/${data.id}`}>
         <a className={styles.title}>{data.name}</a>
       </Link>
     </div>

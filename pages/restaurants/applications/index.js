@@ -26,7 +26,7 @@ const ApplicationsPage = ({ applications }) => {
       </Container>
       <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
         {applications.map((application) => (
-          <ApplicationCard key={application._id} application={application} />
+          <ApplicationCard key={application.id} application={application} />
         ))}
       </Container>
     </Layout>

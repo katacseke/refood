@@ -10,6 +10,8 @@ const restaurantSchema = new mongoose.Schema({
   ownerId: String,
 });
 
+restaurantSchema.set('toObject', { getters: true });
+
 mongoose.models = {};
 
 const Restaurant = mongoose.model('Restaurant', restaurantSchema);

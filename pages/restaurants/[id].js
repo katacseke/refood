@@ -63,7 +63,7 @@ const RestauantPage = ({ restaurant, meals }) => {
       {meals.length ? (
         <Container className="d-flex flex-wrap align-content-md-stretch p-0 mx-0">
           {meals.map((meal) => (
-            <MealCard key={meal._id} data={meal} onClick={() => showMeal(meal)} />
+            <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal)} />
           ))}
         </Container>
       ) : (

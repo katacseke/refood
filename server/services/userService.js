@@ -13,9 +13,9 @@ const saltRounds = 10;
 const getUserIds = async () => {
   await connectDb();
 
-  const ids = await User.find({}).select('_id').exec();
+  const ids = (await User.find({}).select('_id').exec()).map((id) => id.toObject());
 
-  return ids.map((restaurant) => restaurant._id.toString());
+  return ids.map((restaurant) => restaurant.id.toString());
 };
 
 /**
@@ -30,23 +30,15 @@ const getUserIds = async () => {
 const getUserById = async (id) => {
   await connectDb();
 
-  const user = await User.findById(id);
+  const user = (await User.findById(id)).toObject();
 
-  if (!user) {
-    return {
-      success: false,
-      error: 'User not found',
-    };
-  }
-
-  return {
-    success: true,
-    data: { ...user.toObject(), password: undefined },
-  };
+  return user
+    ? { success: true, data: { ...user, password: undefined } }
+    : { success: false, error: 'User not found' };
 };
 
 /**
- * Get user by id.
+ * Get user by email.
  * @param {string} email
  * @returns {
  *   success: Boolean,
@@ -57,19 +49,9 @@ const getUserById = async (id) => {
 const getUserByEmail = async (email) => {
   await connectDb();
 
-  const user = await User.findOne({ email }).exec();
+  const user = (await User.findOne({ email }).exec()).toObject();
 
-  if (!user) {
-    return {
-      success: false,
-      error: 'Ismeretlen email.',
-    };
-  }
-
-  return {
-    success: true,
-    data: user,
-  };
+  return user ? { success: true, data: user } : { success: false, error: 'Ismeretlen email.' };
 };
 
 /**
@@ -79,9 +61,9 @@ const getUserByEmail = async (email) => {
 const getUsers = async () => {
   await connectDb();
 
-  const users = await User.find({}).exec();
-  const data = users.map((user) => ({ ...user.toObject(), password: undefined }));
-  return { success: true, data };
+  const users = (await User.find({}).exec()).map((user) => user.toObject());
+
+  return { success: true, data: users };
 };
 
 /**
@@ -94,10 +76,10 @@ const createUser = async (user, role = 'user') => {
   await connectDb();
 
   const hash = await bcrypt.hash(user.password, saltRounds);
-  const result = await User.create({ ...user, password: hash, role });
+  const result = (await User.create({ ...user, password: hash, role })).toObject();
 
   return result
-    ? { success: true, data: { ...result.toObject(), password: undefined } }
+    ? { success: true, data: { ...result, password: undefined } }
     : { success: false, error: 'Unable to insert data.' };
 };
 
@@ -110,10 +92,10 @@ const createUser = async (user, role = 'user') => {
 const updateUser = async (id, user) => {
   await connectDb();
 
-  const result = await User.findByIdAndUpdate(id, user, { new: true });
+  const result = (await User.findByIdAndUpdate(id, user, { new: true }).exec()).toObject();
 
   return result
-    ? { success: true, data: { ...result.toObject(), password: undefined } }
+    ? { success: true, data: { ...result, password: undefined } }
     : { success: false, error: 'Unable to update data.' };
 };
 
@@ -149,7 +131,7 @@ const checkCredentials = async (email, password) => {
   const match = await bcrypt.compare(password, user.data.password);
 
   return match
-    ? { success: true, data: { ...user.data.toObject(), password: undefined } }
+    ? { success: true, data: { ...user.data, password: undefined } }
     : { success: false, error: 'Az email és jelszó páros nem talál!' };
 };
 

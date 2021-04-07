@@ -42,7 +42,7 @@ const MealsPage = ({ meals }) => {
       {meals.length ? (
         <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
           {meals.map((meal) => (
-            <MealCard key={meal._id} data={meal} onClick={() => showMeal(meal)} />
+            <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal)} />
           ))}
         </Container>
       ) : (

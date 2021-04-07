@@ -9,6 +9,8 @@ const restaurantApplicationSchema = new mongoose.Schema({
   token: String,
 });
 
+restaurantApplicationSchema.set('toObject', { getters: true });
+
 mongoose.models = {};
 
 const Application = mongoose.model('Application', restaurantApplicationSchema);

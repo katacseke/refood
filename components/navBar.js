@@ -45,7 +45,7 @@ const AuthenticatedSection = ({ logout }) => {
         <DropdownMenu right>
           <DropdownItem>Kosár</DropdownItem>
           <DropdownItem>Rendelések</DropdownItem>
-          <Link href="/profile/editt">
+          <Link href="/profile/edit">
             <DropdownItem>Saját profil</DropdownItem>
           </Link>
           <DropdownItem className="text-danger d-flex align-items-center" onClick={logout}>

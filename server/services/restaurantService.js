@@ -12,7 +12,22 @@ const getRestaurantIds = async () => {
 
   const restaurants = await Restaurant.find({}).select('_id').exec();
 
-  return restaurants.map((restaurant) => restaurant._id.toString());
+  return restaurants.map((restaurant) => restaurant.id.toString());
+};
+
+/**
+ * Get restaurant with a specific owner
+ * @param {String} ownerId id of the restaurant owner
+ * @returns {String} Id of the given restaurant or error message.
+ */
+const getRestaurantIdByOwner = async (ownerId) => {
+  await connectDb();
+
+  const restaurantId = await Restaurant.find({ ownerId }).select('_id').exec();
+
+  return restaurantId
+    ? { success: false, error: 'Restaurant not found' }
+    : { success: true, data: restaurantId.toString() };
 };
 
 /**
@@ -27,19 +42,11 @@ const getRestaurantIds = async () => {
 const getRestaurantById = async (id) => {
   await connectDb();
 
-  const restaurant = await Restaurant.findById(id).exec();
+  const restaurant = (await Restaurant.findById(id).exec()).toObject();
 
-  if (!restaurant) {
-    return {
-      success: false,
-      error: 'Restaurant not found',
-    };
-  }
-
-  return {
-    success: true,
-    data: restaurant,
-  };
+  return restaurant
+    ? { success: true, data: restaurant }
+    : { success: false, error: 'Restaurant not found' };
 };
 
 /**
@@ -49,7 +56,7 @@ const getRestaurantById = async (id) => {
 const getRestaurants = async () => {
   await connectDb();
 
-  const restaurants = await Restaurant.find({}).exec();
+  const restaurants = (await Restaurant.find({}).exec()).map((restaurant) => restaurant.toObject());
   return { success: true, data: restaurants };
 };
 
@@ -61,28 +68,17 @@ const getRestaurantsWithName = async (text) => {
   await connectDb();
 
   const regex = new RegExp(text, 'i');
-  const restaurants = await Restaurant.find({ name: { $regex: regex } }).exec();
+  const restaurants = (
+    await Restaurant.find({ name: { $regex: regex } }).exec()
+  ).map((restaurant) => restaurant.toObject());
 
   return { success: true, data: restaurants };
 };
 
 /**
- * Get restaurants with a specific owner
- * @returns {String} Id of the given restaurant or error message.
- */
-const getRestaurantIdWithOwner = async (ownerId) => {
-  await connectDb();
-
-  const restaurantId = await Restaurant.find({ ownerId }).select('_id').exec();
-
-  return restaurantId
-    ? { success: false, error: 'Restaurant not found' }
-    : { success: true, data: restaurantId.toString() };
-};
-
-/**
  * Insert restaurant.
- * @param {Restaurant} restaurant
+ * @param {Restaurant} restaurantData
+ * @param {Object} application application for registration
  * @returns {Object} Returns an object with error message or success
  */
 const createRestaurant = async (restaurantData, application) => {
@@ -104,7 +100,7 @@ const createRestaurant = async (restaurantData, application) => {
         address,
         ownerId: userResult.data.id,
       };
-      const restaurantResult = await Restaurant.create(restaurant);
+      const restaurantResult = (await Restaurant.create(restaurant)).toObject();
 
       await applicationService.updateApplicationStatus(application.id, 'registered');
 
@@ -127,7 +123,9 @@ const createRestaurant = async (restaurantData, application) => {
 const updateRestaurant = async (id, restaurant) => {
   await connectDb();
 
-  const result = await Restaurant.findByIdAndUpdate(id, restaurant, { new: true });
+  const result = (
+    await Restaurant.findByIdAndUpdate(id, restaurant, { new: true }).exec()
+  ).map((res) => res.toObject());
 
   return result
     ? { success: true, data: restaurant }
@@ -139,7 +137,7 @@ export default {
   getRestaurantById,
   getRestaurants,
   getRestaurantsWithName,
-  getRestaurantIdWithOwner,
+  getRestaurantIdByOwner,
   createRestaurant,
   updateRestaurant,
 };
