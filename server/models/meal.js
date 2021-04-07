@@ -15,7 +15,7 @@ const mealSchema = new mongoose.Schema({
 mealSchema.set('toObject', { getters: true });
 mealSchema.index(
   { name: 'text', tags: 'text' },
-  { name: 'Text search index', weights: { name: 2, tags: 1 }, default_language: 'hu' }
+  { name: 'text_search_index', weights: { name: 2, tags: 1 }, default_language: 'hu' }
 );
 
 mongoose.models = {};

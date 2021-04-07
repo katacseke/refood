@@ -93,20 +93,20 @@ const GuestSection = () => (
   </>
 );
 
-const RestuarantSection = ({ logout, user }) => {
+const RestaurantSection = ({ logout, user }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
     <>
       <NavItem>
-        <Link href={`/meals?restaurantId=${user.id}`}>
+        <Link href="/meals/create">
           <NavLink active style={{ cursor: 'pointer' }}>
-            Ajánlatok
+            Ajánlat létrehozása
           </NavLink>
         </Link>
       </NavItem>
       <NavItem>
-        <Link href={`/meals?restaurantId=${user.id}`}>
+        <Link href="/">
           <NavLink active style={{ cursor: 'pointer' }}>
             Rendelések
           </NavLink>
@@ -117,8 +117,11 @@ const RestuarantSection = ({ logout, user }) => {
           Saját vendéglő
         </DropdownToggle>
         <DropdownMenu right>
-          <Link href={`/restauratns/restaurantId=${user.id}`}>
+          <Link href={`/restaurants/${user.restaurantId}`}>
             <DropdownItem>Saját oldal</DropdownItem>
+          </Link>
+          <Link href={`/meals?restaurantId=${user.restaurantId}`}>
+            <DropdownItem>Saját ajánlatok</DropdownItem>
           </Link>
           <DropdownItem className="text-danger d-flex align-items-center" onClick={logout}>
             <IoExitOutline className="mr-1" />
@@ -194,6 +197,20 @@ const NavBar = () => {
     }
   };
 
+  const renderNavSection = () => {
+    if (user?.role === 'user') {
+      return <AuthenticatedSection user={user} logout={logout} />;
+    }
+    if (user?.role === 'restaurant') {
+      return <RestaurantSection user={user} logout={logout} />;
+    }
+    if (user?.role === 'admin') {
+      return <AdminSection logout={logout} />;
+    }
+
+    return <GuestSection />;
+  };
+
   return (
     <Navbar type="dark" theme="primary" expand="md">
       <Link href="/">
@@ -217,7 +234,7 @@ const NavBar = () => {
         </Nav>
 
         <Nav navbar className="ml-auto d-flex align-items-center">
-          {user ? <AuthenticatedSection user={user} logout={logout} /> : <GuestSection />}
+          {renderNavSection()}
         </Nav>
       </Collapse>
     </Navbar>

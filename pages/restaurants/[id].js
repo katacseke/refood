@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Image from 'next/image';
-import { Card, CardBody, CardTitle, Container } from 'shards-react';
-import { IoCall, IoMail, IoLocationSharp, IoEarth } from 'react-icons/io5';
+import { Button, Card, CardBody, CardTitle, Container } from 'shards-react';
+import { IoCall, IoMail, IoLocationSharp, IoEarth, IoAdd } from 'react-icons/io5';
+import Link from 'next/link';
 import MealCard from '../../components/cards/mealCard';
 import MealModal from '../../components/mealModal';
 import Layout from '../../components/layout';
 import { mealService, restaurantService } from '../../server/services';
 import styles from './restaurant.module.scss';
+import AuthContext from '../../context/authContext';
 
 const RestauantPage = ({ restaurant, meals }) => {
+  const { user } = useContext(AuthContext);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState();
 
@@ -56,10 +59,19 @@ const RestauantPage = ({ restaurant, meals }) => {
       </Card>
 
       <MealModal meal={selectedMeal} open={modalOpen} setOpen={setModalOpen} />
+      <div className="d-flex justify-content-between mx-2">
+        <h3>
+          {getArticle(restaurant.name)} {restaurant.name} ajánlatai
+        </h3>
 
-      <h3>
-        {getArticle(restaurant.name)} {restaurant.name} ajánlatai
-      </h3>
+        {user?.id === restaurant.ownerId && (
+          <Link href="/meals/create">
+            <Button className="d-flex align-items-center pl-1">
+              <IoAdd className="m-1" /> Új ajánlat
+            </Button>
+          </Link>
+        )}
+      </div>
       {meals.length ? (
         <Container className="d-flex flex-wrap align-content-md-stretch p-0 mx-0">
           {meals.map((meal) => (
