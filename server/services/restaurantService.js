@@ -89,8 +89,13 @@ const createRestaurant = async (restaurantData, application) => {
 
   try {
     const data = await connection.transaction(async () => {
-      const userResult = await userService.createUser(user, 'restaurant');
+      // Create the user
+      let userResult = await userService.createUser(user, 'restaurant');
+      if (!userResult.success) {
+        throw new Error(userResult.error);
+      }
 
+      // Create the restaurant associated with the user
       const restaurant = {
         name,
         email,
@@ -102,6 +107,15 @@ const createRestaurant = async (restaurantData, application) => {
       };
       const restaurantResult = (await Restaurant.create(restaurant)).toObject();
 
+      // Bind the restaurant to the user
+      userResult = await userService.updateUser(userResult.data.id, {
+        restaurantId: restaurantResult.id,
+      });
+      if (!userResult.success) {
+        throw new Error(userResult.error);
+      }
+
+      // Set the application status to registered
       await applicationService.updateApplicationStatus(application.id, 'registered');
 
       return restaurantResult;
