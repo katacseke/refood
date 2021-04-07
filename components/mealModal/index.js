@@ -12,7 +12,11 @@ import {
 import { IoCartOutline } from 'react-icons/io5';
 import Image from 'next/image';
 import { useEffect } from 'react';
+import moment from 'moment';
+import 'twix';
 import styles from './mealModal.module.scss';
+
+moment.locale('hu');
 
 const MealModal = ({ meal, open, setOpen }) => {
   useEffect(() => {
@@ -23,8 +27,7 @@ const MealModal = ({ meal, open, setOpen }) => {
     return <div />;
   }
 
-  const start = meal.startTime.toString().replace(/T/, ' ').replace(/\..+/, '');
-  const end = meal.endTime.toString().replace(/T/, ' ').replace(/\..+/, '');
+  const timeRange = moment.twix(meal.startTime, meal.endTime);
 
   return (
     <Modal
@@ -51,9 +54,7 @@ const MealModal = ({ meal, open, setOpen }) => {
 
           <ul className={styles.moreInformation}>
             <li className={styles.mealLi}>Adagok: {meal.portionNumber}</li>
-            <li className={styles.mealLi}>
-              Elérhető: {start} - {end}
-            </li>
+            <li className={styles.mealLi}>Elérhető: {timeRange.format()}</li>
             {meal?.donatable && <li className={styles.mealLi}>Adományozható</li>}
             {meal?.dailyMenu && <li className={styles.mealLi}>Napi menü</li>}
           </ul>
