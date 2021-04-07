@@ -7,6 +7,18 @@ import connectDb from '../db';
 const saltRounds = 10;
 
 /**
+ * Get user ids.
+ * @returns {Array} Array of user ids.
+ */
+const getUserIds = async () => {
+  await connectDb();
+
+  const ids = await User.find({}).select('_id').exec();
+
+  return ids.map((restaurant) => restaurant._id.toString());
+};
+
+/**
  * Get user by id.
  * @param {string} id
  * @returns {
@@ -170,6 +182,7 @@ const verifyToken = (token) => {
 };
 
 export default {
+  getUserIds,
   getUserByEmail,
   getUserById,
   getUsers,

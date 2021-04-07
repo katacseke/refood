@@ -11,7 +11,7 @@ handler.post(async (req, res) => {
   if (match.success) {
     const token = userService.createToken(match.data);
 
-    res.setHeader('Set-Cookie', `access_token=${token}; Path=/api; Max-Age=${60 * 60}; HttpOnly`);
+    res.setHeader('Set-Cookie', `access_token=${token}; Path=/; Max-Age=${60 * 60}; HttpOnly`);
     res.status(200).json(match.data);
     return;
   }

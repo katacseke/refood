@@ -67,6 +67,20 @@ const getRestaurantsWithName = async (text) => {
 };
 
 /**
+ * Get restaurants with a specific owner
+ * @returns {String} Id of the given restaurant or error message.
+ */
+const getRestaurantIdWithOwner = async (ownerId) => {
+  await connectDb();
+
+  const restaurantId = await Restaurant.find({ ownerId }).select('_id').exec();
+
+  return restaurantId
+    ? { success: false, error: 'Restaurant not found' }
+    : { success: true, data: restaurantId.toString() };
+};
+
+/**
  * Insert restaurant.
  * @param {Restaurant} restaurant
  * @returns {Object} Returns an object with error message or success
@@ -125,6 +139,7 @@ export default {
   getRestaurantById,
   getRestaurants,
   getRestaurantsWithName,
+  getRestaurantIdWithOwner,
   createRestaurant,
   updateRestaurant,
 };
