@@ -23,7 +23,7 @@ handler.delete(async (req, res) => {
   const result = await userService.deleteUser(req.params.id);
 
   if (!result.success) {
-    res.status(500).json({ error: result.error });
+    res.status(500).json({ general: { message: result.error } });
     return;
   }
 

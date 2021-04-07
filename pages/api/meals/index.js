@@ -27,7 +27,7 @@ handler.post(async (req, res) => {
   const meal = await mealService.createMeal({ ...req.body, restaurantId: req.user.id });
 
   if (!meal.success) {
-    res.status(500).json({ error: meal.error });
+    res.status(500).json({ general: { message: meal.error } });
     return;
   }
 

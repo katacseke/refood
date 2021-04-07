@@ -1,6 +1,7 @@
 import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
 import { IoCall, IoMail, IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
 import Router from 'next/router';
+import toast from 'react-hot-toast';
 import styles from './applicationCard.module.scss';
 
 const ApplicationCard = ({ application }) => {
@@ -15,7 +16,7 @@ const ApplicationCard = ({ application }) => {
 
     if (!res.ok) {
       const err = await res.json();
-      console.log(err.message);
+      toast.error(err.message);
 
       return;
     }

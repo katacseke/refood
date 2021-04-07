@@ -31,7 +31,7 @@ handler.post(async (req, res) => {
   const application = await applicationService.createApplication(req.body);
 
   if (!application.success) {
-    res.status(500).json({ error: application.error });
+    res.status(500).json({ general: { message: application.error } });
     return;
   }
 

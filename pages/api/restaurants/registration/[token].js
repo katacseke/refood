@@ -20,7 +20,7 @@ handler.post(async (req, res) => {
   const restaurant = await restaurantService.createRestaurant(req.body, findApplication.data);
 
   if (!restaurant.success) {
-    res.status(500).json({ error: restaurant.error });
+    res.status(500).json({ general: { message: restaurant.error } });
     return;
   }
 
