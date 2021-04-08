@@ -55,6 +55,25 @@ const getUserByEmail = async (email) => {
 };
 
 /**
+ * Get user by restaurant id.
+ * @param {string} id restaurant id
+ * @returns {
+ *   success: Boolean,
+ *   ?user: User,
+ *   ?error: String,
+ * } Returns an object containing the User instance or an error message
+ */
+const getUserByRestaurantId = async (restaurantId) => {
+  await connectDb();
+
+  const user = await User.findOne({ restaurantId }).exec();
+
+  return user
+    ? { success: true, data: user.toObject() }
+    : { success: false, error: 'Ismeretlen email.' };
+};
+
+/**
  * Get all users.
  * @returns {Array} Array of all users.
  */
@@ -76,10 +95,10 @@ const createUser = async (user, role = 'user') => {
   await connectDb();
 
   const hash = await bcrypt.hash(user.password, saltRounds);
-  const result = (await User.create({ ...user, password: hash, role })).toObject();
+  const result = await User.create({ ...user, password: hash, role });
 
   return result
-    ? { success: true, data: { ...result, password: undefined } }
+    ? { success: true, data: { ...result.toObject(), password: undefined } }
     : { success: false, error: 'Unable to insert data.' };
 };
 
@@ -89,13 +108,19 @@ const createUser = async (user, role = 'user') => {
  * @param {String} id
  * @returns {Object} Returns an object with error message or success
  */
-const updateUser = async (id, user) => {
+const updateUser = async (id, userData) => {
   await connectDb();
 
-  const result = (await User.findByIdAndUpdate(id, user, { new: true }).exec()).toObject();
+  const user = { name: userData.name, email: userData.email };
+  if (userData.password) {
+    const hash = await bcrypt.hash(user.password, saltRounds);
+    user.password = hash;
+  }
+
+  const result = await User.findByIdAndUpdate(id, user, { new: true }).exec();
 
   return result
-    ? { success: true, data: { ...result, password: undefined } }
+    ? { success: true, data: { ...result.toObject(), password: undefined } }
     : { success: false, error: 'Unable to update data.' };
 };
 
@@ -166,6 +191,7 @@ const verifyToken = (token) => {
 export default {
   getUserIds,
   getUserByEmail,
+  getUserByRestaurantId,
   getUserById,
   getUsers,
   createUser,

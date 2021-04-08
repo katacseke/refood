@@ -9,6 +9,7 @@ const filterCollapse = ({ open, onSubmit, values }) => {
     endTime: values.endTime || '',
     donatable: values.donatable === 'true',
     dailyMenu: values.dailyMenu === 'true',
+    restaurantId: values.restaurantId || '',
   };
   const { register, handleSubmit } = useForm({ defaultValues });
 

@@ -105,7 +105,7 @@ const createRestaurant = async (restaurantData, application) => {
         address,
         ownerId: userResult.data.id,
       };
-      const restaurantResult = (await Restaurant.create(restaurant)).toObject();
+      const restaurantResult = await Restaurant.create(restaurant);
 
       // Bind the restaurant to the user
       userResult = await userService.updateUser(userResult.data.id, {
@@ -118,7 +118,7 @@ const createRestaurant = async (restaurantData, application) => {
       // Set the application status to registered
       await applicationService.updateApplicationStatus(application.id, 'registered');
 
-      return restaurantResult;
+      return restaurantResult.toObject();
     });
 
     return { success: true, data };
@@ -134,16 +134,51 @@ const createRestaurant = async (restaurantData, application) => {
  * @param {String} id
  * @returns {Object} Returns an object with error message or success
  */
-const updateRestaurant = async (id, restaurant) => {
-  await connectDb();
+const updateRestaurant = async (id, restaurantData) => {
+  const connection = await connectDb();
 
-  const result = (
-    await Restaurant.findByIdAndUpdate(id, restaurant, { new: true }).exec()
-  ).map((res) => res.toObject());
+  const {
+    name,
+    email,
+    phone,
+    url,
+    description,
+    address,
+    loginEmail,
+    password,
+    ownerId,
+  } = restaurantData;
+  const user = { name, email: loginEmail, password };
 
-  return result
-    ? { success: true, data: restaurant }
-    : { success: false, error: 'Unable to update data.' };
+  try {
+    const data = await connection.transaction(async () => {
+      // Update the user
+      const userResult = await userService.updateUser(ownerId, user);
+      if (!userResult.success) {
+        throw new Error(userResult.error);
+      }
+
+      // Update the restaurant associated with the user
+      const restaurant = {
+        name,
+        email,
+        phone,
+        url,
+        description,
+        address,
+      };
+      const restaurantResult = await Restaurant.findByIdAndUpdate(id, restaurant, {
+        new: true,
+      }).exec();
+
+      return restaurantResult.toObject();
+    });
+
+    return { success: true, data };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: 'Az adatok frissítése sikertelen.' };
+  }
 };
 
 export default {

@@ -6,6 +6,9 @@ export const hasRole = (role) => (user) => user.data.role === role;
 // checks if the user matches the one from the request
 export const isSelf = () => (user, req) => user.data.id === req.query.id;
 
+// checks if the user matches the one from the request
+export const isRestaurantOwner = () => (user, req) => user.data.restaurantId === req.query.id;
+
 // confirms the user is authenticated
 export const authenticated = () => () => true;
 

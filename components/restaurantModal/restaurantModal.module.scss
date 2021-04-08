@@ -6,22 +6,17 @@ $tag-color: #e4e1e1;
 $main-color: #212529;
 $secondary-color: rgb(94, 91, 89);
 
-.mainContainer {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow: hidden;
-  border-radius: inherit;
-  padding: 0;
+.modalBody {
+    padding: 0;
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+    &::-webkit-scrollbar {
+        width: 0;  /* Chrome */
+    }
 
-  .image { 
-    position: relative; 
-    width: 18rem; 
-  }
-
-  .content {
-    padding: 2rem;
-    flex: 1;
-  }
+    .content {
+        margin: 1.5rem 2rem;
+    }
 }
 
 .moreInformation {

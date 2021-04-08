@@ -1,29 +1,44 @@
 import React, { useContext, useState } from 'react';
 import Image from 'next/image';
 import { Button, Card, CardBody, CardTitle, Container } from 'shards-react';
-import { IoCall, IoMail, IoLocationSharp, IoEarth, IoAdd } from 'react-icons/io5';
+import {
+  IoCall,
+  IoMail,
+  IoLocationSharp,
+  IoEarth,
+  IoAdd,
+  IoSettingsOutline,
+} from 'react-icons/io5';
 import Link from 'next/link';
 import MealCard from '../../components/cards/mealCard';
 import MealModal from '../../components/mealModal';
+import RestaurantModal from '../../components/restaurantModal';
 import Layout from '../../components/layout';
-import { mealService, restaurantService } from '../../server/services';
-import styles from './restaurant.module.scss';
+import { mealService, restaurantService, userService } from '../../server/services';
 import AuthContext from '../../context/authContext';
+import styles from './restaurant.module.scss';
 
 const RestauantPage = ({ restaurant, meals }) => {
   const { user } = useContext(AuthContext);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [mealModalOpen, setMealModalOpen] = useState(false);
+  const [restaurantModalOpen, setRestaurantModalOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState();
 
   const showMeal = (meal) => {
     setSelectedMeal(meal);
-    setModalOpen(true);
+    setMealModalOpen(true);
   };
 
   const getArticle = (word) => ('aeiouöüóőúűéáí'.includes(word.toLowerCase()[0]) ? 'Az' : 'A');
 
   return (
     <Layout>
+      <RestaurantModal
+        restaurant={restaurant}
+        open={restaurantModalOpen}
+        setOpen={setRestaurantModalOpen}
+      />
+
       <Card size="lg" className="m-2 mb-5">
         <CardBody className={styles.mainContainer}>
           <div className={styles.image}>
@@ -35,7 +50,17 @@ const RestauantPage = ({ restaurant, meals }) => {
             />
           </div>
           <div className={styles.content}>
-            <CardTitle>{restaurant.name}</CardTitle>
+            <div className="d-flex justify-content-between align-items-baseline">
+              <CardTitle>{restaurant.name}</CardTitle>
+              {user?.id === restaurant.ownerId && (
+                <Button
+                  className="d-flex align-items-center"
+                  onClick={() => setRestaurantModalOpen(true)}
+                >
+                  <IoSettingsOutline />
+                </Button>
+              )}
+            </div>
             <p>{restaurant.description}</p>
 
             <ul className={styles.moreInformation}>
@@ -58,8 +83,8 @@ const RestauantPage = ({ restaurant, meals }) => {
         </CardBody>
       </Card>
 
-      <MealModal meal={selectedMeal} open={modalOpen} setOpen={setModalOpen} />
-      <div className="d-flex justify-content-between mx-2">
+      <MealModal meal={selectedMeal} open={mealModalOpen} setOpen={setMealModalOpen} />
+      <div className="d-flex justify-content-between mx-2 align-items-baseline">
         <h3>
           {getArticle(restaurant.name)} {restaurant.name} ajánlatai
         </h3>
@@ -106,11 +131,19 @@ export async function getStaticProps({ res, params }) {
     res.end();
   }
 
+  const user = await userService.getUserByRestaurantId(id);
+
+  if (!user.success) {
+    return {
+      notFound: true,
+    };
+  }
+
   const meals = await mealService.getCurrentMealsByRestaurant(id);
 
   return {
     props: {
-      restaurant: JSON.parse(JSON.stringify(restaurant.data)),
+      restaurant: JSON.parse(JSON.stringify({ ...restaurant.data, loginEmail: user.data.email })),
       meals: JSON.parse(JSON.stringify(meals.data)),
     },
   };

@@ -38,10 +38,6 @@ const getMeals = async (filters = {}) => {
 
   const mongoFilters = {};
 
-  if (filters.name) {
-    mongoFilters.$text = { $search: filters.name };
-  }
-
   if (filters.donatable === 'true') {
     mongoFilters.donatable = true;
   }
@@ -50,12 +46,23 @@ const getMeals = async (filters = {}) => {
     mongoFilters.dailyMenu = true;
   }
 
+  if (filters.restaurantId && filters.restaurantId !== '') {
+    mongoFilters.restaurantId = filters.restaurantId;
+  }
+
   if (filters.startTime) {
     mongoFilters.endTime = { $gte: filters.startTime };
   }
 
   if (filters.endTime) {
     mongoFilters.startTime = { $lte: filters.endTime };
+  }
+
+  if (filters.name && filters.name !== '') {
+    mongoFilters.$text = { $search: filters.name };
+  } else {
+    const meals = (await Meal.find(mongoFilters).exec()).map((meal) => meal.toObject());
+    return { success: true, data: meals };
   }
 
   const meals = (
