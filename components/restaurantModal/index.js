@@ -11,6 +11,7 @@ import {
   ModalBody,
   ModalHeader,
 } from 'shards-react';
+import Router from 'next/router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import toast from 'react-hot-toast';
 import moment from 'moment';
@@ -57,6 +58,7 @@ const RestaurantModal = ({ restaurant, open, setOpen }) => {
 
     toast.success('Adatok sikeresen módosítva!');
     setOpen(false);
+    Router.push(`/restaurants/${restaurant.id}`);
   };
 
   return (

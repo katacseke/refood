@@ -54,6 +54,7 @@ const RestauantPage = ({ restaurant, meals }) => {
               <CardTitle>{restaurant.name}</CardTitle>
               {user?.id === restaurant.ownerId && (
                 <Button
+                  title="Szerkesztés"
                   className="d-flex align-items-center"
                   onClick={() => setRestaurantModalOpen(true)}
                 >
