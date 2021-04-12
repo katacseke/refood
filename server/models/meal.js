@@ -7,9 +7,16 @@ const mealSchema = new mongoose.Schema({
   startTime: Date,
   endTime: Date,
   price: Number,
-  donateable: Boolean,
+  donatable: Boolean,
   dailyMenu: Boolean,
+  tags: [String],
 });
+
+mealSchema.set('toObject', { getters: true });
+mealSchema.index(
+  { name: 'text', tags: 'text' },
+  { name: 'text_search_index', weights: { name: 2, tags: 1 }, default_language: 'hu' }
+);
 
 mongoose.models = {};
 

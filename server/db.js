@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 export default async () => {
   if (mongoose.connections[0].readyState) {
     // current db connection
-    return;
+    return mongoose.connections[0];
   }
 
   try {
     // new db connection
-    await mongoose.connect(process.env.MONGODB_URI, {
+    return await mongoose.connect(process.env.MONGODB_URI, {
       useUnifiedTopology: true,
       useCreateIndex: true,
       useNewUrlParser: true,
@@ -17,4 +17,6 @@ export default async () => {
   } catch (err) {
     console.log(err);
   }
+
+  return null;
 };

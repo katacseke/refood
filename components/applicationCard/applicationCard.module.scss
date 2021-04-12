@@ -1,0 +1,32 @@
+$secondary-color: rgb(94, 91, 89);
+
+.card {
+    margin: .75rem;
+    width: 300px;
+
+    .moreInformation {
+        margin: 1rem 0;
+        font-size: .85rem;
+        color: $secondary-color;
+        list-style: none;
+        padding: 0;
+    }
+
+    .description {
+        color: $secondary-color;
+    }
+
+    .footer {
+        padding: .3rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: stretch;
+        flex-wrap: wrap;
+
+        .button {
+            margin: .2rem 1rem;
+            white-space: nowrap;
+            flex: 1;
+        }
+    }
+}

@@ -1,68 +1,37 @@
-import Head from 'next/head';
-import { mealService } from '../server/services';
-import styles from '../styles/Home.module.css';
+import { useContext } from 'react';
+import { Button } from 'shards-react';
+import Router from 'next/router';
+import Layout from '../components/layout';
+import AuthContext from '../context/authContext';
 
-export default function Home({ meals }) {
+const Home = () => {
+  const { user } = useContext(AuthContext);
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Layout>
+      <h1>Üdvözlünk {user && user.name}!</h1>
+      <p className="highlightedText">
+        Tudtad, hogy 2019-ben Románia 5 millió tonna ételfelesleget termelt? Most te is
+        hozzájárulhatsz, hogy ez változhasson! Alkalmazásunk segítségével helyi vendéglők, kávézók
+        fennmaradt termélei vásárolhatók meg!
+      </p>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p>Meals: {meals.map((meal) => meal.name).join(', ')}</p>
-        <p className={styles.description}>
-          Get started by editing <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a href="https://github.com/vercel/next.js/tree/master/examples" className={styles.card}>
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
+      <h2>Partnereket keresünk</h2>
+      <p className="highlightedText">
+        Vendéglő, vagy kávézótulajdonos vagy? Itt regisztrálhatod a saját vállalkozásod, hogy
+        ezáltal is hozzájárulj a food waste csökkentéséhez!
+      </p>
+      <Button
+        onClick={() => {
+          Router.push('/restaurants/apply');
+        }}
+        className="align-self-end"
+        size="lg"
+      >
+        Jelentkezz
+      </Button>
+    </Layout>
   );
-}
+};
 
-export async function getStaticProps() {
-  const meals = await mealService.getMeals();
-
-  return {
-    props: { meals: JSON.parse(JSON.stringify(meals)) },
-  };
-}
+export default Home;

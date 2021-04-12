@@ -7,6 +7,18 @@ import connectDb from '../db';
 const saltRounds = 10;
 
 /**
+ * Get user ids.
+ * @returns {Array} Array of user ids.
+ */
+const getUserIds = async () => {
+  await connectDb();
+
+  const ids = (await User.find({}).select('_id').exec()).map((id) => id.toObject());
+
+  return ids.map((restaurant) => restaurant.id.toString());
+};
+
+/**
  * Get user by id.
  * @param {string} id
  * @returns {
@@ -18,23 +30,15 @@ const saltRounds = 10;
 const getUserById = async (id) => {
   await connectDb();
 
-  const user = await User.findById(id);
+  const user = (await User.findById(id)).toObject();
 
-  if (!user) {
-    return {
-      success: false,
-      error: 'User not found',
-    };
-  }
-
-  return {
-    success: true,
-    data: { ...user.toObject(), password: undefined },
-  };
+  return user
+    ? { success: true, data: { ...user, password: undefined } }
+    : { success: false, error: 'User not found' };
 };
 
 /**
- * Get user by id.
+ * Get user by email.
  * @param {string} email
  * @returns {
  *   success: Boolean,
@@ -45,18 +49,28 @@ const getUserById = async (id) => {
 const getUserByEmail = async (email) => {
   await connectDb();
 
-  const user = await User.findOne({ email }).exec();
+  const user = (await User.findOne({ email }).exec()).toObject();
 
-  if (!user) {
-    return {
-      success: false,
-    };
-  }
+  return user ? { success: true, data: user } : { success: false, error: 'Ismeretlen email.' };
+};
 
-  return {
-    success: true,
-    data: user,
-  };
+/**
+ * Get user by restaurant id.
+ * @param {string} id restaurant id
+ * @returns {
+ *   success: Boolean,
+ *   ?user: User,
+ *   ?error: String,
+ * } Returns an object containing the User instance or an error message
+ */
+const getUserByRestaurantId = async (restaurantId) => {
+  await connectDb();
+
+  const user = await User.findOne({ restaurantId }).exec();
+
+  return user
+    ? { success: true, data: user.toObject() }
+    : { success: false, error: 'Ismeretlen email.' };
 };
 
 /**
@@ -66,21 +80,22 @@ const getUserByEmail = async (email) => {
 const getUsers = async () => {
   await connectDb();
 
-  const users = await User.find({}).exec();
-  const data = users.map((user) => ({ ...user.toObject(), password: undefined }));
-  return { success: true, data };
+  const users = (await User.find({}).exec()).map((user) => user.toObject());
+
+  return { success: true, data: users };
 };
 
 /**
  * Insert user.
  * @param {User} user
+ * @param {String} role The role of the user (admin, restaurant, user)
  * @returns {Object} Returns an object with error message or success
  */
-const createUser = async (user) => {
+const createUser = async (user, role = 'user') => {
   await connectDb();
 
   const hash = await bcrypt.hash(user.password, saltRounds);
-  const result = await User.create({ ...user, password: hash, role: 'user' });
+  const result = await User.create({ ...user, password: hash, role });
 
   return result
     ? { success: true, data: { ...result.toObject(), password: undefined } }
@@ -93,10 +108,16 @@ const createUser = async (user) => {
  * @param {String} id
  * @returns {Object} Returns an object with error message or success
  */
-const updateUser = async (id, user) => {
+const updateUser = async (id, userData) => {
   await connectDb();
 
-  const result = await User.findByIdAndUpdate(id, user, { new: true });
+  const user = { name: userData.name, email: userData.email };
+  if (userData.password) {
+    const hash = await bcrypt.hash(user.password, saltRounds);
+    user.password = hash;
+  }
+
+  const result = await User.findByIdAndUpdate(id, user, { new: true }).exec();
 
   return result
     ? { success: true, data: { ...result.toObject(), password: undefined } }
@@ -128,18 +149,15 @@ const checkCredentials = async (email, password) => {
   if (!user.success) {
     return {
       success: false,
-      error: user.error,
+      error: 'Az email és jelszó páros nem talál!',
     };
   }
-  const data = {
-    email: user.data.email,
-    name: user.data.name,
-    role: user.data.role,
-  };
 
   const match = await bcrypt.compare(password, user.data.password);
 
-  return match ? { success: true, data } : { success: false, error: 'Password does not match' };
+  return match
+    ? { success: true, data: { ...user.data, password: undefined } }
+    : { success: false, error: 'Az email és jelszó páros nem talál!' };
 };
 
 /**
@@ -147,7 +165,7 @@ const checkCredentials = async (email, password) => {
  * @param {User} user
  * @returns {String} jwt token
  */
-const createToken = (user) => jwt.sign(user, process.env.SECRET, { expiresIn: '14d' });
+const createToken = (user) => jwt.sign(user, process.env.SECRET, { expiresIn: '1h' });
 
 /**
  * Verify jwt token
@@ -171,7 +189,9 @@ const verifyToken = (token) => {
 };
 
 export default {
+  getUserIds,
   getUserByEmail,
+  getUserByRestaurantId,
   getUserById,
   getUsers,
   createUser,

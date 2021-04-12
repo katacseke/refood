@@ -6,6 +6,12 @@ export const hasRole = (role) => (user) => user.data.role === role;
 // checks if the user matches the one from the request
 export const isSelf = () => (user, req) => user.data.id === req.query.id;
 
+// checks if the user matches the one from the request
+export const isRestaurantOwner = () => (user, req) => user.data.restaurantId === req.query.id;
+
+// confirms the user is authenticated
+export const authenticated = () => () => true;
+
 /**
  * Authorizes the user with different conditions
  * @param  {...function} conditions Functions checking if the user matches certain criteria
@@ -24,8 +30,12 @@ const authorize = (...conditions) => async (req, res, next) => {
     return;
   }
 
-  // checks wether the user matches all the conditions
+  // checks wether the user matches at least one of the conditions
   if (conditions.some((condition) => condition(user, req))) {
+    req.user = user.data;
+    delete req.user.exp;
+    delete req.user.iat;
+
     next();
     return;
   }

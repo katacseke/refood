@@ -5,7 +5,10 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   role: String,
+  restaurantId: String,
 });
+
+userSchema.set('toObject', { getters: true });
 
 mongoose.models = {};
 

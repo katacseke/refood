@@ -1,0 +1,43 @@
+$primary: rgb(22, 95, 100);
+$background: rgb(240, 240, 240);
+$special: rgb(3, 40, 43);
+$custom-toggle-checked-background: $primary;
+$custom-toggle-checked-border-color: $primary;
+
+@import "shards-ui/src/scss/shards";
+@import "bootstrap";
+@import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background-color: $background;
+  font-family: Rubik, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+body.modal-open {
+  overflow-y: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.highlightedText {
+  font-size: 1.5rem;
+}
+
+.modal-header .close {
+  padding-right: 0;
+}
+
+.modal-backdrop.show {
+  opacity: 0.5;
+}

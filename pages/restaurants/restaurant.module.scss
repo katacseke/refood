@@ -1,0 +1,42 @@
+$transition-duration: .3s;
+$width: 300px;
+$hidden-height: 110px;
+$bg-color: #f0f0f0;
+$tag-color: #e4e1e1;
+$main-color: #212529;
+$secondary-color: rgb(94, 91, 89);
+
+.mainContainer {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  border-radius: inherit;
+  padding: 0;
+
+  .image { 
+    position: relative; 
+    width: 18rem; 
+  }
+
+  .content {
+    padding: 2rem;
+    flex: 1;
+  }
+}
+
+.moreInformation {
+    margin: 1rem .5rem;
+    font-size: .85rem;
+    color: $secondary-color;
+    list-style: none;
+    padding: initial 1rem;
+    font-size: .9rem;
+
+    .mealLi::before {
+      content: '\2713';
+      color: green;
+      display: inline-block; 
+      width: 1em; 
+      margin-left: -1em; 
+    }
+}

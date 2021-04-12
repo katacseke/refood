@@ -7,6 +7,6 @@ export default Yup.object({
   startTime: Yup.date().min(new Date(), 'Date must be later than now.'),
   endTime: Yup.date().min(Yup.ref('startTime')),
   price: Yup.number().positive('Price must be positive.'),
-  donateable: Yup.boolean(),
+  donatable: Yup.boolean(),
   dailyMenu: Yup.boolean(),
 });
