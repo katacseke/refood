@@ -6,6 +6,15 @@ const userSchema = new mongoose.Schema({
   password: String,
   role: String,
   restaurantId: String,
+  cart: {
+    type: [
+      {
+        mealId: String,
+        quantity: Number,
+      },
+    ],
+    default: [],
+  },
 });
 
 userSchema.set('toObject', { getters: true });
