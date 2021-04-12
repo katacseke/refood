@@ -8,12 +8,12 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
   const updateCart = async (newCart) => {
-    const res = await fetch(`/api/users/${user.id}`, {
+    const res = await fetch(`/api/users/${user.id}/cart`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ cart: newCart }),
+      body: JSON.stringify(newCart),
     });
 
     if (res.ok) {
@@ -29,11 +29,10 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    const res = await fetch(`/api/users/${user.id}`);
+    const res = await fetch(`/api/users/${user.id}/cart`);
 
     if (res.ok) {
-      const userResponse = await res.json;
-      setCart(userResponse.cart);
+      setCart(await res.json());
     }
   }, [user]);
 

@@ -1,6 +1,6 @@
 import nextConnect from 'next-connect';
-import { userService } from '../../../server/services';
-import authorize, { hasRole, isSelf } from '../../../server/middleware/authorize';
+import { userService } from '../../../../server/services';
+import authorize, { hasRole, isSelf } from '../../../../server/middleware/authorize';
 
 const authorization = nextConnect()
   .get('/api/users/:id', authorize(hasRole('admin'), isSelf()))

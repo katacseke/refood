@@ -9,7 +9,10 @@ const userSchema = new mongoose.Schema({
   cart: {
     type: [
       {
-        mealId: String,
+        meal: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Meal',
+        },
         quantity: Number,
       },
     ],
@@ -19,7 +22,5 @@ const userSchema = new mongoose.Schema({
 
 userSchema.set('toObject', { getters: true });
 
-mongoose.models = {};
-
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 export default User;

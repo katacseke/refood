@@ -11,7 +11,6 @@ const restaurantApplicationSchema = new mongoose.Schema({
 
 restaurantApplicationSchema.set('toObject', { getters: true });
 
-mongoose.models = {};
-
-const Application = mongoose.model('Application', restaurantApplicationSchema);
+const Application =
+  mongoose.models.Application || mongoose.model('Application', restaurantApplicationSchema);
 export default Application;

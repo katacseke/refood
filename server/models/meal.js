@@ -18,7 +18,5 @@ mealSchema.index(
   { name: 'text_search_index', weights: { name: 2, tags: 1 }, default_language: 'hu' }
 );
 
-mongoose.models = {};
-
-const Meal = mongoose.model('Meal', mealSchema);
+const Meal = mongoose.models.Meal || mongoose.model('Meal', mealSchema);
 export default Meal;
