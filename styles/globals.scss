@@ -41,3 +41,11 @@ a {
 .modal-backdrop.show {
   opacity: 0.5;
 }
+
+.tooltip-inner {
+  background-color: $background;
+}
+
+.arrow::before {
+  border-top-color: $background !important;
+}

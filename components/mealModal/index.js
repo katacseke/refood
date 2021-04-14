@@ -1,3 +1,4 @@
+import { useContext, useEffect, useState } from 'react';
 import {
   Container,
   Badge,
@@ -8,20 +9,58 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
+  Tooltip,
 } from 'shards-react';
 import { IoCartOutline } from 'react-icons/io5';
 import Image from 'next/image';
-import { useEffect } from 'react';
+
 import moment from 'moment';
 import 'twix';
+import toast from 'react-hot-toast';
+import AuthContext from '../../context/authContext';
 import styles from './mealModal.module.scss';
 
 moment.locale('hu');
 
 const MealModal = ({ meal, open, setOpen }) => {
+  const { user } = useContext(AuthContext);
+
   useEffect(() => {
     document.body.classList.toggle('modal-open', open);
   }, [open]);
+
+  const [selectedPortions, setSelectedPortions] = useState(1);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
+  const addToCart = async () => {
+    if (selectedPortions > meal.portionNumber || selectedPortions < 1) {
+      toast.error('Ez a mennyiség nem rendelhető meg!');
+      return;
+    }
+
+    const cartItem = {
+      meal: meal.id,
+      quantity: selectedPortions,
+    };
+
+    const res = await fetch(`/api/users/${user.id}/cart`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cartItem),
+    });
+
+    if (res.ok) {
+      setOpen(false);
+      toast.success('Kosárba tetted!');
+
+      return;
+    }
+
+    const err = await res.json();
+    toast.error(err.general.message);
+  };
 
   if (!meal) {
     return <div />;
@@ -75,16 +114,30 @@ const MealModal = ({ meal, open, setOpen }) => {
                 type="number"
                 name="quantity"
                 id="quantity"
-                defaultValue="1"
+                value={selectedPortions}
+                onChange={(e) => setSelectedPortions(e.target.value)}
                 min="1"
                 max={meal.portionNumber}
               />
             </Col>
-            <Col>
-              <Button className="col d-inline-flex align-items-center justify-content-center">
+            <Col id="cartButton">
+              <Button
+                onClick={addToCart}
+                className="col d-inline-flex align-items-center justify-content-center"
+                disabled={!user}
+              >
                 <IoCartOutline className="mr-1" />
                 Kosárba
               </Button>
+              {!user && (
+                <Tooltip
+                  open={tooltipOpen}
+                  target="#cartButton"
+                  toggle={() => setTooltipOpen(!tooltipOpen)}
+                >
+                  Rendeléshez jelentkezz be!
+                </Tooltip>
+              )}
             </Col>
           </Row>
         </div>

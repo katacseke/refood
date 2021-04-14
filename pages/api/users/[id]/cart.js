@@ -1,12 +1,18 @@
 import nextConnect from 'next-connect';
 import { cartService } from '../../../../server/services';
+import validateResource from '../../../../server/middleware/validateResource';
 import authorize, { hasRole, isSelf } from '../../../../server/middleware/authorize';
+import cartItemSchema from '../../../../validation/cartItemSchema';
 
 const authorization = nextConnect()
   .get('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()))
-  .patch('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()));
+  .patch('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()))
+  .post('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()));
+const validation = nextConnect()
+  .patch('/api/users/:id/cart', validateResource(cartItemSchema))
+  .post('/api/users/:id/cart', validateResource(cartItemSchema));
 
-const handler = nextConnect().use(authorization);
+const handler = nextConnect().use(authorization).use(validation);
 
 handler.get(async (req, res) => {
   const cart = await cartService.getCart(req.query.id);
@@ -20,7 +26,7 @@ handler.get(async (req, res) => {
 });
 
 handler.patch(async (req, res) => {
-  const updatedCart = await cartService.updateCart(req.query.id, req.body);
+  const updatedCart = await cartService.updateCartItem(req.query.id, req.body);
 
   if (!updatedCart.success) {
     res.status(500).json({ general: { message: updatedCart.error } });
@@ -28,6 +34,17 @@ handler.patch(async (req, res) => {
   }
 
   res.status(200).json(updatedCart.data);
+});
+
+handler.post(async (req, res) => {
+  const cart = await cartService.addCartItem(req.query.id, req.body);
+
+  if (!cart.success) {
+    res.status(500).json({ general: { message: cart.error } });
+    return;
+  }
+
+  res.status(200).json(cart.data);
 });
 
 export default handler;

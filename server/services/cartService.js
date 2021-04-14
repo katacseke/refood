@@ -17,21 +17,68 @@ const getCart = async (userId) => {
   return { success: true, data: cart.toObject() };
 };
 
-const updateCart = async (userId, cart) => {
+/**
+ * Update a cart item of a cart that belongs to a certain user.
+ * @param {String} userId id of the user the cart belongs to
+ * @param {Object} newItem the cart item to update
+ * @returns Object containing updated cart on success, otherwise error message
+ */
+const updateCartItem = async (userId, newItem) => {
   await connectDb();
 
-  const { cart: updatedCart } = await User.findByIdAndUpdate(userId, { cart }, { new: true })
-    .select('cart')
-    .exec();
+  const user = await User.findById(userId).select('cart').exec();
 
-  if (!updatedCart) {
-    return { success: false, error: 'Nem sikerült frissíteni a kosár tartalmát.' };
+  const { cart } = user;
+  if (!cart) {
+    return { success: false, error: 'Nem sikerült elérni a kosarat' };
   }
 
-  return { success: true, data: updatedCart.toObject() };
+  const meal = cart.find((item) => item.meal.toString() === newItem.meal);
+
+  if (meal) {
+    meal.quantity = newItem.quantity;
+
+    if (meal.quantity === 0) {
+      cart.remove(meal);
+    }
+  } else {
+    cart.push(newItem);
+  }
+
+  user.save();
+  return { success: true, data: cart.toObject() };
+};
+
+/**
+ * Add new item to cart
+ * @param {String} userId id of the user the cart belongs to
+ * @param {*} newItem the cart item to add
+ * @returns Object containing updated cart on success, otherwise error message
+ */
+const addCartItem = async (userId, newItem) => {
+  await connectDb();
+
+  const user = await User.findById(userId).select('cart').exec();
+
+  const { cart } = user;
+  if (!cart) {
+    return { success: false, error: 'Nem sikerült elérni a kosarat' };
+  }
+
+  const meal = cart.find((item) => item.meal.toString() === newItem.meal);
+
+  if (meal) {
+    meal.quantity += newItem.quantity;
+  } else {
+    cart.push(newItem);
+  }
+
+  user.save();
+  return { success: true, data: cart.toObject() };
 };
 
 export default {
   getCart,
-  updateCart,
+  updateCartItem,
+  addCartItem,
 };
