@@ -7,7 +7,8 @@ import cartItemSchema from '../../../../validation/cartItemSchema';
 const authorization = nextConnect()
   .get('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()))
   .patch('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()))
-  .post('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()));
+  .post('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()))
+  .delete('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()));
 const validation = nextConnect()
   .patch('/api/users/:id/cart', validateResource(cartItemSchema))
   .post('/api/users/:id/cart', validateResource(cartItemSchema));
@@ -38,6 +39,17 @@ handler.patch(async (req, res) => {
 
 handler.post(async (req, res) => {
   const cart = await cartService.upsertCartItem(req.query.id, req.body, 'add');
+
+  if (!cart.success) {
+    res.status(500).json({ general: { message: cart.error } });
+    return;
+  }
+
+  res.status(200).json(cart.data);
+});
+
+handler.delete(async (req, res) => {
+  const cart = await cartService.deleteCartContent(req.query.id);
 
   if (!cart.success) {
     res.status(500).json({ general: { message: cart.error } });

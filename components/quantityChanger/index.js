@@ -3,7 +3,7 @@ import { IoRemoveSharp, IoAddSharp, IoTrash } from 'react-icons/io5';
 import styles from './quantityChanger.module.scss';
 
 const QuantityChanger = ({ quantity, onSubtract, onAdd, max }) => (
-  <div className="d-inline-flex align-items-baseline">
+  <div className="d-inline-flex align-items-center">
     <Button pill className={`p-1 ${styles.button}`} onClick={onSubtract}>
       {quantity > 1 ? <IoRemoveSharp /> : <IoTrash />}
     </Button>

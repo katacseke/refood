@@ -73,7 +73,30 @@ const upsertCartItem = async (userId, newItem, quantityStrategy) => {
   return { success: true, data: updatedCart.toObject() };
 };
 
+/**
+ * Delete cart content for user
+ * @param {String} userId id of current user
+ * @returns {Object} Empty cart error message and success: false
+ */
+const deleteCartContent = async (userId) => {
+  await connectDb();
+
+  const user = await User.findById(userId).select('cart').exec();
+
+  const { cart } = user;
+  if (!cart) {
+    return { success: false, error: 'Nem sikerült elérni a kosarat.' };
+  }
+
+  cart.restaurant = undefined;
+  cart.items = [];
+  user.save();
+
+  return { success: true, data: cart.toObject() };
+};
+
 export default {
   getCart,
   upsertCartItem,
+  deleteCartContent,
 };

@@ -43,6 +43,20 @@ export const CartProvider = ({ children }) => {
     throw new Error(err);
   };
 
+  const deleteCartContent = async () => {
+    const res = await fetch(`/api/users/${user.id}/cart`, {
+      method: 'DELETE',
+    });
+
+    if (res.ok) {
+      setCart(await res.json());
+      return;
+    }
+
+    const err = await res.json();
+    throw new Error(err);
+  };
+
   useEffect(async () => {
     if (!user) {
       return;
@@ -56,7 +70,7 @@ export const CartProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <CartContext.Provider value={{ cart, updateCartItem, addCartItem }}>
+    <CartContext.Provider value={{ cart, updateCartItem, addCartItem, deleteCartContent }}>
       {children}
     </CartContext.Provider>
   );

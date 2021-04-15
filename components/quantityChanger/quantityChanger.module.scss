@@ -1,12 +1,20 @@
 .button {
-    height: fit-content;
+    width: 1.9rem;
+    height: 1.9rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .quantity {
-    width: 2rem;
+    width: 1.9rem;
+    height: 1.9rem;
+    font-size: .875rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 50rem;
     background-color: #f0f0f0;
-    padding: .3rem;
     text-align: center;
     margin: initial .3rem;
 }
