@@ -64,8 +64,13 @@ const upsertCartItem = async (userId, newItem, quantityStrategy) => {
     cart.restaurant = undefined;
   }
 
-  user.save();
-  return { success: true, data: cart.toObject() };
+  await user.save();
+
+  const updatedCart = await cart
+    .populate({ path: 'items.meal', model: 'Meal' })
+    .populate({ path: 'restaurant', model: 'Restaurant' })
+    .execPopulate();
+  return { success: true, data: updatedCart.toObject() };
 };
 
 export default {

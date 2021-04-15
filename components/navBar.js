@@ -17,10 +17,13 @@ import {
   FormInput,
   Collapse,
 } from 'shards-react';
+import { Popover } from 'reactstrap';
+import CartPopover from './cartPopover';
 import AuthContext from '../context/authContext';
 
 const AuthenticatedSection = ({ logout }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
   return (
     <>
@@ -38,6 +41,22 @@ const AuthenticatedSection = ({ logout }) => {
           </NavLink>
         </Link>
       </NavItem>
+
+      <NavItem>
+        <NavLink active style={{ cursor: 'pointer' }} id="cartPopover">
+          Kosár
+        </NavLink>
+        <Popover
+          placement="bottom-end"
+          isOpen={cartOpen}
+          target="cartPopover"
+          toggle={() => setCartOpen(!cartOpen)}
+          trigger="legacy"
+        >
+          <CartPopover />
+        </Popover>
+      </NavItem>
+
       <Dropdown open={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
         <DropdownToggle nav caret>
           Saját fiók

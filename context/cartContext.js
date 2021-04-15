@@ -7,21 +7,40 @@ export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cart, setCart] = useState([]);
 
-  const updateCart = async (newCart) => {
+  const updateCartItem = async (cartItem) => {
     const res = await fetch(`/api/users/${user.id}/cart`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(newCart),
+      body: JSON.stringify(cartItem),
     });
 
     if (res.ok) {
-      setCart(newCart);
+      setCart(await res.json());
       return;
     }
 
-    throw new Error('A kosár frissítése sikertelen');
+    const err = await res.json();
+    throw new Error(err);
+  };
+
+  const addCartItem = async (cartItem) => {
+    const res = await fetch(`/api/users/${user.id}/cart`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cartItem),
+    });
+
+    if (res.ok) {
+      setCart(await res.json());
+      return;
+    }
+
+    const err = await res.json();
+    throw new Error(err);
   };
 
   useEffect(async () => {
@@ -36,7 +55,11 @@ export const CartProvider = ({ children }) => {
     }
   }, [user]);
 
-  return <CartContext.Provider value={{ cart, updateCart }}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={{ cart, updateCartItem, addCartItem }}>
+      {children}
+    </CartContext.Provider>
+  );
 };
 
 export default CartContext;

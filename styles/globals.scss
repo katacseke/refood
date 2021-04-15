@@ -49,3 +49,7 @@ a {
 .arrow::before {
   border-top-color: $background !important;
 }
+
+.popover, .popover-inner {
+  max-width: none;
+}

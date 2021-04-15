@@ -19,11 +19,13 @@ import 'twix';
 import toast from 'react-hot-toast';
 import AuthContext from '../../context/authContext';
 import styles from './mealModal.module.scss';
+import CartContext from '../../context/cartContext';
 
 moment.locale('hu');
 
 const MealModal = ({ meal, open, setOpen }) => {
   const { user } = useContext(AuthContext);
+  const { addCartItem } = useContext(CartContext);
 
   useEffect(() => {
     document.body.classList.toggle('modal-open', open);
@@ -32,7 +34,7 @@ const MealModal = ({ meal, open, setOpen }) => {
   const [selectedPortions, setSelectedPortions] = useState(1);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
-  const addToCart = async () => {
+  const handleAddToCart = async () => {
     if (selectedPortions > meal.portionNumber || selectedPortions < 1) {
       toast.error('Ez a mennyiség nem rendelhető meg!');
       return;
@@ -43,23 +45,14 @@ const MealModal = ({ meal, open, setOpen }) => {
       quantity: selectedPortions,
     };
 
-    const res = await fetch(`/api/users/${user.id}/cart`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(cartItem),
-    });
+    try {
+      await addCartItem(cartItem);
 
-    if (res.ok) {
       setOpen(false);
       toast.success('Kosárba tetted!');
-
-      return;
+    } catch (err) {
+      toast.error(err.message);
     }
-
-    const err = await res.json();
-    toast.error(err.general.message);
   };
 
   if (!meal) {
@@ -115,14 +108,14 @@ const MealModal = ({ meal, open, setOpen }) => {
                 name="quantity"
                 id="quantity"
                 value={selectedPortions}
-                onChange={(e) => setSelectedPortions(e.target.value)}
+                onChange={(e) => setSelectedPortions(parseInt(e.target.value, 10))}
                 min="1"
                 max={meal.portionNumber}
               />
             </Col>
             <Col id="cartButton">
               <Button
-                onClick={addToCart}
+                onClick={handleAddToCart}
                 className="col d-inline-flex align-items-center justify-content-center"
                 disabled={!user}
               >
