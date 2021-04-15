@@ -7,16 +7,22 @@ const userSchema = new mongoose.Schema({
   role: String,
   restaurantId: String,
   cart: {
-    type: [
-      {
-        meal: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Meal',
+    restaurant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Restaurant',
+    },
+    items: {
+      type: [
+        {
+          meal: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Meal',
+          },
+          quantity: Number,
         },
-        quantity: Number,
-      },
-    ],
-    default: [],
+      ],
+      default: [],
+    },
   },
 });
 

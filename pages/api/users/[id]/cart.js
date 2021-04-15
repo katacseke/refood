@@ -26,7 +26,7 @@ handler.get(async (req, res) => {
 });
 
 handler.patch(async (req, res) => {
-  const updatedCart = await cartService.updateCartItem(req.query.id, req.body);
+  const updatedCart = await cartService.upsertCartItem(req.query.id, req.body, 'set');
 
   if (!updatedCart.success) {
     res.status(500).json({ general: { message: updatedCart.error } });
@@ -37,7 +37,7 @@ handler.patch(async (req, res) => {
 });
 
 handler.post(async (req, res) => {
-  const cart = await cartService.addCartItem(req.query.id, req.body);
+  const cart = await cartService.upsertCartItem(req.query.id, req.body, 'add');
 
   if (!cart.success) {
     res.status(500).json({ general: { message: cart.error } });
