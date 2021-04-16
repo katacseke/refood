@@ -24,6 +24,30 @@ const userSchema = new mongoose.Schema({
       default: [],
     },
   },
+  orders: {
+    type: [
+      {
+        status: String,
+        restaurant: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Restaurant',
+        },
+        items: {
+          type: [
+            {
+              meal: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Meal',
+              },
+              quantity: Number,
+            },
+          ],
+          default: [],
+        },
+      },
+    ],
+    default: [],
+  },
 });
 
 userSchema.set('toObject', { getters: true });
