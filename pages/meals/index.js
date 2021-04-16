@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Container, Button } from 'shards-react';
 import { IoFilter } from 'react-icons/io5';
 import Router, { useRouter } from 'next/router';
+import { useTransition, animated } from 'react-spring';
 import Layout from '../../components/layout';
 import MealCard from '../../components/cards/mealCard';
 import MealModal from '../../components/mealModal';
@@ -23,6 +24,18 @@ const MealsPage = ({ meals }) => {
     Router.push(`/meals?${queryString}`);
   };
 
+  const transitions = useTransition(meals, (meal) => meal.id, {
+    unique: true,
+    trail: 400 / meals.length,
+    from: { opacity: 0, transform: 'scale(0)' },
+    enter: { opacity: 1, transform: 'scale(1)' },
+    leave: { opacity: 0, transform: 'scale(0)' },
+    config: {
+      tension: 60,
+      friction: 15,
+    },
+  });
+
   const defaultFilters = useRouter().query;
   return (
     <Layout>
@@ -41,8 +54,10 @@ const MealsPage = ({ meals }) => {
 
       {meals.length ? (
         <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
-          {meals.map((meal) => (
-            <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal)} />
+          {transitions.map(({ item, props, key }) => (
+            <animated.div key={key} style={props}>
+              <MealCard data={item} onClick={() => showMeal(item)} />
+            </animated.div>
           ))}
         </Container>
       ) : (
