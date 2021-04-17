@@ -2,10 +2,12 @@ import { useContext } from 'react';
 import { Button, Card, CardBody, CardTitle } from 'shards-react';
 import { IoCartOutline, IoClose } from 'react-icons/io5';
 import toast from 'react-hot-toast';
+import { Router } from 'next/router';
 import Layout from '../../components/layout';
 import CartContext from '../../context/cartContext';
-import styles from './cart.module.scss';
+import withAuthSSR from '../../server/middleware/withAuthSSR';
 import QuantityChanger from '../../components/quantityChanger';
+import styles from './cart.module.scss';
 
 const CartPage = () => {
   const { cart, updateCartItem, deleteCartContent } = useContext(CartContext);
@@ -16,6 +18,20 @@ const CartPage = () => {
     } catch (err) {
       toast.error(err.message);
     }
+  };
+
+  const placeOrder = async () => {
+    const res = await fetch('/api/users/:id/orders', {
+      method: 'POST',
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      toast.error(err.general.message);
+    }
+
+    toast.success('A rendelésedet rögzítettük.');
+    Router.push('/orders');
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
@@ -49,7 +65,7 @@ const CartPage = () => {
   );
 
   return (
-    <Layout>
+    <Layout requiresAuth>
       <Card size="lg" className="m-2 mb-5">
         <CardBody>
           <CardTitle tag="h3" className="d-flex align-items-center">
@@ -73,7 +89,7 @@ const CartPage = () => {
                   <Button className={styles.removeAllButton} onClick={deleteCartContent}>
                     Kosár ürítése
                   </Button>
-                  <Button>Rendelés</Button>
+                  <Button onClick={placeOrder}>Rendelés leadása</Button>
                 </div>
               </div>
             ) : (
@@ -85,5 +101,9 @@ const CartPage = () => {
     </Layout>
   );
 };
+
+export const getServerSideProps = withAuthSSR(async () => ({
+  props: {},
+}));
 
 export default CartPage;
