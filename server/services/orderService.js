@@ -1,5 +1,6 @@
 import { User } from '../models';
 import cartService from './cartService';
+import mealService from './mealService';
 import connectDb from '../db';
 
 /**
@@ -40,42 +41,74 @@ const getOrderByOrderId = async (userId, orderId) => {
   return { success: true, data: order.toObject() };
 };
 
+/**
+ * Handles order process: creates an order from the content of the cart,
+ * then clears the cart and updates the portion numbers of meals.
+ * @param {String} userId id of the user the order belongs to
+ * @returns Order object, or object containing error message.
+ */
 const order = async (userId) => {
   const connection = await connectDb();
 
   let transactionResult;
   try {
-    await connection.transaction(async () => {
-      // Create the order
-      const user = await User.findById(userId).exec();
-      const { orders, cart } = user;
+    await connection.transaction(
+      async () => {
+        const user = await User.findById(userId).exec();
+        const { orders, cart } = user;
 
-      if (!orders) {
-        throw new Error('Nem sikerült elérni a rendeléseket.');
-      }
+        if (!orders) {
+          throw new Error('Nem sikerült elérni a rendeléseket.');
+        }
 
-      if (cart.items.length === 0) {
-        throw new Error('A kosár üres.');
-      }
+        if (cart.items.length === 0) {
+          throw new Error('A kosár üres.');
+        }
 
-      const orderContent = {
-        ...cart.toObject(),
-        status: 'active',
-      };
+        // Update meal quantities
+        const populatedCart = await cart
+          .populate({ path: 'items.meal', model: 'Meal' })
+          .execPopulate();
 
-      orders.push(orderContent);
+        await Promise.all(
+          populatedCart.items.map(async (item) => {
+            const newPortionNumber = item.meal.portionNumber - item.quantity;
 
-      await user.save();
+            if (newPortionNumber < 0) {
+              throw new Error(`Nincs elegendő adag a(z) ${item.meal.name} nevű ételből.`);
+            }
 
-      // Delete cart content
-      const cartResult = await cartService.deleteCartContent(userId);
+            const result = await mealService.updateMeal(item.meal.id, {
+              portionNumber: newPortionNumber,
+            });
 
-      if (!cartResult.success) {
-        throw new Error(cartResult.error);
-      }
+            if (!result.success) {
+              throw new Error('Nem sikerült leadni a rendelést.');
+            }
+          })
+        );
 
-      transactionResult = orderContent;
-    });
+        // Create the order
+        const orderContent = {
+          ...cart.toObject(),
+          status: 'active',
+        };
+
+        orders.push(orderContent);
+
+        await user.save();
+
+        // Delete cart content
+        const cartResult = await cartService.deleteCartContent(userId);
+
+        if (!cartResult.success) {
+          throw new Error(cartResult.error);
+        }
+
+        transactionResult = orderContent;
+      },
+      { readConcern: { level: 'snapshot' }, writeConcearn: { w: 'majority' } }
+    );
 
     return { success: true, data: transactionResult };
   } catch (err) {

@@ -40,7 +40,7 @@ export const CartProvider = ({ children }) => {
     }
 
     const err = await res.json();
-    throw new Error(err);
+    throw new Error(err.general.message);
   };
 
   const deleteCartContent = async () => {
