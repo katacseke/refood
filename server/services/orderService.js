@@ -133,7 +133,7 @@ const cancelOrder = async (userId, orderId) => {
     return { success: false, error: 'Nem sikerült visszavonni a rendelést.' };
   }
 
-  const order = orders.find((item) => item._id.toString() === orderId);
+  const order = orders.id(orderId);
 
   if (!order) {
     return { success: false, error: 'Ez a rendelés nem létezik.' };

@@ -1,6 +1,6 @@
 import { userService } from '../services';
 
-export const isSelfSSR = () => (user, ctx) => user.data._id === ctx.params.id;
+export const isSelfSSR = () => (user, ctx) => user.data.id === ctx.params.id;
 
 const withAuthSSR = (getServerSideProps, ...conditions) => async (ctx) => {
   const token = ctx.req.cookies.access_token;

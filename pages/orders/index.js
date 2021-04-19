@@ -13,13 +13,13 @@ const OrdersPage = ({ orders }) => {
       {activeOrders.length && <h1>Aktív rendelések</h1>}
       <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
         {activeOrders.map((order) => (
-          <UserOrderCard key={order._id} order={order} />
+          <UserOrderCard key={order.id} order={order} />
         ))}
       </Container>
       <h1>Régebbi rendelések</h1>
       <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
         {pastOrders.map((order) => (
-          <UserOrderCard key={order._id} order={order} />
+          <UserOrderCard key={order.id} order={order} />
         ))}
       </Container>
     </Layout>

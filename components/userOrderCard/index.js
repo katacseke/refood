@@ -15,7 +15,7 @@ const UserOrderCard = ({ order }) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ orderId: order._id }),
+      body: JSON.stringify({ orderId: order.id }),
     });
 
     if (!res.ok) {
