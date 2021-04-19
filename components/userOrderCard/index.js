@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
 import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
 import toast from 'react-hot-toast';
 import { useContext } from 'react';
-import { Router } from 'next/router';
+import Router from 'next/router';
 import styles from './userOrderCard.module.scss';
 import AuthContext from '../../context/authContext';
 

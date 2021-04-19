@@ -28,6 +28,8 @@ const userSchema = new mongoose.Schema({
     type: [
       {
         status: String,
+        createdAt: Date,
+        updatedAt: Date,
         restaurant: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Restaurant',

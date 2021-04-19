@@ -92,6 +92,8 @@ const createOrder = async (userId) => {
         const orderContent = {
           ...cart.toObject(),
           status: 'active',
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
         };
 
         orders.push(orderContent);
@@ -138,6 +140,7 @@ const cancelOrder = async (userId, orderId) => {
   }
 
   order.status = 'canceled';
+  order.updatedAt = Date.now();
   user.save();
 
   return { success: true, data: order.toObject() };
