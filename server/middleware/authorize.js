@@ -40,6 +40,8 @@ const authorize = (...conditions) => async (req, res, next) => {
     return;
   }
 
+  console.log(user.data.id, req.query.id);
+
   res.status(403).json({ error: 'No permission for this action' });
 };
 

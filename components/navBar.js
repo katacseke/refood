@@ -63,7 +63,9 @@ const AuthenticatedSection = ({ logout }) => {
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem>Kosár</DropdownItem>
-          <DropdownItem>Rendelések</DropdownItem>
+          <Link href="/orders">
+            <DropdownItem>Rendelések</DropdownItem>
+          </Link>
           <Link href="/profile/edit">
             <DropdownItem>Saját profil</DropdownItem>
           </Link>

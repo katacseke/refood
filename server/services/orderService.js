@@ -12,7 +12,7 @@ const getOrdersByUser = async (userId) => {
   await connectDb();
 
   const { orders } = await User.findById(userId)
-    .populate({ path: 'orders.restaurant', model: 'Meal' })
+    .populate({ path: 'orders.items.meal', model: 'Meal' })
     .populate({ path: 'orders.restaurant', model: 'Restaurant' })
     .exec();
 
@@ -29,7 +29,7 @@ const getOrderByOrderId = async (userId, orderId) => {
   await connectDb();
 
   const { orders } = User.findById(userId, { 'orders.id': orderId })
-    .populate({ path: 'orders.restaurant', model: 'Meal' })
+    .populate({ path: 'orders.items.meal', model: 'Meal' })
     .populate({ path: 'orders.restaurant', model: 'Restaurant' })
     .exec();
 
@@ -47,7 +47,7 @@ const getOrderByOrderId = async (userId, orderId) => {
  * @param {String} userId id of the user the order belongs to
  * @returns Order object, or object containing error message.
  */
-const order = async (userId) => {
+const createOrder = async (userId) => {
   const connection = await connectDb();
 
   let transactionResult;
@@ -116,8 +116,36 @@ const order = async (userId) => {
   }
 };
 
+/**
+ * Cancel  order for user
+ * @param {String} userId id of current user
+ * @returns {Object} Order or error message and success: false
+ */
+const cancelOrder = async (userId, orderId) => {
+  await connectDb();
+
+  const user = await User.findById(userId).select('orders').exec();
+
+  const { orders } = user;
+  if (!orders) {
+    return { success: false, error: 'Nem sikerült visszavonni a rendelést.' };
+  }
+
+  const order = orders.find((item) => item._id.toString() === orderId);
+
+  if (!order) {
+    return { success: false, error: 'Ez a rendelés nem létezik.' };
+  }
+
+  order.status = 'canceled';
+  user.save();
+
+  return { success: true, data: order.toObject() };
+};
+
 export default {
   getOrdersByUser,
   getOrderByOrderId,
-  order,
+  cancelOrder,
+  createOrder,
 };
