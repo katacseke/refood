@@ -25,7 +25,7 @@ const UserOrderCard = ({ order }) => {
       return;
     }
 
-    toast.success('Rendelés törölve.');
+    toast.success('Rendelés lemondva.');
     Router.push('/orders');
   };
 

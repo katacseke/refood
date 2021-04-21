@@ -2,15 +2,17 @@ import { useContext } from 'react';
 import { Button, Card, CardBody, CardTitle } from 'shards-react';
 import { IoCartOutline, IoClose } from 'react-icons/io5';
 import toast from 'react-hot-toast';
-import { Router } from 'next/router';
+import Router from 'next/router';
 import Layout from '../../components/layout';
 import CartContext from '../../context/cartContext';
 import withAuthSSR from '../../server/middleware/withAuthSSR';
 import QuantityChanger from '../../components/quantityChanger';
 import styles from './cart.module.scss';
+import AuthContext from '../../context/authContext';
 
 const CartPage = () => {
   const { cart, updateCartItem, deleteCartContent } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
 
   const handleUpdate = async (mealId, newQuantity) => {
     try {
@@ -21,13 +23,14 @@ const CartPage = () => {
   };
 
   const placeOrder = async () => {
-    const res = await fetch('/api/users/:id/orders', {
+    const res = await fetch(`/api/users/${user.id}/orders`, {
       method: 'POST',
     });
 
     if (!res.ok) {
       const err = await res.json();
-      toast.error(err.general.message);
+      toast.error(err.error || err.general.message);
+      return;
     }
 
     toast.success('A rendelésedet rögzítettük.');

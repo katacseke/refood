@@ -20,7 +20,7 @@ export const authenticated = () => () => true;
 const authorize = (...conditions) => async (req, res, next) => {
   const token = req.cookies.access_token;
   if (!token) {
-    res.status(401).json({ error: 'Missing credentials.' });
+    res.status(401).json({ error: 'Először be kell jelentkezned.' });
     return;
   }
 
@@ -40,9 +40,9 @@ const authorize = (...conditions) => async (req, res, next) => {
     return;
   }
 
-  console.log(user.data.id, req.query.id);
+  console.log(user.data.id, req.query);
 
-  res.status(403).json({ error: 'No permission for this action' });
+  res.status(403).json({ error: 'Nincs jogosultságod ehhez.' });
 };
 
 export default authorize;

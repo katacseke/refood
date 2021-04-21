@@ -2,8 +2,6 @@ import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
   status: String,
-  createdAt: Date,
-  updatedAt: Date,
   restaurant: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Restaurant',
@@ -22,6 +20,7 @@ const orderSchema = new mongoose.Schema({
   },
 });
 
+orderSchema.set('timestamps', true);
 orderSchema.set('id', true);
 orderSchema.set('toObject', { getters: true });
 

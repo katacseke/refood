@@ -92,8 +92,6 @@ const createOrder = async (userId) => {
         const orderContent = {
           ...cart.toObject(),
           status: 'active',
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
         };
 
         orders.push(orderContent);
@@ -109,7 +107,7 @@ const createOrder = async (userId) => {
 
         transactionResult = orderContent;
       },
-      { readConcern: { level: 'snapshot' }, writeConcearn: { w: 'majority' } }
+      { readConcern: { level: 'snapshot' }, writeConcern: { w: 'majority' } }
     );
 
     return { success: true, data: transactionResult };
@@ -124,26 +122,49 @@ const createOrder = async (userId) => {
  * @returns {Object} Order or error message and success: false
  */
 const cancelOrder = async (userId, orderId) => {
-  await connectDb();
+  const connection = await connectDb();
 
-  const user = await User.findById(userId).select('orders').exec();
+  let transactionResult;
+  try {
+    await connection.transaction(async () => {
+      const user = await User.findById(userId)
+        .populate({ path: 'orders.items.meal', model: 'Meal' })
+        .select('orders')
+        .exec();
 
-  const { orders } = user;
-  if (!orders) {
-    return { success: false, error: 'Nem sikerült visszavonni a rendelést.' };
+      const { orders } = user;
+      if (!orders) {
+        throw new Error('Nem sikerült visszavonni a rendelést.');
+      }
+
+      const order = orders.id(orderId);
+
+      if (!order) {
+        throw new Error('Ez a rendelés nem létezik.');
+      }
+
+      order.status = 'canceled';
+      user.save();
+
+      await Promise.all(
+        order.items.map(async (item) => {
+          const result = await mealService.updateMeal(item.meal.id, {
+            portionNumber: item.meal.portionNumber + item.quantity,
+          });
+
+          if (!result.success) {
+            throw new Error('Nem sikerült visszavonni a rendelést.');
+          }
+        })
+      );
+
+      order.items.transactionResult = order.toObject();
+    });
+
+    return { success: true, data: transactionResult };
+  } catch (err) {
+    return { success: false, error: err.message };
   }
-
-  const order = orders.id(orderId);
-
-  if (!order) {
-    return { success: false, error: 'Ez a rendelés nem létezik.' };
-  }
-
-  order.status = 'canceled';
-  order.updatedAt = Date.now();
-  user.save();
-
-  return { success: true, data: order.toObject() };
 };
 
 export default {

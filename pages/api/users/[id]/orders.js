@@ -11,7 +11,7 @@ const handler = nextConnect().use(authorization);
 
 handler.get(async (req, res) => {
   const orders = await orderService.getOrdersByUser(req.query.id);
-  console.log(orders);
+
   if (!orders.success) {
     res.status(404).json({ error: orders.error });
     return;
