@@ -1,6 +1,17 @@
 settings:
   react:
     version: detect
+  import/resolver:
+      alias:
+        - ['@components', './components']
+        - ['@context', './context']
+        - ['@styles', './styles']
+        - ['@pages', './pages']
+        - ['@api', './pages/api']
+        - ['@server', './server']
+        - ['@services', './server/services']
+        - ['@middleware', './server/middleware']
+        - ['@validation', './validation']
 env:
   browser: true
   es2021: true
