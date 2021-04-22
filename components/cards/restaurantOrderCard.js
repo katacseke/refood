@@ -3,19 +3,19 @@ import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5'
 import toast from 'react-hot-toast';
 import { useContext } from 'react';
 import Router from 'next/router';
-import styles from './userOrderCard.module.scss';
+import styles from './orderCard.module.scss';
 import AuthContext from '../../context/authContext';
 
-const UserOrderCard = ({ order }) => {
+const RestaurantOrderCard = ({ order }) => {
   const { user } = useContext(AuthContext);
 
-  const handleDelete = async () => {
-    const res = await fetch(`/api/users/${user.id}/orders`, {
+  const handleOrder = async (status) => {
+    const res = await fetch(`/api/restaurants/${user.restaurantId}/orders/${order.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ orderId: order.id }),
+      body: JSON.stringify({ status }),
     });
 
     if (!res.ok) {
@@ -25,8 +25,8 @@ const UserOrderCard = ({ order }) => {
       return;
     }
 
-    toast.success('Rendelés lemondva.');
-    Router.push('/orders');
+    toast.success(`Rendelés ${status === 'finished' ? 'átadva' : 'elutasítva'}.`);
+    Router.push('/restaurant/orders');
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
@@ -49,7 +49,7 @@ const UserOrderCard = ({ order }) => {
   return (
     <Card className={styles.card}>
       <CardBody>
-        <CardTitle>Rendelés innen: {order.restaurant.name}</CardTitle>
+        <CardTitle>{order.user.name}</CardTitle>
         {order.items.map(renderCartItem)}
         <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
           <p className={styles.mealName}>Összesen</p>
@@ -61,24 +61,37 @@ const UserOrderCard = ({ order }) => {
       <CardFooter className={styles.footer}>
         {order.status === 'active' && (
           <>
-            <Button active theme="danger" className={styles.button} onClick={handleDelete}>
-              <IoAlertCircleOutline className="mr-1" /> Rendelés lemondása
+            <Button
+              active
+              theme="success"
+              className={styles.button}
+              onClick={() => handleOrder('finished')}
+            >
+              <IoCheckmarkCircleOutline className="mr-1" size={20} /> Befejezés
+            </Button>
+            <Button
+              active
+              theme="danger"
+              className={styles.button}
+              onClick={() => handleOrder('denied')}
+            >
+              <IoAlertCircleOutline className="mr-1" size={20} /> Elutasítás
             </Button>
           </>
         )}
         {order.status === 'finished' && (
           <p className="text-success my-2 text-center flex-grow-1">
-            <IoCheckmarkCircleOutline className="mr-1" /> Sikeres
+            <IoCheckmarkCircleOutline className="mr-1" /> Rendelés átadva
           </p>
         )}
         {order.status === 'denied' && (
           <p className="text-danger my-2 text-center flex-grow-1">
-            <IoAlertCircleOutline className="mr-1" /> Elutasítva
+            <IoAlertCircleOutline className="mr-1" /> Rendelés elutasítva
           </p>
         )}
         {order.status === 'canceled' && (
           <p className="text-danger my-2 text-center flex-grow-1">
-            <IoAlertCircleOutline className="mr-1" /> Lemondva
+            <IoAlertCircleOutline className="mr-1" /> Rendelés lemondva
           </p>
         )}
       </CardFooter>
@@ -86,4 +99,4 @@ const UserOrderCard = ({ order }) => {
   );
 };
 
-export default UserOrderCard;
+export default RestaurantOrderCard;

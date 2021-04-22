@@ -1,7 +1,7 @@
 import nextConnect from 'next-connect';
-import { orderService } from '@services';
+import orderService from '@services/orderService';
 import authorize, { hasRole, isOrderRestaurantOwner } from '@middleware/authorize';
-import { validateResource } from '@middleware';
+import validateResource from '@middleware/validateResource';
 import orderUpdateByRestaurantSchema from '@validation/orderUpdateByRestaurantSchema';
 
 const authorization = nextConnect().patch(
@@ -10,7 +10,7 @@ const authorization = nextConnect().patch(
 );
 
 const validation = nextConnect().patch(
-  '/api/users/:id/orders/:orderId',
+  '/api/restaurants/:id/orders/:orderId',
   validateResource(orderUpdateByRestaurantSchema)
 );
 
@@ -19,9 +19,9 @@ const handler = nextConnect().use(authorization).use(validation);
 handler.patch(async (req, res) => {
   let orders;
   if (req.body.status === 'finished') {
-    orders = await orderService.finishOrder(req.query.id, req.query.orderId);
+    orders = await orderService.finishOrder(req.query.orderId);
   } else {
-    orders = await orderService.cancelOrder(req.query.id, req.query.orderId, 'denied');
+    orders = await orderService.cancelOrder(req.query.orderId, 'denied');
   }
 
   if (!orders.success) {
@@ -31,3 +31,5 @@ handler.patch(async (req, res) => {
 
   res.status(200).json(orders.data);
 });
+
+export default handler;

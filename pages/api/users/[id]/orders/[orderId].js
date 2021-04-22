@@ -17,7 +17,7 @@ const validation = nextConnect().patch(
 const handler = nextConnect().use(authorization).use(validation);
 
 handler.patch(async (req, res) => {
-  const orders = await orderService.cancelOrder(req.query.id, req.query.orderId);
+  const orders = await orderService.cancelOrder(req.query.orderId);
 
   if (!orders.success) {
     res.status(422).json({ general: { message: orders.error } });

@@ -2,6 +2,8 @@ import { userService } from '../services';
 
 export const isSelfSSR = () => (user, ctx) => user.data.id === ctx.params.id;
 
+export const hasRoleSSR = (role) => (user) => user.data.role === role;
+
 const withAuthSSR = (getServerSideProps, ...conditions) => async (ctx) => {
   const token = ctx.req.cookies.access_token;
   if (!token) {

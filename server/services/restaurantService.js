@@ -123,7 +123,6 @@ const createRestaurant = async (restaurantData, application) => {
 
     return { success: true, data };
   } catch (err) {
-    console.log(err);
     return { success: false, error: 'Unable to create restaurant.' };
   }
 };
@@ -176,7 +175,6 @@ const updateRestaurant = async (id, restaurantData) => {
 
     return { success: true, data };
   } catch (err) {
-    console.log(err);
     return { success: false, error: 'Az adatok frissítése sikertelen.' };
   }
 };

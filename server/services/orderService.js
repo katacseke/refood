@@ -45,11 +45,19 @@ const getOrderByUser = async (userId, orderId) => {
 const getOrdersByRestaurant = async (restaurantId) => {
   await connectDb();
 
-  const users = await User.find({ 'orders.restaurant': restaurantId }).select('orders').exec();
+  const users = await User.find({ 'orders.restaurant': restaurantId })
+    .populate({ path: 'orders.items.meal', model: 'Meal' })
+    .populate({ path: 'orders.restaurant', model: 'Restaurant' })
+    .exec();
 
-  const orders = users.flatMap((user) => user.orders);
+  const orders = users.flatMap((user) =>
+    user.orders.map((order) => ({
+      ...order.toObject(),
+      user: { name: user.name, email: user.email },
+    }))
+  );
 
-  return { success: true, data: orders.toObject() };
+  return { success: true, data: orders };
 };
 
 // TODO: Test this method
@@ -64,7 +72,6 @@ const getOrderById = async (orderId) => {
     return { success: false, error: 'Ez a rendelés nem létezik.' };
   }
 
-  console.log(order);
   return { success: true, data: order.toObject() };
 };
 
@@ -149,23 +156,19 @@ const createOrder = async (userId) => {
  * @param {String} userId id of current user
  * @returns {Object} Order or error message and success: false
  */
-const cancelOrder = async (userId, orderId, newStatus = 'canceled') => {
+const cancelOrder = async (orderId, newStatus = 'canceled') => {
   const connection = await connectDb();
 
   let transactionResult;
   try {
     await connection.transaction(async () => {
       // Get the necessary data
-      const user = await User.findById(userId)
+      const user = await User.findOne({ 'orders._id': orderId })
         .populate({ path: 'orders.items.meal', model: 'Meal' })
         .select('orders')
         .exec();
 
-      if (!user) {
-        throw new Error('Ez a felhasználó nem létezik.');
-      }
-
-      const order = user.orders.id(orderId);
+      const order = user?.orders.id(orderId);
 
       if (!order) {
         throw new Error('Ez a rendelés nem létezik.');
@@ -201,23 +204,18 @@ const cancelOrder = async (userId, orderId, newStatus = 'canceled') => {
   }
 };
 
-const finishOrder = async (userId, orderId) => {
+const finishOrder = async (orderId) => {
   await connectDb();
 
-  const user = await User.findById(userId);
-
-  if (!user) {
-    return { success: false, message: 'A felhasználó nem létezik.' };
-  }
-
-  const order = user.orders.id(orderId);
+  const user = await User.findOne({ 'orders._id': orderId }).select('orders').exec();
+  const order = user?.orders.id(orderId);
 
   if (!order) {
-    return { success: false, message: 'Ez a rendelés nem létezik.' };
+    return { success: false, error: 'Ez a rendelés nem létezik.' };
   }
 
   if (order.status !== 'active') {
-    return { success: false, message: 'A rendelés már lezárult.' };
+    return { success: false, error: 'A rendelés már lezárult.' };
   }
 
   order.status = 'finished';

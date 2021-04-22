@@ -1,10 +1,10 @@
 import { Container } from 'shards-react';
-import Layout from '../../components/layout';
-import UserOrderCard from '../../components/cards/userOrderCard';
-import withAuthSSR from '../../server/middleware/withAuthSSR';
-import { orderService } from '../../server/services';
+import Layout from '@components/layout';
+import RestaurantOrderCard from '@components/cards/restaurantOrderCard';
+import withAuthSSR, { hasRoleSSR } from '@middleware/withAuthSSR';
+import { orderService } from '@server/services';
 
-const UserOrdersPage = ({ orders }) => {
+const RestaurantOrdersPage = ({ orders }) => {
   const activeOrders = orders.filter((order) => order.status === 'active');
   const pastOrders = orders.filter((order) => order.status !== 'active');
 
@@ -13,13 +13,13 @@ const UserOrdersPage = ({ orders }) => {
       {activeOrders.length > 0 && <h1>Aktív rendelések</h1>}
       <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
         {activeOrders.map((order) => (
-          <UserOrderCard key={order.id} order={order} />
+          <RestaurantOrderCard key={order.id} order={order} />
         ))}
       </Container>
-      {pastOrders.length > 0 && <h1>Régebbi rendelések</h1>}
+      {pastOrders.length > 0 && <h1>Lezárt rendelések</h1>}
       <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
         {pastOrders.map((order) => (
-          <UserOrderCard key={order.id} order={order} />
+          <RestaurantOrderCard key={order.id} order={order} />
         ))}
       </Container>
       {orders.length === 0 && <h3>Nincsenek rendelések</h3>}
@@ -28,13 +28,13 @@ const UserOrdersPage = ({ orders }) => {
 };
 
 export const getServerSideProps = withAuthSSR(async ({ user }) => {
-  const orders = await orderService.getOrdersByUser(user.id);
+  const orders = await orderService.getOrdersByRestaurant(user.restaurantId);
 
   return {
     props: {
       orders: JSON.parse(JSON.stringify(orders.data)),
     },
   };
-});
+}, hasRoleSSR('restaurant'));
 
-export default UserOrdersPage;
+export default RestaurantOrdersPage;

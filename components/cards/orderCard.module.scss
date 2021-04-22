@@ -19,9 +19,13 @@ $secondary-color: rgb(94, 91, 89);
         flex-wrap: wrap;
 
         .button {
-            margin: .2rem 1rem;
+            margin: .2rem .5rem;
             white-space: nowrap;
             flex: 1;
+            display: flex;
+            line-height: 0;
+            align-items: center;
+            justify-content: center;
         }
     }
 }

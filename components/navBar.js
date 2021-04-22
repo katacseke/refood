@@ -127,7 +127,7 @@ const RestaurantSection = ({ logout, user }) => {
         </Link>
       </NavItem>
       <NavItem>
-        <Link href="/">
+        <Link href="/restaurant/orders">
           <NavLink active style={{ cursor: 'pointer' }}>
             Rendelések
           </NavLink>

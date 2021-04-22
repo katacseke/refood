@@ -9,10 +9,10 @@ export const isSelf = () => (user, req) => user.id === req.query.id;
 // checks if the user matches the one from the request
 export const isRestaurantOwner = () => (user, req) => user.restaurantId === req.query.id;
 
-export const isOrderRestaurantOwner = async (user, req) => {
+export const isOrderRestaurantOwner = () => async (user, req) => {
   const { data: order } = await orderService.getOrderById(req.query.orderId);
 
-  return user.restaurantId === order?.restaurant;
+  return user.restaurantId === order?.restaurant.toString();
 };
 
 // confirms the user is authenticated
