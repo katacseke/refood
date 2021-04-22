@@ -16,7 +16,7 @@ const getOrdersByUser = async (userId) => {
     .populate({ path: 'orders.restaurant', model: 'Restaurant' })
     .exec();
 
-  return { success: true, data: orders.toObject() };
+  return { success: true, data: orders.toObject().sort((a, b) => b.updatedAt - a.updatedAt) };
 };
 
 /**
@@ -41,7 +41,11 @@ const getOrderByUser = async (userId, orderId) => {
   return { success: true, data: order };
 };
 
-// TODO: Test this method
+/**
+ * Get orders that belong to a certain restaurant in an order from latest to oldest.
+ * @param {String} restaurantId id of the restaurant the order is from.
+ * @returns Orders or an object containing error message.
+ */
 const getOrdersByRestaurant = async (restaurantId) => {
   await connectDb();
 
@@ -50,17 +54,23 @@ const getOrdersByRestaurant = async (restaurantId) => {
     .populate({ path: 'orders.restaurant', model: 'Restaurant' })
     .exec();
 
-  const orders = users.flatMap((user) =>
-    user.orders.map((order) => ({
-      ...order.toObject(),
-      user: { name: user.name, email: user.email },
-    }))
-  );
+  const orders = users
+    .flatMap((user) =>
+      user.orders.map((order) => ({
+        ...order.toObject(),
+        user: { name: user.name, email: user.email },
+      }))
+    )
+    .sort((a, b) => b.updatedAt - a.updatedAt);
 
   return { success: true, data: orders };
 };
 
-// TODO: Test this method
+/**
+ * Get order with a given id.
+ * @param {String} orderId Id of the order.
+ * @returns Order or object with error message.
+ */
 const getOrderById = async (orderId) => {
   await connectDb();
 
