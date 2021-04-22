@@ -156,7 +156,10 @@ const checkCredentials = async (email, password) => {
   const match = await bcrypt.compare(password, user.data.password);
 
   return match
-    ? { success: true, data: { ...user.data, password: undefined, cart: undefined } }
+    ? {
+        success: true,
+        data: { ...user.data, password: undefined, cart: undefined, orders: undefined },
+      }
     : { success: false, error: 'Az email és jelszó páros nem talál!' };
 };
 

@@ -57,7 +57,7 @@ export const CartProvider = ({ children }) => {
     throw new Error(err);
   };
 
-  useEffect(async () => {
+  const refresh = async () => {
     if (!user) {
       return;
     }
@@ -67,10 +67,12 @@ export const CartProvider = ({ children }) => {
     if (res.ok) {
       setCart(await res.json());
     }
-  }, [user]);
+  };
+
+  useEffect(refresh, [user]);
 
   return (
-    <CartContext.Provider value={{ cart, updateCartItem, addCartItem, deleteCartContent }}>
+    <CartContext.Provider value={{ cart, updateCartItem, addCartItem, deleteCartContent, refresh }}>
       {children}
     </CartContext.Provider>
   );

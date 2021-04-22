@@ -26,13 +26,13 @@ moment.locale('hu');
 const MealModal = ({ meal, open, setOpen }) => {
   const { user } = useContext(AuthContext);
   const { addCartItem } = useContext(CartContext);
+  const [selectedPortions, setSelectedPortions] = useState(1);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   useEffect(() => {
     document.body.classList.toggle('modal-open', open);
+    setSelectedPortions(1);
   }, [open]);
-
-  const [selectedPortions, setSelectedPortions] = useState(1);
-  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const handleAddToCart = async () => {
     if (selectedPortions > meal.portionNumber || selectedPortions < 1) {

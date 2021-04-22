@@ -11,7 +11,7 @@ import styles from './cart.module.scss';
 import AuthContext from '../../context/authContext';
 
 const CartPage = () => {
-  const { cart, updateCartItem, deleteCartContent } = useContext(CartContext);
+  const { cart, updateCartItem, deleteCartContent, refresh } = useContext(CartContext);
   const { user } = useContext(AuthContext);
 
   const handleUpdate = async (mealId, newQuantity) => {
@@ -33,6 +33,7 @@ const CartPage = () => {
       return;
     }
 
+    refresh();
     toast.success('A rendelésedet rögzítettük.');
     Router.push('/orders');
   };

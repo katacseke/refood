@@ -1,3 +1,4 @@
+import Router from 'next/router';
 import React, { useEffect, useState } from 'react';
 import useInterval from 'use-interval';
 
@@ -13,6 +14,7 @@ export const AuthProvider = ({ children }) => {
 
     if (res.ok) {
       setUser(null);
+      Router.push('/');
     }
   };
 
