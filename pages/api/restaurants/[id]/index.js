@@ -1,8 +1,8 @@
 import nextConnect from 'next-connect';
-import { restaurantService } from '../../../server/services';
-import authorize, { isRestaurantOwner } from '../../../server/middleware/authorize';
-import validateResource from '../../../server/middleware/validateResource';
-import restaurantUpdateSchema from '../../../validation/restaurantUpdateSchema';
+import { restaurantService } from '../../../../server/services';
+import authorize, { isRestaurantOwner } from '../../../../server/middleware/authorize';
+import validateResource from '../../../../server/middleware/validateResource';
+import restaurantUpdateSchema from '../../../../validation/restaurantUpdateSchema';
 
 const authorization = nextConnect().patch('/api/restaurants/:id', authorize(isRestaurantOwner()));
 const validation = nextConnect().patch(

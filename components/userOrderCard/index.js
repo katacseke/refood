@@ -66,7 +66,7 @@ const UserOrderCard = ({ order }) => {
             </Button>
           </>
         )}
-        {order.status === 'successful' && (
+        {order.status === 'finished' && (
           <p className="text-success my-2 text-center flex-grow-1">
             <IoCheckmarkCircleOutline className="mr-1" /> Sikeres
           </p>

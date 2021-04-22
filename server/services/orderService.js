@@ -4,7 +4,7 @@ import mealService from './mealService';
 import connectDb from '../db';
 
 /**
- * Get all orders by a certain user.
+ * Get all orders belonging to a certain user.
  * @param {String} userId id of the user
  * @returns Orders array containing order objects
  */
@@ -20,24 +20,51 @@ const getOrdersByUser = async (userId) => {
 };
 
 /**
- * Get order with id by a certain user.
+ * Get order with id, belonging to a certain user.
  * @param {String} userId Id of the user.
  * @param {String} orderId Id of the order.
  * @returns Order object or error message and success: false
  */
-const getOrderByOrderId = async (userId, orderId) => {
+const getOrderByUser = async (userId, orderId) => {
   await connectDb();
 
-  const { orders } = User.findById(userId, { 'orders.id': orderId })
+  const user = User.findOne({ _id: userId, 'orders.id': orderId })
     .populate({ path: 'orders.items.meal', model: 'Meal' })
     .populate({ path: 'orders.restaurant', model: 'Restaurant' })
     .exec();
 
-  if (orders.length <= 0) {
-    return { success: false, error: 'Nem sikerült lekérni a rendelést' };
+  if (!user?.orders) {
+    return { success: false, error: 'Ez a rendelés nem létezik.' };
   }
 
-  const order = orders[0].toObject();
+  const order = user.orders[0].toObject();
+  return { success: true, data: order };
+};
+
+// TODO: Test this method
+const getOrdersByRestaurant = async (restaurantId) => {
+  await connectDb();
+
+  const users = await User.find({ 'orders.restaurant': restaurantId }).select('orders').exec();
+
+  const orders = users.flatMap((user) => user.orders);
+
+  return { success: true, data: orders.toObject() };
+};
+
+// TODO: Test this method
+const getOrderById = async (orderId) => {
+  await connectDb();
+
+  const user = await User.findOne({ 'orders._id': orderId }).select('orders').exec();
+
+  const order = user?.orders.id(orderId);
+
+  if (!order) {
+    return { success: false, error: 'Ez a rendelés nem létezik.' };
+  }
+
+  console.log(order);
   return { success: true, data: order.toObject() };
 };
 
@@ -54,12 +81,14 @@ const createOrder = async (userId) => {
   try {
     await connection.transaction(
       async () => {
+        // Get the necessary data
         const user = await User.findById(userId).exec();
-        const { orders, cart } = user;
 
-        if (!orders) {
-          throw new Error('Nem sikerült elérni a rendeléseket.');
+        if (!user) {
+          throw new Error('Ez a felhasználó nem létezik.');
         }
+
+        const { orders, cart } = user;
 
         if (cart.items.length === 0) {
           throw new Error('A kosár üres.');
@@ -95,7 +124,6 @@ const createOrder = async (userId) => {
         };
 
         orders.push(orderContent);
-
         await user.save();
 
         // Delete cart content
@@ -117,35 +145,41 @@ const createOrder = async (userId) => {
 };
 
 /**
- * Cancel  order for user
+ * Cancel order for user
  * @param {String} userId id of current user
  * @returns {Object} Order or error message and success: false
  */
-const cancelOrder = async (userId, orderId) => {
+const cancelOrder = async (userId, orderId, newStatus = 'canceled') => {
   const connection = await connectDb();
 
   let transactionResult;
   try {
     await connection.transaction(async () => {
+      // Get the necessary data
       const user = await User.findById(userId)
         .populate({ path: 'orders.items.meal', model: 'Meal' })
         .select('orders')
         .exec();
 
-      const { orders } = user;
-      if (!orders) {
-        throw new Error('Nem sikerült visszavonni a rendelést.');
+      if (!user) {
+        throw new Error('Ez a felhasználó nem létezik.');
       }
 
-      const order = orders.id(orderId);
+      const order = user.orders.id(orderId);
 
       if (!order) {
         throw new Error('Ez a rendelés nem létezik.');
       }
 
-      order.status = 'canceled';
-      user.save();
+      // Update the order status
+      if (order.status !== 'active') {
+        throw new Error('A rendelést már nem lehet lemondani.');
+      }
 
+      order.status = newStatus;
+      await user.save();
+
+      // Update the meal portion numbers
       await Promise.all(
         order.items.map(async (item) => {
           const result = await mealService.updateMeal(item.meal.id, {
@@ -158,7 +192,7 @@ const cancelOrder = async (userId, orderId) => {
         })
       );
 
-      order.items.transactionResult = order.toObject();
+      transactionResult = order.toObject();
     });
 
     return { success: true, data: transactionResult };
@@ -167,9 +201,37 @@ const cancelOrder = async (userId, orderId) => {
   }
 };
 
+const finishOrder = async (userId, orderId) => {
+  await connectDb();
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return { success: false, message: 'A felhasználó nem létezik.' };
+  }
+
+  const order = user.orders.id(orderId);
+
+  if (!order) {
+    return { success: false, message: 'Ez a rendelés nem létezik.' };
+  }
+
+  if (order.status !== 'active') {
+    return { success: false, message: 'A rendelés már lezárult.' };
+  }
+
+  order.status = 'finished';
+  await user.save();
+
+  return { success: true, data: order.toObject() };
+};
+
 export default {
   getOrdersByUser,
-  getOrderByOrderId,
+  getOrderByUser,
+  getOrdersByRestaurant,
+  getOrderById,
   cancelOrder,
   createOrder,
+  finishOrder,
 };

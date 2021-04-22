@@ -9,6 +9,7 @@ const authorization = nextConnect()
   .patch('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()))
   .post('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()))
   .delete('/api/users/:id/cart', authorize(hasRole('admin'), isSelf()));
+
 const validation = nextConnect()
   .patch('/api/users/:id/cart', validateResource(cartItemSchema))
   .post('/api/users/:id/cart', validateResource(cartItemSchema));

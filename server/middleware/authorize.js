@@ -1,13 +1,19 @@
-import { userService } from '../services';
+import { orderService, userService } from '../services';
 
 // checks if a user has a certain role
-export const hasRole = (role) => (user) => user.data.role === role;
+export const hasRole = (role) => (user) => user.role === role;
 
 // checks if the user matches the one from the request
-export const isSelf = () => (user, req) => user.data.id === req.query.id;
+export const isSelf = () => (user, req) => user.id === req.query.id;
 
 // checks if the user matches the one from the request
-export const isRestaurantOwner = () => (user, req) => user.data.restaurantId === req.query.id;
+export const isRestaurantOwner = () => (user, req) => user.restaurantId === req.query.id;
+
+export const isOrderRestaurantOwner = async (user, req) => {
+  const { data: order } = await orderService.getOrderById(req.query.orderId);
+
+  return user.restaurantId === order?.restaurant;
+};
 
 // confirms the user is authenticated
 export const authenticated = () => () => true;
@@ -31,7 +37,9 @@ const authorize = (...conditions) => async (req, res, next) => {
   }
 
   // checks wether the user matches at least one of the conditions
-  if (conditions.some((condition) => condition(user, req))) {
+  const results = await Promise.all(conditions.map((condition) => condition(user.data, req)));
+
+  if (results.includes(true)) {
     req.user = user.data;
     delete req.user.exp;
     delete req.user.iat;
@@ -39,8 +47,6 @@ const authorize = (...conditions) => async (req, res, next) => {
     next();
     return;
   }
-
-  console.log(user.data.id, req.query);
 
   res.status(403).json({ error: 'Nincs jogosultságod ehhez.' });
 };

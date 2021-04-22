@@ -4,6 +4,7 @@ import authorize, { hasRole, isSelf } from '../../../../server/middleware/author
 
 const authorization = nextConnect()
   .get('/api/users/:id', authorize(hasRole('admin'), isSelf()))
+  .delete('/api/users/:id', authorize(hasRole('admin'), isSelf()))
   .patch('/api/users/:id', authorize(isSelf()));
 
 const handler = nextConnect().use(authorization);
@@ -20,10 +21,10 @@ handler.get(async (req, res) => {
 });
 
 handler.delete(async (req, res) => {
-  const result = await userService.deleteUser(req.params.id);
+  const result = await userService.deleteUser(req.query.id);
 
   if (!result.success) {
-    res.status(500).json({ general: { message: result.error } });
+    res.status(404).json({ general: { message: result.error } });
     return;
   }
 

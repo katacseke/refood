@@ -4,8 +4,9 @@ import registrationSchema from '../../../validation/registrationSchema';
 import { validateResource } from '../../../server/middleware';
 import authorize, { hasRole } from '../../../server/middleware/authorize';
 
-const validation = nextConnect().post('/api/users', validateResource(registrationSchema));
 const authorization = nextConnect().get('/api/users', authorize(hasRole('admin')));
+
+const validation = nextConnect().post('/api/users', validateResource(registrationSchema));
 
 const handler = nextConnect().use(validation).use(authorization);
 
