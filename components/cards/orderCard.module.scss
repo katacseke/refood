@@ -1,0 +1,31 @@
+$secondary-color: rgb(94, 91, 89);
+
+.card {
+    margin: .75rem;
+    width: 350px;
+
+    .mealName {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 0;
+    }
+    
+
+    .footer {
+        padding: .3rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: stretch;
+        flex-wrap: wrap;
+
+        .button {
+            margin: .2rem .5rem;
+            white-space: nowrap;
+            flex: 1;
+            display: flex;
+            line-height: 0;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}

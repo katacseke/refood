@@ -1,0 +1,52 @@
+settings:
+  react:
+    version: detect
+  import/resolver:
+      alias:
+        - ['@components', './components']
+        - ['@context', './context']
+        - ['@styles', './styles']
+        - ['@pages', './pages']
+        - ['@api', './pages/api']
+        - ['@server', './server']
+        - ['@services', './server/services']
+        - ['@middleware', './server/middleware']
+        - ['@validation', './validation']
+env:
+  browser: true
+  es2021: true
+  node: true
+extends:
+  - airbnb
+  - prettier  
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: 12
+  sourceType: module
+plugins:
+  - react
+  - prettier
+rules: 
+  react/prop-types: 'off'
+  react/react-in-jsx-scope: 'off'
+  react/jsx-filename-extension: 'off'
+  jsx-a11y/label-has-associated-control: 'off'
+  jsx-a11y/anchor-is-valid: 'off'
+  no-console: 'off'
+  no-underscore-dangle:
+    - error
+    - allow:
+      - _id 
+  semi: 
+    - error
+    - always
+  quotes:
+    - error
+    - single
+  prettier/prettier:
+    - error
+    - trailingComma: es5
+      singleQuote: true
+      printWidth: 100
+      endOfLine: auto
