@@ -123,13 +123,14 @@ export async function getStaticPaths() {
   };
 }
 
-export async function getStaticProps({ res, params }) {
+export async function getStaticProps({ params }) {
   const { id } = params;
   const restaurant = await restaurantService.getRestaurantById(id);
 
   if (!restaurant.success) {
-    res.writeHead(302, { Location: '/404' });
-    res.end();
+    return {
+      notFound: true,
+    };
   }
 
   const user = await userService.getUserByRestaurantId(id);
