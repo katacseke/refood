@@ -23,7 +23,14 @@ const MealInfromation = ({ data }) => {
 const MealCard = ({ data, onClick }) => (
   <div className={styles.card}>
     <div className={styles.imageContainer}>
-      <Image src={data.image || '/default.svg'} alt="" width={300} height={300} objectFit="cover" />
+      <Image
+        src={data.image || '/default.svg'}
+        alt=""
+        width={300}
+        height={300}
+        layout="responsive"
+        objectFit="cover"
+      />
 
       <Button onClick={onClick} className={styles.button}>
         Bővebben
