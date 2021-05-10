@@ -10,6 +10,7 @@ const mealSchema = new mongoose.Schema({
   donatable: Boolean,
   dailyMenu: Boolean,
   tags: [String],
+  image: String,
 });
 
 mealSchema.set('toObject', { getters: true });

@@ -12,4 +12,5 @@ export default Yup.object({
   price: Yup.number().positive('Price must be positive.').required('Price is required'),
   donatable: Yup.boolean(),
   dailyMenu: Yup.boolean(),
+  image: Yup.mixed(),
 });

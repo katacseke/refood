@@ -22,11 +22,7 @@ const MealInfromation = ({ data }) => {
 const MealCard = ({ data, onClick }) => (
   <div className={styles.card}>
     <div className={styles.imageContainer}>
-      <img
-        className={styles.image}
-        src="https://discovernative.org/wp-content/uploads/2020/05/food.jpg"
-        alt=""
-      />
+      <img className={styles.image} src={data.image} alt="" />
       <Button onClick={onClick} className={styles.button}>
         Bővebben
       </Button>

@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from 'shards-react';
 import { yupResolver } from '@hookform/resolvers/yup';
+import objectToFormData from '../../helpers/objectToFormData';
 import mealCreationSchema from '../../validation/mealCreationSchema';
 import Layout from '../../components/layout';
 import styles from './create.module.scss';
@@ -32,13 +33,11 @@ const CreateMealPage = () => {
 
   const onSubmit = async (data) => {
     setAlertVisible(false);
+    const formData = objectToFormData(data);
 
     const res = await fetch('/api/meals', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
+      body: formData,
     });
 
     if (!res.ok) {
@@ -146,6 +145,12 @@ const CreateMealPage = () => {
             <FormGroup>
               <label className="d-block">Tagek</label>
               <ChipInput name="tags" placeholder="Tag hozzáadása..." control={control} />
+            </FormGroup>
+
+            <FormGroup>
+              <label className="d-block">Kép</label>
+              <FormInput type="file" name="image" innerRef={register} invalid={!!errors?.image} />
+              <FormFeedback>{errors?.image?.message}</FormFeedback>
             </FormGroup>
 
             <FormGroup>

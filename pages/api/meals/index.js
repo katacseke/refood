@@ -1,16 +1,35 @@
 import nextConnect from 'next-connect';
-import validateResource from '../../../server/middleware/validateResource';
-import authorize, { hasRole } from '../../../server/middleware/authorize';
-import { mealService } from '../../../server/services';
-import mealCreationSchema from '../../../validation/mealCreationSchema';
+import fs from 'fs';
+import { imageUpload, formDataParser, validateResource } from '@server/middleware';
+import authorize, { hasRole } from '@middleware/authorize';
+import mealService from '@services/mealService';
+import mealCreationSchema from '@validation/mealCreationSchema';
 
-const validation = nextConnect().post('/api/meals', validateResource(mealCreationSchema));
+const onUploadError = (err, req, res) => {
+  res.status(422).json({ error: err.message });
+};
+
+const deleteImage = (req) => {
+  if (req.file?.path) {
+    fs.unlinkSync(req.file.path);
+  }
+};
+
+const imageUploadMiddleware = nextConnect({ onError: onUploadError })
+  .post('/api/meals', imageUpload('image'))
+  .post('/api/meals', formDataParser);
+
+const validation = nextConnect().post(
+  '/api/meals',
+  validateResource(mealCreationSchema, deleteImage)
+);
+
 const authorization = nextConnect().post(
   '/api/meals',
   authorize(hasRole('restaurant'), hasRole('admin'))
 );
 
-const handler = nextConnect().use(validation).use(authorization);
+const handler = nextConnect().use(authorization).use(imageUploadMiddleware).use(validation);
 
 handler.get(async (req, res) => {
   const meals = await mealService.getMeals();
@@ -24,7 +43,11 @@ handler.get(async (req, res) => {
 });
 
 handler.post(async (req, res) => {
-  const meal = await mealService.createMeal({ ...req.body, restaurantId: req.user.id });
+  const meal = await mealService.createMeal({
+    ...req.body,
+    restaurantId: req.user.id,
+    image: req.file?.path,
+  });
 
   if (!meal.success) {
     res.status(500).json({ general: { message: meal.error } });
@@ -35,3 +58,10 @@ handler.post(async (req, res) => {
 });
 
 export default handler;
+
+// turn off Body Parser
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};

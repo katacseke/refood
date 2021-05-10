@@ -1,4 +1,4 @@
-const validateResource = (resourceSchema) => async (req, res, next) => {
+const validateResource = (resourceSchema, onError) => async (req, res, next) => {
   const resource = req.body;
 
   try {
@@ -6,6 +6,7 @@ const validateResource = (resourceSchema) => async (req, res, next) => {
     await resourceSchema.validate(resource);
     next();
   } catch (e) {
+    onError(req, res);
     res.status(422).json(e.errors);
   }
 };
