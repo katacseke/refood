@@ -43,7 +43,7 @@ const RestauantPage = ({ restaurant, meals }) => {
         <CardBody className={styles.mainContainer}>
           <div className={styles.image}>
             <Image
-              src="https://interactive-examples.mdn.mozilla.net/media/examples/plumeria.jpg"
+              src={restaurant.image || '/default.svg'}
               alt=""
               layout="fill"
               objectFit="cover"

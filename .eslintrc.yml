@@ -12,6 +12,7 @@ settings:
         - ['@services', './server/services']
         - ['@middleware', './server/middleware']
         - ['@validation', './validation']
+        - ['@helpers', './helpers']
 env:
   browser: true
   es2021: true

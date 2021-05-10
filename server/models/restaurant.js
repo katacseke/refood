@@ -8,6 +8,7 @@ const restaurantSchema = new mongoose.Schema({
   description: String,
   address: String,
   ownerId: String,
+  image: String,
 });
 
 restaurantSchema.set('toObject', { getters: true });

@@ -1,29 +1,18 @@
 import nextConnect from 'next-connect';
-import fs from 'fs';
 import { imageUpload, formDataParser, validateResource } from '@server/middleware';
 import authorize, { hasRole } from '@middleware/authorize';
 import mealService from '@services/mealService';
 import mealCreationSchema from '@validation/mealCreationSchema';
 
 const onUploadError = (err, req, res) => {
-  console.log(err);
   res.status(422).json({ error: err.message });
-};
-
-const deleteImage = (req) => {
-  if (req.file?.path) {
-    fs.unlinkSync(`public/${req.file.path}`);
-  }
 };
 
 const imageUploadMiddleware = nextConnect({ onError: onUploadError })
   .post('/api/meals', imageUpload('image'))
   .post('/api/meals', formDataParser);
 
-const validation = nextConnect().post(
-  '/api/meals',
-  validateResource(mealCreationSchema, deleteImage)
-);
+const validation = nextConnect().post('/api/meals', validateResource(mealCreationSchema));
 
 const authorization = nextConnect().post(
   '/api/meals',

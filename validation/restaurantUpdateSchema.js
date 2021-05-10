@@ -18,4 +18,5 @@ export default Yup.object({
       regex,
       'A jelszónak tartalmaznia kell legalább egy számot, egy nagy-, és egy kisbetűt!'
     ),
+  image: Yup.mixed(),
 });

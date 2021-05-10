@@ -22,4 +22,5 @@ export default Yup.object({
       'A jelszónak tartalmaznia kell legalább egy számot, egy nagy-, és egy kisbetűt!'
     )
     .required('Jelszó megadása kötelező!'),
+  image: Yup.mixed(),
 });
