@@ -6,12 +6,13 @@ import mealService from '@services/mealService';
 import mealCreationSchema from '@validation/mealCreationSchema';
 
 const onUploadError = (err, req, res) => {
+  console.log(err);
   res.status(422).json({ error: err.message });
 };
 
 const deleteImage = (req) => {
   if (req.file?.path) {
-    fs.unlinkSync(req.file.path);
+    fs.unlinkSync(`public/${req.file.path}`);
   }
 };
 

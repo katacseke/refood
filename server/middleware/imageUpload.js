@@ -14,6 +14,11 @@ const imageUpload = (inputName, maxSize = 5) => async (req, res, next) => {
   const uploadConfig = multer({
     storage: multer.diskStorage({
       destination: './public/uploads',
+      filename: (_req, file, callback) =>
+        callback(
+          null,
+          `${file.fieldname}-${new Date().getTime()}${path.extname(file.originalname)}`
+        ),
     }),
     fileFilter(_req, file, callback) {
       const ext = path.extname(file.originalname);

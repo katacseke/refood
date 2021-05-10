@@ -72,12 +72,7 @@ const MealModal = ({ meal, open, setOpen }) => {
       <ModalHeader toggle={() => setOpen(!open)} />
       <ModalBody className={styles.modalBody}>
         <div style={{ position: 'relative', height: '18rem' }}>
-          <Image
-            src="https://interactive-examples.mdn.mozilla.net/media/examples/plumeria.jpg"
-            alt=""
-            layout="fill"
-            objectFit="cover"
-          />
+          <Image src={meal.image || '/default.svg'} alt="" layout="fill" objectFit="cover" />
         </div>
         <div className={styles.content}>
           <h4 className="mb-0">{meal.name}</h4>
