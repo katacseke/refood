@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from 'shards-react';
 import moment from 'moment';
 import 'twix';
+import Image from 'next/image';
 import styles from './card.module.scss';
 
 moment.locale('hu');
@@ -22,11 +23,15 @@ const MealInfromation = ({ data }) => {
 const MealCard = ({ data, onClick }) => (
   <div className={styles.card}>
     <div className={styles.imageContainer}>
-      <img
-        className={styles.image}
-        src="https://discovernative.org/wp-content/uploads/2020/05/food.jpg"
+      <Image
+        src={data.image || '/default.svg'}
         alt=""
+        width={300}
+        height={300}
+        layout="responsive"
+        objectFit="cover"
       />
+
       <Button onClick={onClick} className={styles.button}>
         Bővebben
       </Button>

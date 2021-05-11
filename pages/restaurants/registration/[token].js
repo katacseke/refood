@@ -14,10 +14,11 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import Router from 'next/router';
 import toast from 'react-hot-toast';
-import FormCard from '../../../components/formCard';
-import restaurantCreationSchema from '../../../validation/restaurantCreationSchema';
-import Layout from '../../../components/layout';
-import { applicationService } from '../../../server/services';
+import objectToFormData from '@helpers/objectToFormData';
+import FormCard from '@components/formCard';
+import restaurantCreationSchema from '@validation/restaurantCreationSchema';
+import Layout from '@components/layout';
+import { applicationService } from '@server/services';
 
 const RestaurantRegistration = ({ application, token }) => {
   const [isAlertVisible, setAlertVisible] = useState(false);
@@ -30,12 +31,11 @@ const RestaurantRegistration = ({ application, token }) => {
   const onSubmit = async (data) => {
     setAlertVisible(false);
 
+    const formData = objectToFormData(data);
+
     const res = await fetch(`/api/restaurants/registration/${token}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
+      body: JSON.stringify(formData),
     });
 
     if (!res.ok) {
@@ -97,6 +97,12 @@ const RestaurantRegistration = ({ application, token }) => {
                 invalid={!!errors?.email}
               />
               <FormFeedback>{errors?.email?.message}</FormFeedback>
+            </FormGroup>
+
+            <FormGroup>
+              <label className="d-block">Kép</label>
+              <FormInput type="file" name="image" innerRef={register} invalid={!!errors?.image} />
+              <FormFeedback>{errors?.image?.message}</FormFeedback>
             </FormGroup>
 
             <FormGroup>

@@ -1,14 +1,19 @@
 import nextConnect from 'next-connect';
-import validateResource from '../../../../server/middleware/validateResource';
-import { restaurantService, applicationService } from '../../../../server/services';
-import restaurantCreationSchema from '../../../../validation/restaurantCreationSchema';
+import { validateResource, uploadImage } from '@server/middleware';
+import { restaurantService, applicationService } from '@server/services';
+import restaurantCreationSchema from '@validation/restaurantCreationSchema';
+
+const imageUploadMiddleware = nextConnect().post(
+  '/api/restaurants/registration/:token',
+  uploadImage('image')
+);
 
 const validation = nextConnect().post(
   '/api/restaurants/registration/:token',
   validateResource(restaurantCreationSchema)
 );
 
-const handler = nextConnect().use(validation);
+const handler = nextConnect().use(imageUploadMiddleware).use(validation);
 
 handler.post(async (req, res) => {
   const findApplication = await applicationService.getAcceptedApplicationByToken(req.query.token);
@@ -28,3 +33,10 @@ handler.post(async (req, res) => {
 });
 
 export default handler;
+
+// turn off Body Parser
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};

@@ -1,3 +1,4 @@
+import fs from 'fs';
 import userService from './userService';
 import applicationService from './applicationService';
 import { Restaurant } from '../models';
@@ -84,7 +85,17 @@ const getRestaurantsWithName = async (text) => {
 const createRestaurant = async (restaurantData, application) => {
   const connection = await connectDb();
 
-  const { name, email, phone, url, description, address, loginEmail, password } = restaurantData;
+  const {
+    name,
+    email,
+    phone,
+    url,
+    description,
+    address,
+    loginEmail,
+    password,
+    image,
+  } = restaurantData;
   const user = { name, email: loginEmail, password };
 
   try {
@@ -104,6 +115,7 @@ const createRestaurant = async (restaurantData, application) => {
         description,
         address,
         ownerId: userResult.data.id,
+        image,
       };
       const restaurantResult = await Restaurant.create(restaurant);
 
@@ -146,6 +158,7 @@ const updateRestaurant = async (id, restaurantData) => {
     loginEmail,
     password,
     ownerId,
+    image,
   } = restaurantData;
   const user = { name, email: loginEmail, password };
 
@@ -166,11 +179,16 @@ const updateRestaurant = async (id, restaurantData) => {
         description,
         address,
       };
-      const restaurantResult = await Restaurant.findByIdAndUpdate(id, restaurant, {
+      if (image) {
+        const restaurantResult = await Restaurant.findById(id).exec();
+        fs.unlinkSync(`public/${restaurantResult?.image}`);
+        restaurant.image = image;
+      }
+      const updatedRestaurant = await Restaurant.findByIdAndUpdate(id, restaurant, {
         new: true,
       }).exec();
 
-      return restaurantResult.toObject();
+      return updatedRestaurant.toObject();
     });
 
     return { success: true, data };
