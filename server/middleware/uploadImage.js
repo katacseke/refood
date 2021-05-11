@@ -1,11 +1,12 @@
-import multer from 'multer';
 import path from 'path';
+import multer from 'multer';
 import formDataToObject from '@helpers/formDataToObject';
 
 /**
  * Middleware that uploads the image from the specified file input to the server.
- * Throws an error if the extension or file size is incorrect.
- * This error can be handled in the handler, on which this middleware is defined.
+ * Sends respons with 422 if the extension or file size is incorrect.
+ * It parses the other fields of the request data, and sets the
+ * req.body[fileInput] field to the location of the uploaded file.
  *
  * @param {String} inputName The name of the file input field.
  * @param {Number} maxSize The maximum file size in megabytes.
@@ -21,9 +22,9 @@ const uploadImage = (inputName, maxSize = 5) => async (req, res, next) => {
           `${file.fieldname}-${new Date().getTime()}${path.extname(file.originalname)}`
         ),
     }),
-    fileFilter(_req, file, callback) {
+    fileFilter: (_req, file, callback) => {
       const ext = path.extname(file.originalname);
-      if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
+      if (!['.png', '.jpg', '.jpeg'].includes(ext)) {
         callback(new Error('Csak png, jpg vagy jpeg formátumú képeket tudunk elfogadni.'));
       }
 

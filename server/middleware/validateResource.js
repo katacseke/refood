@@ -8,8 +8,9 @@ const validateResource = (resourceSchema) => async (req, res, next) => {
     await resourceSchema.validate(resource);
     next();
   } catch (e) {
+    // delete the previously uploaded file if validation failed
     if (req.file?.path) {
-      fs.unlinkSync(req.file.path);
+      fs.unlink(req.file.path);
     }
     res.status(422).json({ [e.path]: { message: e.errors.join(' ') } });
   }
