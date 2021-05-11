@@ -2,11 +2,14 @@ import * as Yup from 'yup';
 
 export default Yup.object({
   name: Yup.string(),
-  portionNumber: Yup.number().positive('Portion number must be positive.'),
+  portionNumber: Yup.number().positive('Az adagok száma pozitív kell legyen.'),
   restaurantId: Yup.string(),
-  startTime: Yup.date().min(new Date(), 'Date must be later than now.'),
-  endTime: Yup.date().min(Yup.ref('startTime')),
-  price: Yup.number().positive('Price must be positive.'),
+  startTime: Yup.date().min(new Date(), 'Az ajánlat kezdési ideje egy jövőbeli dátum kell legyen.'),
+  endTime: Yup.date().min(
+    Yup.ref('startTime'),
+    'A lejárati dátum a kezdési dátum után kell legyen.'
+  ),
+  price: Yup.number().positive('Az ár pozitív szám kell legyen.'),
   donatable: Yup.boolean(),
   dailyMenu: Yup.boolean(),
 });
