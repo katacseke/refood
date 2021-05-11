@@ -1,5 +1,6 @@
 import multer from 'multer';
 import path from 'path';
+import formDataToObject from '@helpers/formDataToObject';
 
 /**
  * Middleware that uploads the image from the specified file input to the server.
@@ -10,7 +11,7 @@ import path from 'path';
  * @param {Number} maxSize The maximum file size in megabytes.
  *
  */
-const imageUpload = (inputName, maxSize = 5) => async (req, res, next) => {
+const uploadImage = (inputName, maxSize = 5) => async (req, res, next) => {
   const uploadConfig = multer({
     storage: multer.diskStorage({
       destination: './public/uploads',
@@ -33,7 +34,22 @@ const imageUpload = (inputName, maxSize = 5) => async (req, res, next) => {
     },
   });
 
-  uploadConfig.single(inputName)(req, res, next);
+  uploadConfig.single(inputName)(req, res, (err) => {
+    if (err) {
+      const message =
+        err.code === 'LIMIT_FILE_SIZE' ? `A maximális méret ${maxSize} MB.` : err.message;
+      res.status(422).json({ [inputName]: { message } });
+      return;
+    }
+
+    req.body = formDataToObject(req.body);
+
+    req.body[inputName] = req?.file?.path
+      ? req.file.path.replace('\\', '/').replace('public/', '/')
+      : null;
+
+    next();
+  });
 };
 
-export default imageUpload;
+export default uploadImage;

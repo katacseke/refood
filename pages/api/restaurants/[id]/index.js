@@ -1,19 +1,11 @@
 import nextConnect from 'next-connect';
 import authorize, { isRestaurantOwner } from '@middleware/authorize';
-import { imageUpload, formDataParser, validateResource } from '@server/middleware';
+import { uploadImage, validateResource } from '@server/middleware';
 import { restaurantService } from '@server/services';
 import restaurantUpdateSchema from '@validation/restaurantUpdateSchema';
 
-const onUploadError = (err, req, res) => {
-  res.status(422).json({ error: err.message });
-};
-
-const imageUploadMiddleware = nextConnect({ onError: onUploadError })
-  .patch('/api/restaurants/:id', imageUpload('image'))
-  .patch('/api/restaurants/:id', formDataParser);
-
+const imageUploadMiddleware = nextConnect().patch('/api/restaurants/:id', uploadImage('image'));
 const authorization = nextConnect().patch('/api/restaurants/:id', authorize(isRestaurantOwner()));
-
 const validation = nextConnect().patch(
   '/api/restaurants/:id',
   validateResource(restaurantUpdateSchema)
@@ -33,12 +25,7 @@ handler.get(async (req, res) => {
 });
 
 handler.patch(async (req, res) => {
-  const { id } = req.query;
-
-  const updatedRestaurant = await restaurantService.updateRestaurant(id, {
-    ...req.body,
-    image: req.file?.path,
-  });
+  const updatedRestaurant = await restaurantService.updateRestaurant(req.query.id, req.body);
 
   if (!updatedRestaurant.success) {
     res.status(500).json({ general: { message: updatedRestaurant.error } });

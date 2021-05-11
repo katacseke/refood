@@ -1,15 +1,12 @@
 import nextConnect from 'next-connect';
-import { formDataParser, validateResource, imageUpload } from '@server/middleware';
+import { validateResource, uploadImage } from '@server/middleware';
 import { restaurantService, applicationService } from '@server/services';
 import restaurantCreationSchema from '@validation/restaurantCreationSchema';
 
-const onUploadError = (err, req, res) => {
-  res.status(422).json({ error: err.message });
-};
-
-const imageUploadMiddleware = nextConnect({ onError: onUploadError })
-  .post('/api/restaurants/registration/:token', imageUpload('image'))
-  .post('/api/restaurants/registration/:token', formDataParser);
+const imageUploadMiddleware = nextConnect().post(
+  '/api/restaurants/registration/:token',
+  uploadImage('image')
+);
 
 const validation = nextConnect().post(
   '/api/restaurants/registration/:token',
@@ -25,10 +22,7 @@ handler.post(async (req, res) => {
     return;
   }
 
-  const restaurant = await restaurantService.createRestaurant(
-    { ...req.body, image: req.file?.path },
-    findApplication.data
-  );
+  const restaurant = await restaurantService.createRestaurant(req.body, findApplication.data);
 
   if (!restaurant.success) {
     res.status(500).json({ general: { message: restaurant.error } });

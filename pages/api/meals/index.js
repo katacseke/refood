@@ -1,19 +1,11 @@
 import nextConnect from 'next-connect';
-import { imageUpload, formDataParser, validateResource } from '@server/middleware';
+import { uploadImage, validateResource } from '@server/middleware';
 import authorize, { hasRole } from '@middleware/authorize';
 import mealService from '@services/mealService';
 import mealCreationSchema from '@validation/mealCreationSchema';
 
-const onUploadError = (err, req, res) => {
-  res.status(422).json({ error: err.message });
-};
-
-const imageUploadMiddleware = nextConnect({ onError: onUploadError })
-  .post('/api/meals', imageUpload('image'))
-  .post('/api/meals', formDataParser);
-
+const imageUploadMiddleware = nextConnect().post('/api/meals', uploadImage('image'));
 const validation = nextConnect().post('/api/meals', validateResource(mealCreationSchema));
-
 const authorization = nextConnect().post(
   '/api/meals',
   authorize(hasRole('restaurant'), hasRole('admin'))
@@ -36,7 +28,6 @@ handler.post(async (req, res) => {
   const meal = await mealService.createMeal({
     ...req.body,
     restaurantId: req.user.id,
-    image: req.file?.path,
   });
 
   if (!meal.success) {

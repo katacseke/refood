@@ -1,6 +1,5 @@
 import validateResource from './validateResource';
 import authorize from './authorize';
-import imageUpload from './imageUpload';
-import formDataParser from './formDataParser';
+import uploadImage from './uploadImage';
 
-export { validateResource, authorize, imageUpload, formDataParser };
+export { validateResource, authorize, uploadImage };

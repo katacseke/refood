@@ -9,9 +9,9 @@ const validateResource = (resourceSchema) => async (req, res, next) => {
     next();
   } catch (e) {
     if (req.file?.path) {
-      fs.unlinkSync(`public/${req.file.path}`);
+      fs.unlinkSync(req.file.path);
     }
-    res.status(422).json(e.errors);
+    res.status(422).json({ [e.path]: { message: e.errors.join(' ') } });
   }
 };
 
