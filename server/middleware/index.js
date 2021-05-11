@@ -1,5 +1,6 @@
-import validateResource from './validateResource';
 import authorize from './authorize';
 import uploadImage from './uploadImage';
+import validateResource from './validateResource';
+import withAuthSSR from './withAuthSSR';
 
-export { validateResource, authorize, uploadImage };
+export { authorize, uploadImage, validateResource, withAuthSSR };

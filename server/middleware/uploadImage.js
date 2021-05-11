@@ -25,7 +25,7 @@ const uploadImage = (inputName, maxSize = 5) => async (req, res, next) => {
     fileFilter: (_req, file, callback) => {
       const ext = path.extname(file.originalname);
       if (!['.png', '.jpg', '.jpeg'].includes(ext)) {
-        callback(new Error('Csak png, jpg vagy jpeg formátumú képeket tudunk elfogadni.'));
+        callback(new Error('Csak png, jpg vagy jpeg formátumú kép feltöltése lehetséges.'));
       }
 
       callback(null, true);
