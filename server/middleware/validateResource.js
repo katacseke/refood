@@ -11,11 +11,9 @@ import fs from 'fs';
  * @param {Yup.Schema} resourceSchema
  */
 const validateResource = (resourceSchema) => async (req, res, next) => {
-  const resource = req.body;
-
   try {
     // throws error if not valid
-    await resourceSchema.validate(resource);
+    req.body = await resourceSchema.validate(req.body, { stripUnknown: true });
     next();
   } catch (e) {
     // delete the previously uploaded file if validation failed

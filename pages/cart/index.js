@@ -22,6 +22,24 @@ const CartPage = () => {
     }
   };
 
+  const handleDelete = async () => {
+    const promise = deleteCartContent();
+
+    toast.promise(
+      promise,
+      {
+        loading: 'Kosár ürítése...',
+        success: 'Kosár sikeresen kiürítve!',
+        error: 'Nem sikerült kiüríteni a kosarat!',
+      },
+      {
+        style: {
+          minWidth: '18rem',
+        },
+      }
+    );
+  };
+
   const placeOrder = async () => {
     const res = await fetch(`/api/users/${user.id}/orders`, {
       method: 'POST',
@@ -90,7 +108,7 @@ const CartPage = () => {
                 </div>
                 <hr />
                 <div className="d-flex justify-content-end pt-2">
-                  <Button className={styles.removeAllButton} onClick={deleteCartContent}>
+                  <Button className={styles.removeAllButton} onClick={handleDelete}>
                     Kosár ürítése
                   </Button>
                   <Button onClick={placeOrder}>Rendelés leadása</Button>

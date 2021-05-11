@@ -13,7 +13,7 @@ export const isRestaurantOwner = () => (user, req) => user.restaurantId === req.
 export const isOrderRestaurantOwner = () => async (user, req) => {
   const orderResult = await orderService.getOrderById(req.query.orderId);
 
-  return user.restaurantId === orderResult?.data?.restaurant.toString();
+  return user.restaurantId === orderResult?.restaurant.toString();
 };
 
 /**
@@ -32,16 +32,12 @@ const authorize = (...conditions) => async (req, res, next) => {
   }
 
   const userResult = userService.verifyToken(token);
-  if (!userResult.success) {
-    res.status(401).json({ error: userResult.error });
-    return;
-  }
 
   // checks wether the user matches at least one of the conditions
-  const results = await Promise.all(conditions.map((condition) => condition(userResult.data, req)));
+  const results = await Promise.all(conditions.map((condition) => condition(userResult, req)));
 
   if (conditions.length === 0 || results.includes(true)) {
-    req.user = userResult.data;
+    req.user = userResult;
     delete req.user.exp;
     delete req.user.iat;
 

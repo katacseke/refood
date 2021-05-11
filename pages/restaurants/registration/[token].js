@@ -191,16 +191,17 @@ const RestaurantRegistration = ({ application, token }) => {
 
 export default RestaurantRegistration;
 
-export async function getServerSideProps({ res, params }) {
+export async function getServerSideProps({ params }) {
   const { token } = params;
-  const application = await applicationService.getAcceptedApplicationByToken(token);
+  try {
+    const application = await applicationService.getAcceptedApplicationByToken(token);
 
-  if (!application.success) {
-    res.writeHead(302, { Location: '/404' });
-    res.end();
+    return {
+      props: { token, application: JSON.parse(JSON.stringify(application)) },
+    };
+  } catch (err) {
+    return {
+      notFound: true,
+    };
   }
-
-  return {
-    props: { token, application: JSON.parse(JSON.stringify(application.data)) },
-  };
 }

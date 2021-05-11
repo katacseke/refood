@@ -23,6 +23,6 @@ export async function getStaticProps() {
   const restaurants = await restaurantService.getRestaurants();
 
   return {
-    props: { restaurants: JSON.parse(JSON.stringify(restaurants.data)) },
+    props: { restaurants: JSON.parse(JSON.stringify(restaurants)) },
   };
 }

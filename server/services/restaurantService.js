@@ -3,10 +3,12 @@ import userService from './userService';
 import applicationService from './applicationService';
 import { Restaurant } from '../models';
 import connectDb from '../db';
+import { NotFoundError } from './errors';
 
 /**
  * Get restaurant ids.
- * @returns {Array} Array of restauratn ids.
+ *
+ * @returns {Array<String>} Array of restaurant ids.
  */
 const getRestaurantIds = async () => {
   await connectDb();
@@ -17,70 +19,79 @@ const getRestaurantIds = async () => {
 };
 
 /**
- * Get restaurant with a specific owner
- * @param {String} ownerId id of the restaurant owner
- * @returns {String} Id of the given restaurant or error message.
+ * Get restaurant id with a specific owner.
+ *
+ * @param {String} ownerId Id of the restaurant owner.
+ * @returns {String} Id of the given restaurant.
+ *
+ * @throws {NotFoundError} Throws NotFoundError when no restaurant
+ *  was found for with the specified owner.
  */
 const getRestaurantIdByOwner = async (ownerId) => {
   await connectDb();
 
   const restaurantId = await Restaurant.find({ ownerId }).select('_id').exec();
 
-  return restaurantId
-    ? { success: false, error: 'Restaurant not found' }
-    : { success: true, data: restaurantId.toString() };
+  if (!restaurantId) {
+    throw new NotFoundError('A felhasználóhoz nem tartozik vendéglő.');
+  }
+  return restaurantId.toString();
 };
 
 /**
  * Get restaurant by id.
+ *
  * @param {string} id
- * @returns {
- *   success: Boolean,
- *   ?restaurant: Restaurant,
- *   ?error: String,
- * } Returns an object containing the Restaurant instance or an error message
+ * @returns {Object} Returns an object containing the Restaurant instance.
+ *
+ * @throws {NotFoundError} Throws NotFoundError when no restaurant
+ *  was found with the id.
  */
 const getRestaurantById = async (id) => {
   await connectDb();
 
-  const restaurant = (await Restaurant.findById(id).exec()).toObject();
+  const restaurant = await Restaurant.findById(id).exec();
 
-  return restaurant
-    ? { success: true, data: restaurant }
-    : { success: false, error: 'Restaurant not found' };
+  if (!restaurant) {
+    throw new NotFoundError('Nem létezik vendéglő a megadott azonosítóval.');
+  }
+  return restaurant.toObject();
 };
 
 /**
  * Get all restaurants.
- * @returns {Array} Array of all restaurants.
+ *
+ * @returns {Array<Object>} Array of all restaurants.
  */
 const getRestaurants = async () => {
   await connectDb();
 
-  const restaurants = (await Restaurant.find({}).exec()).map((restaurant) => restaurant.toObject());
-  return { success: true, data: restaurants };
+  const restaurants = await Restaurant.find({}).exec();
+  return restaurants.map((restaurant) => restaurant.toObject());
 };
 
 /**
- * Get restaurants with a specific name
+ * Get restaurants with a specific name.
+ *
  * @returns {Array} Array of all restaurants.
  */
 const getRestaurantsWithName = async (text) => {
   await connectDb();
 
   const regex = new RegExp(text, 'i');
-  const restaurants = (
-    await Restaurant.find({ name: { $regex: regex } }).exec()
-  ).map((restaurant) => restaurant.toObject());
+  const restaurants = await Restaurant.find({ name: { $regex: regex } }).exec();
 
-  return { success: true, data: restaurants };
+  return restaurants.map((restaurant) => restaurant.toObject());
 };
 
 /**
  * Insert restaurant.
- * @param {Restaurant} restaurantData
- * @param {Object} application application for registration
- * @returns {Object} Returns an object with error message or success
+ *
+ * @param {Object} restaurantData
+ * @param {Object} application Application for registration.
+ * @returns {Object} Returns the new restaurant instance.
+ *
+ *@throws {Error} Throws Error when insertion failed.
  */
 const createRestaurant = async (restaurantData, application) => {
   const connection = await connectDb();
@@ -98,52 +109,50 @@ const createRestaurant = async (restaurantData, application) => {
   } = restaurantData;
   const user = { name, email: loginEmail, password };
 
-  try {
-    const data = await connection.transaction(async () => {
-      // Create the user
-      let userResult = await userService.createUser(user, 'restaurant');
-      if (!userResult.success) {
-        throw new Error(userResult.error);
-      }
+  let transactionResult;
+  await connection.transaction(async () => {
+    // Create the user
+    let userResult = await userService.createUser(user, 'restaurant');
 
-      // Create the restaurant associated with the user
-      const restaurant = {
-        name,
-        email,
-        phone,
-        url,
-        description,
-        address,
-        ownerId: userResult.data.id,
-        image,
-      };
-      const restaurantResult = await Restaurant.create(restaurant);
+    // Create the restaurant associated with the user
+    const restaurant = {
+      name,
+      email,
+      phone,
+      url,
+      description,
+      address,
+      ownerId: userResult.id,
+      image,
+    };
+    const restaurantResult = await Restaurant.create(restaurant);
 
-      // Bind the restaurant to the user
-      userResult = await userService.updateUser(userResult.data.id, {
-        restaurantId: restaurantResult.id,
-      });
-      if (!userResult.success) {
-        throw new Error(userResult.error);
-      }
+    if (!restaurantResult) {
+      throw new Error('Nem sikerült létrehozni a vendéglőt');
+    }
 
-      // Set the application status to registered
-      await applicationService.updateApplicationStatus(application.id, 'registered');
-
-      return restaurantResult.toObject();
+    // Bind the restaurant to the user
+    userResult = await userService.updateUser(userResult.id, {
+      restaurantId: restaurantResult.id,
     });
 
-    return { success: true, data };
-  } catch (err) {
-    return { success: false, error: 'Unable to create restaurant.' };
-  }
+    // Set the application status to registered
+    await applicationService.updateApplicationStatus(application.id, 'registered');
+
+    transactionResult = restaurantResult.toObject();
+  });
+
+  return transactionResult;
 };
 
 /**
  * Update restaurant.
- * @param {Restaurant} restaurant
+ *
+ * @param {Object} restaurantData
  * @param {String} id
- * @returns {Object} Returns an object with error message or success
+ * @returns {Object} Returns the updated restaurant instance.
+ *
+ * @throws {Error} Throws Error when update failed.
  */
 const updateRestaurant = async (id, restaurantData) => {
   const connection = await connectDb();
@@ -162,39 +171,33 @@ const updateRestaurant = async (id, restaurantData) => {
   } = restaurantData;
   const user = { name, email: loginEmail, password };
 
-  try {
-    const data = await connection.transaction(async () => {
-      // Update the user
-      const userResult = await userService.updateUser(ownerId, user);
-      if (!userResult.success) {
-        throw new Error(userResult.error);
-      }
+  let transactionResult;
+  await connection.transaction(async () => {
+    // Update the user
+    await userService.updateUser(ownerId, user);
 
-      // Update the restaurant associated with the user
-      const restaurant = {
-        name,
-        email,
-        phone,
-        url,
-        description,
-        address,
-      };
-      if (image) {
-        const restaurantResult = await Restaurant.findById(id).exec();
-        fs.unlinkSync(`public/${restaurantResult?.image}`);
-        restaurant.image = image;
-      }
-      const updatedRestaurant = await Restaurant.findByIdAndUpdate(id, restaurant, {
-        new: true,
-      }).exec();
+    // Update the restaurant associated with the user
+    const restaurant = {
+      name,
+      email,
+      phone,
+      url,
+      description,
+      address,
+    };
+    if (image) {
+      const restaurantResult = await Restaurant.findById(id).exec();
+      fs.unlink(`public/${restaurantResult?.image}`);
+      restaurant.image = image;
+    }
+    const updatedRestaurant = await Restaurant.findByIdAndUpdate(id, restaurant, {
+      new: true,
+    }).exec();
 
-      return updatedRestaurant.toObject();
-    });
+    transactionResult = updatedRestaurant.toObject();
+  });
 
-    return { success: true, data };
-  } catch (err) {
-    return { success: false, error: 'Az adatok frissítése sikertelen.' };
-  }
+  return transactionResult;
 };
 
 export default {

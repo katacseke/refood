@@ -24,7 +24,7 @@ const RestauantPage = ({ user }) => {
     value: user.email,
     error: undefined,
   });
-  const [nameState, setNameState] = useState({ active: false, value: user.name });
+  const [nameState, setNameState] = useState({ active: false, value: user.name, error: undefined });
   const [passwordState, setPasswordState] = useState({
     active: false,
     value: '..........',
@@ -33,7 +33,7 @@ const RestauantPage = ({ user }) => {
 
   const handleClick = async (name, state, setState) => {
     if (!state.active) {
-      setState({ active: true, value: state.value });
+      setState({ active: true, value: name === 'password' ? '' : state.value });
       return;
     }
 
@@ -157,17 +157,16 @@ const RestauantPage = ({ user }) => {
 export default RestauantPage;
 
 export const getServerSideProps = withAuthSSR(async ({ user }) => {
-  const userModel = await userService.getUserById(user.id);
-
-  if (!userModel.success) {
+  try {
+    const userModel = await userService.getUserById(user.id);
+    return {
+      props: {
+        user: JSON.parse(JSON.stringify(userModel)),
+      },
+    };
+  } catch (err) {
     return {
       notFound: true,
     };
   }
-
-  return {
-    props: {
-      user: JSON.parse(JSON.stringify(userModel.data)),
-    },
-  };
 });

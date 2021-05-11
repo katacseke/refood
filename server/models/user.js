@@ -26,7 +26,7 @@ orderSchema.set('toObject', { getters: true });
 
 const userSchema = new mongoose.Schema({
   name: String,
-  email: String,
+  email: { type: String, unique: true },
   password: String,
   role: String,
   restaurantId: String,
@@ -52,6 +52,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.set('toObject', { getters: true });
+userSchema.set('autoIndex', true);
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 export default User;

@@ -28,13 +28,19 @@ const UserOrdersPage = ({ orders }) => {
 };
 
 export const getServerSideProps = withAuthSSR(async ({ user }) => {
-  const orders = await orderService.getOrdersByUser(user.id);
+  try {
+    const orders = await orderService.getOrdersByUser(user.id);
 
-  return {
-    props: {
-      orders: JSON.parse(JSON.stringify(orders.data)),
-    },
-  };
+    return {
+      props: {
+        orders: JSON.parse(JSON.stringify(orders)),
+      },
+    };
+  } catch (err) {
+    return {
+      notFound: true,
+    };
+  }
 });
 
 export default UserOrdersPage;

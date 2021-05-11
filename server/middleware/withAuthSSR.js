@@ -1,8 +1,8 @@
 import userService from '@services/userService';
 
-export const isSelfSSR = () => (user, ctx) => user.data.id === ctx.params.id;
+export const isSelfSSR = () => (user, ctx) => user.id === ctx.params.id;
 
-export const hasRoleSSR = (role) => (user) => user.data.role === role;
+export const hasRoleSSR = (role) => (user) => user.role === role;
 
 /**
  * Higher order function for handling authentication with server side rendering.
@@ -27,9 +27,22 @@ const withAuthSSR = (getServerSideProps, ...conditions) => async (ctx) => {
       },
     };
   }
+  try {
+    const result = await userService.verifyToken(token);
 
-  const result = await userService.verifyToken(token);
-  if (!result.success) {
+    // checks wether the user matches at least one of the conditions
+    if (conditions.length === 0 || conditions.some((condition) => condition(result, ctx))) {
+      ctx.user = result;
+      delete ctx.user.exp;
+      delete ctx.user.iat;
+
+      return getServerSideProps(ctx);
+    }
+
+    return {
+      notFound: true,
+    };
+  } catch {
     return {
       redirect: {
         destination: '/login',
@@ -37,19 +50,6 @@ const withAuthSSR = (getServerSideProps, ...conditions) => async (ctx) => {
       },
     };
   }
-
-  // checks wether the user matches at least one of the conditions
-  if (conditions.length === 0 || conditions.some((condition) => condition(result, ctx))) {
-    ctx.user = result.data;
-    delete ctx.user.exp;
-    delete ctx.user.iat;
-
-    return getServerSideProps(ctx);
-  }
-
-  return {
-    notFound: true,
-  };
 };
 
 export default withAuthSSR;

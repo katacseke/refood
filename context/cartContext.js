@@ -5,7 +5,7 @@ const CartContext = React.createContext();
 
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState({ items: [] });
 
   const updateCartItem = async (cartItem) => {
     const res = await fetch(`/api/users/${user.id}/cart`, {
@@ -49,7 +49,7 @@ export const CartProvider = ({ children }) => {
     });
 
     if (res.ok) {
-      setCart(await res.json());
+      setCart({ items: [] });
       return;
     }
 

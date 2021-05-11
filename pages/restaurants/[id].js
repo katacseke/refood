@@ -125,28 +125,21 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const { id } = params;
-  const restaurant = await restaurantService.getRestaurantById(id);
 
-  if (!restaurant.success) {
+  try {
+    const restaurant = await restaurantService.getRestaurantById(id);
+    const user = await userService.getUserByRestaurantId(id);
+    const meals = await mealService.getCurrentMealsByRestaurant(id);
+
+    return {
+      props: {
+        restaurant: JSON.parse(JSON.stringify({ ...restaurant, loginEmail: user.email })),
+        meals: JSON.parse(JSON.stringify(meals)),
+      },
+    };
+  } catch (err) {
     return {
       notFound: true,
     };
   }
-
-  const user = await userService.getUserByRestaurantId(id);
-
-  if (!user.success) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const meals = await mealService.getCurrentMealsByRestaurant(id);
-
-  return {
-    props: {
-      restaurant: JSON.parse(JSON.stringify({ ...restaurant.data, loginEmail: user.data.email })),
-      meals: JSON.parse(JSON.stringify(meals.data)),
-    },
-  };
 }

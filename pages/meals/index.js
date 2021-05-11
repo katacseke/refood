@@ -64,6 +64,6 @@ export async function getServerSideProps(context) {
   const meals = await mealService.getMeals(filters);
 
   return {
-    props: { meals: JSON.parse(JSON.stringify(meals.data)) },
+    props: { meals: JSON.parse(JSON.stringify(meals)) },
   };
 }

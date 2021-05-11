@@ -26,6 +26,9 @@
             "@middleware/*": [
                 "server/middleware/*"
             ],
+            "@errors/*": [
+                "server/errors/*"
+            ],
             "@validation/*": [
                 "validation/*"
             ],

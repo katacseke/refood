@@ -36,14 +36,15 @@ export default SearchResultPage;
 
 export async function getServerSideProps({ params }) {
   const { searchText } = params;
-  const meals = await mealService.getMealsWithName(searchText);
+
+  const meals = await mealService.getMeals({ name: searchText });
   const restaurants = await restaurantService.getRestaurantsWithName(params.searchText);
 
   return {
     props: {
       text: searchText,
-      meals: JSON.parse(JSON.stringify(meals.data)),
-      restaurants: JSON.parse(JSON.stringify(restaurants.data)),
+      meals: JSON.parse(JSON.stringify(meals)),
+      restaurants: JSON.parse(JSON.stringify(restaurants)),
     },
   };
 }

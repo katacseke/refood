@@ -1,8 +1,9 @@
 import nextConnect from 'next-connect';
-import authorize, { authenticated } from '../../../server/middleware/authorize';
-import { userService } from '../../../server/services';
+import userService from '@services/userService';
+import authorize from '@middleware/authorize';
 
-const authorization = nextConnect().post('/api/users/refreshToken', authorize(authenticated()));
+const authorization = nextConnect().post('/api/users/refreshToken', authorize());
+
 const handler = nextConnect().use(authorization);
 
 handler.post(async (req, res) => {

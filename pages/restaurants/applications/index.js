@@ -40,7 +40,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      applications: JSON.parse(JSON.stringify(applications.data)),
+      applications: JSON.parse(JSON.stringify(applications)),
     },
   };
 }

@@ -1,17 +1,13 @@
 import nextConnect from 'next-connect';
-import { mealService } from '../../../server/services';
+import mealService from '@services/mealService';
+import handleErrors from '@middleware/handleErrors';
 
-const handler = nextConnect();
+const handler = nextConnect({ onError: handleErrors });
 
 handler.get(async (req, res) => {
   const meal = await mealService.getMealById(req.query.id);
 
-  if (!meal.success) {
-    res.status(404).json({ error: meal.error });
-    return;
-  }
-
-  res.status(200).json(meal.data);
+  res.status(200).json(meal);
 });
 
 export default handler;

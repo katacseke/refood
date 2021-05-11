@@ -62,7 +62,9 @@ const AuthenticatedSection = ({ logout }) => {
           Saját fiók
         </DropdownToggle>
         <DropdownMenu right>
-          <DropdownItem>Kosár</DropdownItem>
+          <Link href="/cart">
+            <DropdownItem>Kosár</DropdownItem>
+          </Link>
           <Link href="/orders">
             <DropdownItem>Rendelések</DropdownItem>
           </Link>
