@@ -9,6 +9,7 @@ const restaurantApplicationSchema = new mongoose.Schema({
   token: String,
 });
 
+restaurantApplicationSchema.set('timestamps', true);
 restaurantApplicationSchema.set('toObject', { getters: true });
 
 const Application =

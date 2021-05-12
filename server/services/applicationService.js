@@ -52,12 +52,8 @@ const getAcceptedApplicationByToken = async (token) => {
 const getApplications = async (status = null) => {
   await connectDb();
 
-  let applications;
-  if (status) {
-    applications = await Application.find({ status }).exec();
-  } else {
-    applications = await Application.find({}).exec();
-  }
+  const filters = status ? { status } : {};
+  const applications = await Application.find(filters).sort({ createdAt: -1 }).exec();
 
   return applications.map((application) => application.toObject());
 };
