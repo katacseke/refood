@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import mailjet from 'node-mailjet';
 import { Application } from '../models';
 import connectDb from '../db';
 import { NotFoundError } from './errors';
@@ -51,7 +52,12 @@ const getAcceptedApplicationByToken = async (token) => {
 const getApplications = async (status = null) => {
   await connectDb();
 
-  const applications = await Application.find({ status }).exec();
+  let applications;
+  if (status) {
+    applications = await Application.find({ status }).exec();
+  } else {
+    applications = await Application.find({}).exec();
+  }
 
   return applications.map((application) => application.toObject());
 };
@@ -76,6 +82,23 @@ const createApplication = async (application) => {
   return result.toObject();
 };
 
+const sendApplicationAcceptedEmail = async (name, email, token) => {
+  const emailClient = mailjet.connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE);
+
+  await emailClient.post('send', { version: 'v3.1' }).request({
+    Messages: [
+      {
+        From: { Email: 'katacseke@gmail.com', Name: 'Food' },
+        To: [{ Email: email, Name: name }],
+        TemplateID: 2734751,
+        TemplateLanguage: true,
+        Subject: 'Food - A jelentkezésed elfogadva',
+        Variables: { token },
+      },
+    ],
+  });
+};
+
 /**
  * Update application status.
  *
@@ -91,13 +114,29 @@ const updateApplicationStatus = async (id, status) => {
   const applicationData =
     status === 'accepted' ? { status, token: await bcrypt.genSalt() } : { status };
 
-  const result = await Application.findByIdAndUpdate(id, applicationData, { new: true }).exec();
+  const application = await Application.findByIdAndUpdate(id, applicationData, {
+    new: true,
+  }).exec();
 
-  if (!result) {
+  if (!application) {
     throw new Error('Nem sikerült frissíteni a jelentkezést.');
   }
 
-  return result.toObject();
+  if (status === 'accepted') {
+    try {
+      await sendApplicationAcceptedEmail(application.name, application.email, application.token);
+    } catch (err) {
+      await Application.findByIdAndUpdate(
+        id,
+        { status: 'pending', token: undefined },
+        { new: true }
+      ).exec();
+
+      throw new Error('Nem sikerült elküldeni a visszaigazoló e-mailt.');
+    }
+  }
+
+  return application.toObject();
 };
 
 export default {

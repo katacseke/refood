@@ -185,7 +185,7 @@ const AdminSection = ({ logout }) => {
       <NavItem>
         <Link href="/restaurants/applications">
           <NavLink active style={{ cursor: 'pointer' }}>
-            Ajánlatok
+            Jelentkezések
           </NavLink>
         </Link>
       </NavItem>
