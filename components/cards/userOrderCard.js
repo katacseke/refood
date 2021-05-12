@@ -3,6 +3,7 @@ import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5'
 import toast from 'react-hot-toast';
 import { useContext } from 'react';
 import Router from 'next/router';
+import CartItem from '@components/cartItem';
 import styles from './orderCard.module.scss';
 import AuthContext from '../../context/authContext';
 
@@ -30,27 +31,16 @@ const UserOrderCard = ({ order }) => {
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
-
   const totalPrice = order.items.reduce((acc, item) => acc + item.quantity * item.meal.price, 0);
-
-  const renderCartItem = (item) => (
-    <div key={item.meal.id}>
-      <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
-        <p className={styles.mealName}>{item.meal.name}</p>
-
-        <p className="pl-2 mb-1">
-          {item.quantity} x {currencyFormatter.format(item.meal.price)}
-        </p>
-      </div>
-      <hr />
-    </div>
-  );
 
   return (
     <Card className={styles.card}>
       <CardBody>
         <CardTitle>Rendelés innen: {order.restaurant.name}</CardTitle>
-        {order.items.map(renderCartItem)}
+        {order.items.map((item) => (
+          <CartItem key={item.key} item={item} />
+        ))}
+
         <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
           <p className={styles.mealName}>Összesen</p>
 

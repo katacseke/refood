@@ -1,14 +1,17 @@
 import { useContext } from 'react';
-import { Button, Card, CardBody, CardTitle } from 'shards-react';
-import { IoCartOutline, IoClose } from 'react-icons/io5';
-import toast from 'react-hot-toast';
 import Router from 'next/router';
-import Layout from '../../components/layout';
-import CartContext from '../../context/cartContext';
-import withAuthSSR from '../../server/middleware/withAuthSSR';
-import QuantityChanger from '../../components/quantityChanger';
+import toast from 'react-hot-toast';
+import { Button, Card, CardBody, CardTitle } from 'shards-react';
+import { IoCartOutline } from 'react-icons/io5';
+
+import withAuthSSR from '@middleware/withAuthSSR';
+
+import AuthContext from '@context/authContext';
+import Layout from '@components/layout';
+import CartContext from '@context/cartContext';
+import fetchToast from '@helpers/fetchToast';
+import CartItem from '@components/cartItem';
 import styles from './cart.module.scss';
-import AuthContext from '../../context/authContext';
 
 const CartPage = () => {
   const { cart, updateCartItem, deleteCartContent, refresh } = useContext(CartContext);
@@ -41,50 +44,22 @@ const CartPage = () => {
   };
 
   const placeOrder = async () => {
-    const res = await fetch(`/api/users/${user.id}/orders`, {
+    const promise = fetch(`/api/users/${user.id}/orders`, {
       method: 'POST',
     });
 
-    if (!res.ok) {
-      const err = await res.json();
-      toast.error(err.error || err.general.message);
-      return;
-    }
+    await fetchToast(promise, {
+      loading: 'Rendelés rögzítése...',
+      success: 'A rendelésedet rögzítettük.',
+      error: (err) => err.error || err.general.message,
+    });
 
-    refresh();
-    toast.success('A rendelésedet rögzítettük.');
-    Router.push('/orders');
+    refresh(); // refresh cart model in Cart Context
+    Router.replace('/orders');
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
-
   const totalPrice = cart.items?.reduce((acc, item) => acc + item.quantity * item.meal.price, 0);
-
-  const renderCartItem = (item) => (
-    <div key={item.meal.id}>
-      <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
-        <p className={styles.mealName}>{item.meal.name}</p>
-
-        <p className="pl-5 mb-1">{currencyFormatter.format(item.meal.price * item.quantity)}</p>
-      </div>
-      <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
-        <QuantityChanger
-          quantity={item.quantity}
-          onAdd={() => handleUpdate(item.meal.id, item.quantity + 1)}
-          onSubtract={() => handleUpdate(item.meal.id, item.quantity - 1)}
-          max={item.meal.portionNumber}
-        />
-        <Button
-          theme="light"
-          className={styles.closeButton}
-          onClick={() => updateCartItem({ meal: item.meal.id, quantity: 0 })}
-        >
-          <IoClose />
-        </Button>
-      </div>
-      <hr />
-    </div>
-  );
 
   return (
     <Layout requiresAuth>
@@ -98,7 +73,15 @@ const CartPage = () => {
           <>
             {cart.items?.length > 0 ? (
               <div>
-                {cart.items.map(renderCartItem)}
+                {cart.items.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    showRemoveButton
+                    showQuantityChanger
+                    onQuantityUpdate={handleUpdate}
+                  />
+                ))}
                 <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
                   <p className={styles.mealName}>Összesen</p>
 
