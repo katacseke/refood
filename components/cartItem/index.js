@@ -1,6 +1,7 @@
-import QuantityChanger from '@components/quantityChanger';
-import { IoClose } from 'react-icons/io5';
 import { Button } from 'shards-react';
+import { IoClose } from 'react-icons/io5';
+
+import QuantityChanger from '@components/quantityChanger';
 import styles from './cartItem.module.scss';
 
 const CartItem = ({ item, showRemoveButton, showQuantityChanger, onQuantityUpdate }) => {
