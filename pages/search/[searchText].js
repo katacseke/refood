@@ -38,7 +38,7 @@ export async function getServerSideProps({ params }) {
   const { searchText } = params;
 
   const meals = await mealService.getMeals({ name: searchText });
-  const restaurants = await restaurantService.getRestaurantsWithName(params.searchText);
+  const restaurants = await restaurantService.getRestaurantsWithName(searchText);
 
   return {
     props: {

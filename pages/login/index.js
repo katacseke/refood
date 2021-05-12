@@ -1,8 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import Router from 'next/router';
 import { useForm } from 'react-hook-form';
 import {
-  Alert,
   Form,
   FormInput,
   FormGroup,
@@ -13,14 +12,14 @@ import {
   CardTitle,
 } from 'shards-react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import loginSchema from '../../validation/loginSchema';
-import Layout from '../../components/layout';
-import styles from './login.module.scss';
-import AuthContext from '../../context/authContext';
+
+import loginSchema from '@validation/loginSchema';
+import AuthContext from '@context/authContext';
+
+import Layout from '@components/layout';
+import toast from 'react-hot-toast';
 
 const Login = () => {
-  const [isAlertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
   const { login } = useContext(AuthContext);
 
   const { register, handleSubmit, errors } = useForm({
@@ -28,35 +27,29 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
-    setAlertVisible(false);
+    try {
+      const promise = login(data);
 
-    const res = await login(data);
+      await toast.promise(
+        promise,
+        {
+          loading: 'Bejelentkezés folyamatban...',
+          success: 'Bejelentkezve!',
+          error: (err) => err.error || err.general.message,
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-    if (!res.ok) {
-      const err = await res.json();
-
-      setAlertMessage(err.general.message);
-      setAlertVisible(true);
-
-      return;
-    }
-
-    Router.push('/');
+      Router.push('/');
+    } catch (err) {}
   };
 
   return (
     <Layout>
-      <Card className={styles.card}>
+      <Card>
         <CardBody>
           <CardTitle>Lépj be!</CardTitle>
-          <Alert
-            className="mb-3"
-            dismissible={() => setAlertVisible(false)}
-            open={isAlertVisible}
-            theme="danger"
-          >
-            {alertMessage}
-          </Alert>
+
           <Form onSubmit={handleSubmit(onSubmit)}>
             <FormGroup>
               <label htmlFor="email">Emailcím</label>

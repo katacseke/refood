@@ -9,8 +9,8 @@ import withAuthSSR from '@middleware/withAuthSSR';
 import AuthContext from '@context/authContext';
 import Layout from '@components/layout';
 import CartContext from '@context/cartContext';
-import fetchToast from '@helpers/fetchToast';
 import CartItem from '@components/cartItem';
+import axios from 'axios';
 import styles from './cart.module.scss';
 
 const CartPage = () => {
@@ -21,7 +21,8 @@ const CartPage = () => {
     try {
       await updateCartItem({ meal: mealId, quantity: newQuantity });
     } catch (err) {
-      toast.error(err.message);
+      const body = err.response.data;
+      toast.error(body.error || body.general.message);
     }
   };
 
@@ -35,27 +36,27 @@ const CartPage = () => {
         success: 'Kosár sikeresen kiürítve!',
         error: 'Nem sikerült kiüríteni a kosarat!',
       },
-      {
-        style: {
-          minWidth: '18rem',
-        },
-      }
+      { style: { minWidth: '18rem' } }
     );
   };
 
   const placeOrder = async () => {
-    const promise = fetch(`/api/users/${user.id}/orders`, {
-      method: 'POST',
-    });
+    try {
+      const promise = axios.post(`/api/users/${user.id}/orders`);
 
-    await fetchToast(promise, {
-      loading: 'Rendelés rögzítése...',
-      success: 'A rendelésedet rögzítettük.',
-      error: (err) => err.error || err.general.message,
-    });
+      await toast.promise(
+        promise,
+        {
+          loading: 'Rendelés rögzítése...',
+          success: 'A rendelésedet rögzítettük.',
+          error: (err) => err.response.data.error || err.response.data.general.message,
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-    refresh(); // refresh cart model in Cart Context
-    Router.replace('/orders');
+      refresh(); // refresh cart model in Cart Context
+      Router.push('/orders');
+    } catch {}
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });

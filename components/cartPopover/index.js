@@ -13,7 +13,8 @@ const CartPopover = () => {
     try {
       await updateCartItem({ meal: mealId, quantity: newQuantity });
     } catch (err) {
-      toast.error(err.message);
+      const body = err.response.data;
+      toast.error(body.error || body.general.message);
     }
   };
 

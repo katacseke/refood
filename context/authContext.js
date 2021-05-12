@@ -1,5 +1,5 @@
-import Router from 'next/router';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import useInterval from 'use-interval';
 
 const AuthContext = React.createContext();
@@ -8,46 +8,21 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const logout = async () => {
-    const res = await fetch('/api/users/logout', {
-      method: 'POST',
-    });
+    await axios.post('/api/users/logout');
 
-    if (res.ok) {
-      setUser(null);
-      Router.push('/');
-    }
+    setUser(null);
   };
 
   const login = async (data) => {
-    const res = await fetch('/api/users/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const res = await axios.post('/api/users/login', data);
 
-    if (res.ok) {
-      setUser(await res.json());
-    }
-
-    return res;
+    setUser(res.data);
   };
 
   const registration = async (data) => {
-    const res = await fetch('/api/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const res = await axios.post('/api/users', data);
 
-    if (res.ok) {
-      setUser(await res.json());
-    }
-
-    return res;
+    setUser(res.data);
   };
 
   const refreshToken = async (strict = true) => {
@@ -55,14 +30,12 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    const res = await fetch('/api/users/refreshToken', {
-      method: 'POST',
-    });
+    try {
+      const res = await axios.post('/api/users/refreshToken');
+      setUser(res.data);
 
-    if (res.ok) {
-      const userData = await res.json();
-      setUser(userData);
-    }
+      // eslint-disable-next-line no-empty
+    } catch (err) {}
   };
 
   useEffect(() => refreshToken(false), []);

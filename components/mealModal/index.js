@@ -51,7 +51,8 @@ const MealModal = ({ meal, open, setOpen }) => {
       setOpen(false);
       toast.success('Kosárba tetted!');
     } catch (err) {
-      toast.error(err.message);
+      const body = err.response.data;
+      toast.error(body.error || body.general.message);
     }
   };
 

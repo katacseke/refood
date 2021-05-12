@@ -43,6 +43,7 @@ const uploadImage = (inputName, maxSize = 5) => async (req, res, next) => {
       return;
     }
 
+    delete req.body[inputName];
     req.body = formDataToObject(req.body);
 
     req.body[inputName] = req?.file?.path

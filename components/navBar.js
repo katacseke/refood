@@ -18,6 +18,7 @@ import {
   Collapse,
 } from 'shards-react';
 import { Popover } from 'reactstrap';
+import toast from 'react-hot-toast';
 import CartPopover from './cartPopover';
 import AuthContext from '../context/authContext';
 
@@ -220,15 +221,31 @@ const NavBar = () => {
     }
   };
 
+  const handleLogout = async () => {
+    const promise = logout();
+
+    await toast.promise(
+      promise,
+      {
+        loading: 'Kijelentkezés folyamatban...',
+        success: 'Kijelentkezve!',
+        error: (err) => err.error || err.general.message,
+      },
+      { style: { minWidth: '18rem' } }
+    );
+
+    Router.push('/');
+  };
+
   const renderNavSection = () => {
     if (user?.role === 'user') {
-      return <AuthenticatedSection user={user} logout={logout} />;
+      return <AuthenticatedSection user={user} logout={handleLogout} />;
     }
     if (user?.role === 'restaurant') {
-      return <RestaurantSection user={user} logout={logout} />;
+      return <RestaurantSection user={user} logout={handleLogout} />;
     }
     if (user?.role === 'admin') {
-      return <AdminSection logout={logout} />;
+      return <AdminSection logout={handleLogout} />;
     }
 
     return <GuestSection />;

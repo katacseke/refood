@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
+import Router from 'next/router';
+import toast from 'react-hot-toast';
 import {
-  Alert,
   Form,
   FormInput,
   FormGroup,
@@ -12,49 +13,42 @@ import {
   FormTextarea,
 } from 'shards-react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Router from 'next/router';
-import toast from 'react-hot-toast';
-import objectToFormData from '@helpers/objectToFormData';
-import FormCard from '@components/formCard';
+
+import applicationService from '@services/applicationService';
 import restaurantCreationSchema from '@validation/restaurantCreationSchema';
+import objectToFormData from '@helpers/objectToFormData';
+
+import FormCard from '@components/formCard';
 import Layout from '@components/layout';
-import { applicationService } from '@server/services';
+import axios from 'axios';
 
 const RestaurantRegistration = ({ application, token }) => {
-  const [isAlertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-
   const { register, handleSubmit, errors, setError } = useForm({
     resolver: yupResolver(restaurantCreationSchema),
   });
 
   const onSubmit = async (data) => {
-    setAlertVisible(false);
+    try {
+      const formData = objectToFormData(data);
+      const promise = axios.post(`/api/restaurants/registration/${token}`, formData);
 
-    const formData = objectToFormData(data);
+      await toast.promise(
+        promise,
+        {
+          loading: 'Regisztráció folyamatban...',
+          success: 'Sikeres regisztráció! Mostmár bejelntkezhetsz a vendéglő felhasználójával!',
+          error: (err) =>
+            err.response.data.error || err.response.data.general || 'A regisztráció sikertelen!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-    const res = await fetch(`/api/restaurants/registration/${token}`, {
-      method: 'POST',
-      body: JSON.stringify(formData),
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      Object.keys(err)
+      Router.push('/');
+    } catch (err) {
+      Object.keys(err.response.data)
         .filter((field) => field !== 'general')
-        .forEach((field) => setError(field, { message: err[field].message }));
-
-      if (err.general) {
-        setAlertMessage(err.general.message);
-        setAlertVisible(true);
-      }
-      return;
+        .forEach((field) => setError(field, { message: err.response.data[field].message }));
     }
-
-    toast.success('Sikeres regisztráció! Mostmár bejelntkezhetsz a vendéglő felhasználójával!', {
-      duration: 5000,
-    });
-    Router.push('/');
   };
 
   return (
@@ -62,15 +56,6 @@ const RestaurantRegistration = ({ application, token }) => {
       <FormCard>
         <CardBody>
           <CardTitle tag="h3">Vendéglátó helyiség regisztrálása</CardTitle>
-
-          <Alert
-            className="mb-3"
-            dismissible={() => setAlertVisible(false)}
-            open={isAlertVisible}
-            theme="danger"
-          >
-            {alertMessage}
-          </Alert>
 
           <Form onSubmit={handleSubmit(onSubmit)}>
             <h4>Vendéglő nyilvános adatai</h4>

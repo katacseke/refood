@@ -43,9 +43,7 @@ const ApplicationsPage = ({ applications }) => {
           <ApplicationCard key={application.id} application={application} />
         ))}
         {applications.length === 0 && (
-          <span className="text-muted mt-3">
-            Nem találhatók a feltételnek megfelelő jelentkezések.
-          </span>
+          <p className="text-muted mt-3">Nem találhatók a feltételnek megfelelő jelentkezések.</p>
         )}
       </Container>
     </Layout>

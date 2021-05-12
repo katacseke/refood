@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button, Card, CardBody, CardTitle, Container } from 'shards-react';
 import {
   IoCall,
@@ -9,13 +10,14 @@ import {
   IoAdd,
   IoSettingsOutline,
 } from 'react-icons/io5';
-import Link from 'next/link';
-import MealCard from '../../components/cards/mealCard';
-import MealModal from '../../components/mealModal';
-import RestaurantModal from '../../components/restaurantModal';
-import Layout from '../../components/layout';
-import { mealService, restaurantService, userService } from '../../server/services';
-import AuthContext from '../../context/authContext';
+
+import { mealService, restaurantService, userService } from '@server/services';
+
+import AuthContext from '@context/authContext';
+import MealCard from '@components/cards/mealCard';
+import MealModal from '@components/mealModal';
+import RestaurantModal from '@components/restaurantModal';
+import Layout from '@components/layout';
 import styles from './restaurant.module.scss';
 
 const RestauantPage = ({ restaurant, meals }) => {

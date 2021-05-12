@@ -1,8 +1,10 @@
 import { Container } from 'shards-react';
-import Layout from '../../components/layout';
-import UserOrderCard from '../../components/cards/userOrderCard';
-import withAuthSSR from '../../server/middleware/withAuthSSR';
-import { orderService } from '../../server/services';
+
+import orderService from '@services/orderService';
+import withAuthSSR from '@middleware/withAuthSSR';
+
+import Layout from '@components/layout';
+import UserOrderCard from '@components/cards/userOrderCard';
 
 const UserOrdersPage = ({ orders }) => {
   const activeOrders = orders.filter((order) => order.status === 'active');
@@ -16,7 +18,8 @@ const UserOrdersPage = ({ orders }) => {
           <UserOrderCard key={order.id} order={order} />
         ))}
       </Container>
-      {pastOrders.length > 0 && <h1>Régebbi rendelések</h1>}
+
+      {pastOrders.length > 0 && <h1>Lezárult rendelések</h1>}
       <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
         {pastOrders.map((order) => (
           <UserOrderCard key={order.id} order={order} />

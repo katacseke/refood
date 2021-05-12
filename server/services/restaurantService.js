@@ -187,7 +187,7 @@ const updateRestaurant = async (id, restaurantData) => {
     };
     if (image) {
       const restaurantResult = await Restaurant.findById(id).exec();
-      fs.unlink(`public/${restaurantResult?.image}`);
+      fs.unlinkSync(`public/${restaurantResult?.image}`);
       restaurant.image = image;
     }
     const updatedRestaurant = await Restaurant.findByIdAndUpdate(id, restaurant, {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Router from 'next/router';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import {
@@ -13,10 +14,11 @@ import {
   FormTextarea,
 } from 'shards-react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Router from 'next/router';
-import FormCard from '../../components/formCard';
-import restaurantApplicationSchema from '../../validation/restaurantApplicationSchema';
-import Layout from '../../components/layout';
+
+import restaurantApplicationSchema from '@validation/restaurantApplicationSchema';
+
+import FormCard from '@components/formCard';
+import Layout from '@components/layout';
 
 const Apply = () => {
   const [isAlertVisible, setAlertVisible] = useState(false);

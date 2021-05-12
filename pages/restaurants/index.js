@@ -1,7 +1,8 @@
 import { Container } from 'shards-react';
-import Layout from '../../components/layout';
-import RestaurantCard from '../../components/cards/restaurantCard';
-import { restaurantService } from '../../server/services';
+
+import restaurantService from '@services/restaurantService';
+import Layout from '@components/layout';
+import RestaurantCard from '@components/cards/restaurantCard';
 
 const RestaurantsPage = ({ restaurants }) => (
   <Layout>

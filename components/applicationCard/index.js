@@ -1,24 +1,24 @@
 import Router from 'next/router';
+import axios from 'axios';
 import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
 import { IoCall, IoMail, IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
-import fetchToast from '@helpers/fetchToast';
+import toast from 'react-hot-toast';
+
 import styles from './applicationCard.module.scss';
 
 const ApplicationCard = ({ application }) => {
   const handleApplication = async (status) => {
-    const promise = fetch(`/api/restaurants/applications/${application.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ status }),
-    });
+    const promise = axios.patch(`/api/restaurants/applications/${application.id}`, { status });
 
-    await fetchToast(promise, {
-      loading: 'Jelentkezés frissítése...',
-      success: 'Jelentkezés sikeresen frissítve!',
-      error: (err) => err.error,
-    });
+    await toast.promise(
+      promise,
+      {
+        loading: 'Jelentkezés frissítése...',
+        success: 'Jelentkezés sikeresen frissítve!',
+        error: (err) => err.response.data.error,
+      },
+      { style: { minWidth: '18rem' } }
+    );
 
     Router.replace('/restaurants/applications');
   };
