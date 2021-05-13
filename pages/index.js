@@ -1,6 +1,4 @@
-import Image from 'next/image';
 import { Button } from 'shards-react';
-import NavBar from '@components/navBar';
 import Link from 'next/link';
 import {
   IoCashOutline,
@@ -10,6 +8,10 @@ import {
   IoRestaurantOutline,
   IoWalkOutline,
 } from 'react-icons/io5';
+import { getImage } from '@plaiceholder/next';
+import { getBase64 } from '@plaiceholder/base64';
+import NavBar from '@components/navBar';
+import LoadImage from '@components/loadImage';
 import styles from './home.module.scss';
 
 const Feature = ({ icon, children }) => (
@@ -19,11 +21,12 @@ const Feature = ({ icon, children }) => (
   </li>
 );
 
-const Home = () => (
+const Home = ({ mainPlaceholderSrc, featurePlaceholderSrc }) => (
   <>
     <NavBar />
     <div className={styles.topContainer}>
-      <Image
+      <LoadImage
+        placeholderSrc={mainPlaceholderSrc}
         src="/hermes-rivera-Ww8eQWjMJWk-unsplash.jpg"
         alt=""
         width={5465}
@@ -41,7 +44,7 @@ const Home = () => (
           fennmaradt termélei vásárolhatók meg!
         </p>
         <Link href="/meals">
-          <Button tag="a" className="align-self-start mt-2" size="lg">
+          <Button tag="a" className={styles.forwardButton} size="lg">
             Tovább
           </Button>
         </Link>
@@ -49,7 +52,14 @@ const Home = () => (
     </div>
 
     <div className={styles.centerContainer}>
-      <Image src="/vegleges.jpg" alt="" width={2400} height={1000} layout="responsive" />
+      <LoadImage
+        placeholderSrc={featurePlaceholderSrc}
+        src="/vegleges.jpg"
+        alt=""
+        width={2400}
+        height={1000}
+        layout="responsive"
+      />
       <ul className={styles.featureGrid}>
         <Feature icon={<IoEarthOutline />}> Ételpazarlás-csökkentés </Feature>
         <Feature icon={<IoCashOutline />}> Pénz megtakarítás </Feature>
@@ -82,3 +92,18 @@ const Home = () => (
 );
 
 export default Home;
+
+export async function getStaticProps() {
+  const mainImg = await getImage('/hermes-rivera-Ww8eQWjMJWk-unsplash.jpg');
+  const featureImg = await getImage('/vegleges.jpg');
+
+  const mainPlaceholderSrc = await getBase64(mainImg);
+  const featurePlaceholderSrc = await getBase64(featureImg);
+
+  return {
+    props: {
+      mainPlaceholderSrc,
+      featurePlaceholderSrc,
+    },
+  };
+}
