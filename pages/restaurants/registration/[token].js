@@ -1,7 +1,9 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
 import Router from 'next/router';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 import {
   Form,
   FormInput,
@@ -12,7 +14,6 @@ import {
   CardTitle,
   FormTextarea,
 } from 'shards-react';
-import { yupResolver } from '@hookform/resolvers/yup';
 
 import applicationService from '@services/applicationService';
 import restaurantCreationSchema from '@validation/restaurantCreationSchema';
@@ -20,7 +21,6 @@ import objectToFormData from '@helpers/objectToFormData';
 
 import FormCard from '@components/formCard';
 import Layout from '@components/layout';
-import axios from 'axios';
 
 const RestaurantRegistration = ({ application, token }) => {
   const { register, handleSubmit, errors, setError } = useForm({

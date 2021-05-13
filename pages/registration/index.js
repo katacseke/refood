@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
-import { useForm } from 'react-hook-form';
 import Router from 'next/router';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import toast from 'react-hot-toast';
 import {
   Form,
   FormInput,
@@ -11,13 +13,11 @@ import {
   CardBody,
   CardTitle,
 } from 'shards-react';
-import { yupResolver } from '@hookform/resolvers/yup';
 
 import registrationSchema from '@validation/registrationSchema';
 
 import AuthContext from '@context/authContext';
 import Layout from '@components/layout';
-import toast from 'react-hot-toast';
 
 const Registration = () => {
   const { registration } = useContext(AuthContext);
