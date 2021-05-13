@@ -107,7 +107,7 @@ const createRestaurant = async (restaurantData, application) => {
     password,
     image,
   } = restaurantData;
-  const user = { name, email: loginEmail, password };
+  const user = { name, email: loginEmail, phone, password };
 
   let transactionResult;
   await connection.transaction(async () => {
@@ -169,7 +169,7 @@ const updateRestaurant = async (id, restaurantData) => {
     ownerId,
     image,
   } = restaurantData;
-  const user = { name, email: loginEmail, password };
+  const user = { name, email: loginEmail, phone, password };
 
   let transactionResult;
   await connection.transaction(async () => {

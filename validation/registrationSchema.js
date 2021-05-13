@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 
 const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+const phoneRegex = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
 export default Yup.object({
   name: Yup.string()
@@ -9,6 +10,9 @@ export default Yup.object({
   email: Yup.string()
     .email('Az e-mail cím formátuma nem megfelelő.')
     .required('E-mail cím megadása kötelező.'),
+  phone: Yup.string()
+    .matches(phoneRegex, 'A telefonszám formátuma nem megfelelő.')
+    .required('Telefonszám megadása kötelező.'),
   password: Yup.string()
     .min(8, 'A jelszónak legalább 8 karaktert kell tartalmaznia.')
     .matches(

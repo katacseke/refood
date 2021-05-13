@@ -79,6 +79,17 @@ const Registration = () => {
               <FormFeedback>{errors?.name?.message}</FormFeedback>
             </FormGroup>
             <FormGroup>
+              <label htmlFor="phone">Telefonszám</label>
+              <FormInput
+                id="phone"
+                name="phone"
+                placeholder="Telefonszám"
+                innerRef={register}
+                invalid={!!errors?.phone}
+              />
+              <FormFeedback>{errors?.phone?.message}</FormFeedback>
+            </FormGroup>
+            <FormGroup>
               <label htmlFor="password">Jelszó</label>
               <FormInput
                 type="password"

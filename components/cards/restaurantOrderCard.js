@@ -3,7 +3,11 @@ import Router from 'next/router';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
-import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
+import {
+  IoAlertCircleOutline,
+  IoCheckmarkCircleOutline,
+  IoPhonePortraitSharp,
+} from 'react-icons/io5';
 
 import AuthContext from '@context/authContext';
 import CartItem from '@components/cartItem';
@@ -39,7 +43,11 @@ const RestaurantOrderCard = ({ order }) => {
   return (
     <Card className={styles.card}>
       <CardBody>
-        <CardTitle>{order.user.name}</CardTitle>
+        <CardTitle className="mb-0">{order.user.name}</CardTitle>
+        <p className="mb-3 d-flex align-items-center">
+          <IoPhonePortraitSharp className="mr-1" />
+          {user.phone}
+        </p>
         {order.items.map((item) => (
           <CartItem key={item.id} item={item} />
         ))}

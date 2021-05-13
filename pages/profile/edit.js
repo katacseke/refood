@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { Card, CardBody, CardTitle } from 'shards-react';
-import { IoLockClosedSharp, IoMail, IoPerson } from 'react-icons/io5';
+import { IoLockClosedSharp, IoMail, IoPerson, IoPhonePortraitSharp } from 'react-icons/io5';
 import axios from 'axios';
 
 import userService from '@services/userService';
@@ -52,6 +52,13 @@ const EditPage = ({ user }) => {
             name="email"
             onUpdate={handleUpdate}
             icon={<IoMail />}
+          />
+
+          <UserUpdateItem
+            initialValue={user.phone}
+            name="phone"
+            onUpdate={handleUpdate}
+            icon={<IoPhonePortraitSharp />}
           />
 
           <UserUpdateItem
