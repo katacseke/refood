@@ -12,14 +12,14 @@ const UserOrdersPage = ({ orders }) => {
 
   return (
     <Layout>
-      {activeOrders.length > 0 && <h1>Aktív rendelések</h1>}
-      <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
+      {activeOrders.length > 0 && <h2>Aktív rendelések</h2>}
+      <Container className="m-0 mb-3 p-0 d-flex flex-wrap w-100 justify-content-center">
         {activeOrders.map((order) => (
           <UserOrderCard key={order.id} order={order} />
         ))}
       </Container>
 
-      {pastOrders.length > 0 && <h1>Lezárult rendelések</h1>}
+      {pastOrders.length > 0 && <h2>Lezárult rendelések</h2>}
       <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
         {pastOrders.map((order) => (
           <UserOrderCard key={order.id} order={order} />

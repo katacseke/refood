@@ -1,7 +1,7 @@
-import { ValidationError } from 'yup';
-import { User } from '../models';
-import mealService from './mealService';
-import connectDb from '../db';
+import User from '@server/models/user';
+import mealService from '@services/mealService';
+import connectDb from '@server/db';
+import ValidationError from '@services/errors/ValidationError';
 
 /**
  * Get cart by user id.
@@ -20,7 +20,7 @@ const getCart = async (userId) => {
     .exec();
 
   if (!cart) {
-    throw new Error('A kosár nem érhető el');
+    throw new Error('A kosár nem érhető el.');
   }
   return cart.toObject();
 };

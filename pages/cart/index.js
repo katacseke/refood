@@ -64,7 +64,7 @@ const CartPage = () => {
 
   return (
     <Layout requiresAuth>
-      <Card size="lg" className="m-2 mb-5">
+      <Card size="lg" className="mb-5">
         <CardBody>
           <CardTitle tag="h3" className="d-flex align-items-center">
             <IoCartOutline className="mr-1" />

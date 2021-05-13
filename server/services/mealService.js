@@ -54,6 +54,10 @@ const getMeals = async (filters = {}) => {
     mongoFilters.startTime = { $lte: filters.endTime };
   }
 
+  if (filters.minPortionNumber) {
+    mongoFilters.portionNumber = { $gte: filters.minPortionNumber };
+  }
+
   let meals;
   if (filters.name && filters.name !== '') {
     mongoFilters.$text = { $search: filters.name };

@@ -35,7 +35,7 @@ const Login = () => {
         {
           loading: 'Bejelentkezés folyamatban...',
           success: 'Bejelentkezve!',
-          error: (err) => err.error || err.general.message,
+          error: (err) => err.response.data.error || err.response.data.general.message,
         },
         { style: { minWidth: '18rem' } }
       );

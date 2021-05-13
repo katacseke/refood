@@ -9,7 +9,7 @@ const handleErrors = (err, req, res) => {
     res.status(401).json({ error: err.message });
   } else {
     res.status(500).json({ error: err.message });
-    console.err(err);
+    console.error(err);
   }
 };
 

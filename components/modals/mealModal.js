@@ -53,7 +53,10 @@ const MealModal = ({ meal, open, setOpen }) => {
         {
           loading: 'Kosár frissítése...',
           success: 'Kosárba tetted!',
-          error: (err) => err.error || err.general?.message || 'A kosár frissítése sikertelen!',
+          error: (err) =>
+            err.response.data.error ||
+            err.response.data.general?.message ||
+            'A kosár frissítése sikertelen!',
         },
         { style: { minWidth: '18rem' } }
       );

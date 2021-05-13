@@ -24,7 +24,9 @@ const UserOrderCard = ({ order }) => {
           loading: 'Rendelés lemondása folyamatban...',
           success: 'Rendelés lemondva.',
           error: (err) =>
-            err.error || err.general.message || 'A rendelés lemondása frissítése sikertelen!',
+            err.response.data.error ||
+            err.response.data.general.message ||
+            'A rendelés lemondása frissítése sikertelen!',
         },
         { style: { minWidth: '18rem' } }
       );

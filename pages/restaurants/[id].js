@@ -41,7 +41,7 @@ const RestauantPage = ({ restaurant, meals }) => {
         setOpen={setRestaurantModalOpen}
       />
 
-      <Card size="lg" className="m-2 mb-5">
+      <Card size="lg" className="m-2 mb-5 w-100">
         <CardBody className={styles.mainContainer}>
           <div className={styles.image}>
             <Image

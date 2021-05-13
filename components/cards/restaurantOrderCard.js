@@ -28,7 +28,9 @@ const RestaurantOrderCard = ({ order }) => {
           loading: 'Rendelés állapotának frissítése folyamatban...',
           success: `Rendelés ${status === 'finished' ? 'átadva' : 'elutasítva'}.`,
           error: (err) =>
-            err.error || err.general.message || 'A rendelés állapotának frissítése sikertelen!',
+            err.response.data.error ||
+            err.response.data.general.message ||
+            'A rendelés állapotának frissítése sikertelen!',
         },
         { style: { minWidth: '18rem' } }
       );

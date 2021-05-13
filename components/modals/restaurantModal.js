@@ -54,7 +54,9 @@ const RestaurantModal = ({ restaurant, open, setOpen }) => {
           loading: 'Vendéglő adatainak frissítése...',
           success: 'Adatok sikeresen módosítva!',
           error: (err) =>
-            err.error || err.general.message || 'A vendéglő adatainak frissítése sikertelen!',
+            err.response.data.error ||
+            err.response.data.general.message ||
+            'A vendéglő adatainak frissítése sikertelen!',
         },
         { style: { minWidth: '18rem' } }
       );

@@ -63,6 +63,7 @@ export async function getServerSideProps(context) {
   const filters = {
     startTime: Date.now(),
     endTime: Date.now(),
+    minPortionNumber: 1,
     ...context.query,
   };
 
