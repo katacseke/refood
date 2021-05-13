@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { Button, Card, CardBody, CardTitle } from 'shards-react';
 import { IoCartOutline } from 'react-icons/io5';
 
-import withAuthSSR from '@middleware/withAuthSSR';
+import withAuthSSR, { hasRoleSSR } from '@middleware/withAuthSSR';
 
 import AuthContext from '@context/authContext';
 import Layout from '@components/layout';
@@ -108,8 +108,6 @@ const CartPage = () => {
   );
 };
 
-export const getServerSideProps = withAuthSSR(async () => ({
-  props: {},
-}));
+export const getServerSideProps = withAuthSSR(async () => ({ props: {} }), hasRoleSSR('user'));
 
 export default CartPage;

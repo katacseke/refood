@@ -48,7 +48,7 @@ const RestaurantOrderCard = ({ order }) => {
         <CardTitle className="mb-0">{order.user.name}</CardTitle>
         <p className="mb-3 d-flex align-items-center">
           <IoPhonePortraitSharp className="mr-1" />
-          {user.phone}
+          {order.user.phone}
         </p>
         {order.items.map((item) => (
           <CartItem key={item.id} item={item} />

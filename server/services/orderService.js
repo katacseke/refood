@@ -68,7 +68,7 @@ const getOrdersByRestaurant = async (restaurantId) => {
     .flatMap((user) =>
       user.orders.map((order) => ({
         ...order.toObject(),
-        user: { name: user.name, email: user.email },
+        user: { name: user.name, email: user.email, phone: user.phone },
       }))
     )
     .sort((a, b) => b.updatedAt - a.updatedAt);
