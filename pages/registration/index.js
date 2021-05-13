@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import Router from 'next/router';
+import React, { useContext, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import toast from 'react-hot-toast';
@@ -21,10 +21,18 @@ import Layout from '@components/layout';
 
 const Registration = () => {
   const { registration } = useContext(AuthContext);
+  const router = useRouter();
 
   const { register, handleSubmit, errors, setError } = useForm({
     resolver: yupResolver(registrationSchema),
   });
+
+  // prefetch the home page if register will redirect there
+  useEffect(() => {
+    if (!router.query.next || router.query.next === '/') {
+      router.prefetch('/');
+    }
+  }, []);
 
   const onSubmit = async (data) => {
     try {
@@ -41,7 +49,7 @@ const Registration = () => {
         { style: { minWidth: '18rem' } }
       );
 
-      Router.push('/');
+      router.push(router.query.next || '/');
     } catch (err) {
       Object.keys(err.response.data)
         .filter((field) => field !== 'general' && field !== 'error')

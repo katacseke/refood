@@ -22,7 +22,7 @@ const withAuthSSR = (getServerSideProps, ...conditions) => async (ctx) => {
   if (!token) {
     return {
       redirect: {
-        destination: '/login',
+        destination: `/login?next=${encodeURIComponent(ctx.resolvedUrl)}`,
         permanent: false,
       },
     };
@@ -45,7 +45,7 @@ const withAuthSSR = (getServerSideProps, ...conditions) => async (ctx) => {
   } catch {
     return {
       redirect: {
-        destination: '/login',
+        destination: `/login?next=${encodeURIComponent(ctx.resolvedUrl)}`,
         permanent: false,
       },
     };

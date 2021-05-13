@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import Router from 'next/router';
+import React, { useContext, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import {
   Form,
@@ -21,10 +21,18 @@ import toast from 'react-hot-toast';
 
 const Login = () => {
   const { login } = useContext(AuthContext);
+  const router = useRouter();
 
   const { register, handleSubmit, errors } = useForm({
     resolver: yupResolver(loginSchema),
   });
+
+  // prefetch the home page if login will redirect there
+  useEffect(() => {
+    if (!router.query.next || router.query.next === '/') {
+      router.prefetch('/');
+    }
+  }, []);
 
   const onSubmit = async (data) => {
     try {
@@ -40,7 +48,7 @@ const Login = () => {
         { style: { minWidth: '18rem' } }
       );
 
-      Router.push('/');
+      router.push(router.query.next || '/');
     } catch (err) {}
   };
 

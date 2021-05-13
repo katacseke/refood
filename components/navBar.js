@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { IoExitOutline } from 'react-icons/io5';
@@ -82,40 +82,49 @@ const AuthenticatedSection = ({ logout }) => {
   );
 };
 
-const GuestSection = () => (
-  <>
-    <NavItem>
-      <Link href="/meals">
-        <NavLink active style={{ cursor: 'pointer' }}>
-          Ajánlatok
-        </NavLink>
-      </Link>
-    </NavItem>
-    <NavItem>
-      <Link href="/restaurants">
-        <NavLink active style={{ cursor: 'pointer' }}>
-          Vendéglők
-        </NavLink>
-      </Link>
-    </NavItem>
-    <NavItem>
-      <Link href="/login">
+const GuestSection = () => {
+  const router = useRouter();
+
+  return (
+    <>
+      <NavItem>
+        <Link href="/meals">
+          <NavLink active style={{ cursor: 'pointer' }}>
+            Ajánlatok
+          </NavLink>
+        </Link>
+      </NavItem>
+      <NavItem>
+        <Link href="/restaurants">
+          <NavLink active style={{ cursor: 'pointer' }}>
+            Vendéglők
+          </NavLink>
+        </Link>
+      </NavItem>
+      <NavItem>
+        <Link
+          href={{
+            pathname: '/login',
+            query: { next: router.pathname },
+          }}
+        >
+          <NavLink active>
+            <Button outline theme="light">
+              Belépés
+            </Button>
+          </NavLink>
+        </Link>
+      </NavItem>
+      <Link href="/registration">
         <NavLink active>
           <Button outline theme="light">
-            Belépés
+            Regisztráció
           </Button>
         </NavLink>
       </Link>
-    </NavItem>
-    <Link href="/registration">
-      <NavLink active>
-        <Button outline theme="light">
-          Regisztráció
-        </Button>
-      </NavLink>
-    </Link>
-  </>
-);
+    </>
+  );
+};
 
 const RestaurantSection = ({ logout, user }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
