@@ -17,7 +17,7 @@ handler.get(async (req, res) => {
 
 handler.post(async (req, res) => {
   const user = await userService.createUser(req.body);
-  const token = userService.createToken(user);
+  const token = await userService.createToken(user.id);
 
   res.setHeader('Set-Cookie', `access_token=${token}; Path=/; Max-Age=${60 * 60}; HttpOnly`);
   res.status(201).json(user);

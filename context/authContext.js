@@ -33,8 +33,6 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.post('/api/users/refreshToken');
       setUser(res.data);
-
-      // eslint-disable-next-line no-empty
     } catch (err) {}
   };
 
@@ -42,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   useInterval(refreshToken, 30 * 60 * 1000);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, registration }}>
+    <AuthContext.Provider value={{ user, login, logout, registration, refreshToken }}>
       {children}
     </AuthContext.Provider>
   );

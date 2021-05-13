@@ -162,7 +162,7 @@ const deleteUser = async (id) => {
  *
  * @param {String} email Email from login form.
  * @param {String} password Password from login form.
- * @returns Returns an object with user data.
+ * @returns {Object} Returns an object with user data.
  *
  * @throws {AuthenticationError} Throws AuthenticationError if the
  * credentials are wrong.
@@ -176,16 +176,25 @@ const checkCredentials = async (email, password) => {
     throw new AuthenticationError('Az email és jelszó páros nem talál!');
   }
 
-  return { ...user, password: undefined, cart: undefined, orders: undefined };
+  return user;
 };
 
 /**
  * Generate JWT token.
  *
- * @param {User} user
+ * @param {String} userId The id of the user.
  * @returns {String} The JWT token.
+ *
+ * @throws {NotFoundError} Throws NotFoundError if no user with the respective
+ *  id was found.
  */
-const createToken = (user) => jwt.sign(user, process.env.SECRET, { expiresIn: '1h' });
+const createToken = async (userId) => {
+  const user = await getUserById(userId);
+  const { id, name, email, phone, role, restaurantId } = user;
+  const claims = { id, name, email, phone, role, restaurantId };
+
+  return jwt.sign(claims, process.env.SECRET, { expiresIn: '1h' });
+};
 
 /**
  * Verify JWT token.
