@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import Router from 'next/router';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { IoExitOutline } from 'react-icons/io5';
 import {
   Button,
@@ -18,7 +19,6 @@ import {
   Collapse,
 } from 'shards-react';
 import { Popover } from 'reactstrap';
-import toast from 'react-hot-toast';
 import CartPopover from './cartPopover';
 import AuthContext from '../context/authContext';
 
@@ -222,19 +222,21 @@ const NavBar = () => {
   };
 
   const handleLogout = async () => {
-    const promise = logout();
+    try {
+      const promise = logout();
 
-    await toast.promise(
-      promise,
-      {
-        loading: 'Kijelentkezés folyamatban...',
-        success: 'Kijelentkezve!',
-        error: (err) => err.error || err.general.message,
-      },
-      { style: { minWidth: '18rem' } }
-    );
+      await toast.promise(
+        promise,
+        {
+          loading: 'Kijelentkezés folyamatban...',
+          success: 'Kijelentkezve!',
+          error: (err) => err.response.data.error,
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-    Router.push('/');
+      Router.push('/');
+    } catch (err) {}
   };
 
   const renderNavSection = () => {

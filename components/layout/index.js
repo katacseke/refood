@@ -1,4 +1,5 @@
 import Head from 'next/head';
+
 import NavBar from '../navBar';
 import styles from './layout.module.scss';
 

@@ -7,7 +7,7 @@ import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5'
 
 import AuthContext from '@context/authContext';
 import CartItem from '@components/cartItem';
-import styles from './orderCard.module.scss';
+import styles from './shardsReactCard.module.scss';
 
 const UserOrderCard = ({ order }) => {
   const { user } = useContext(AuthContext);

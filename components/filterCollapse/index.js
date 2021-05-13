@@ -1,5 +1,6 @@
-import { Button, Collapse, Container, Form, FormGroup, FormInput, Row, Col } from 'shards-react';
 import { useForm } from 'react-hook-form';
+import { Button, Collapse, Container, Form, FormGroup, FormInput, Row, Col } from 'shards-react';
+
 import Checkbox from '../checkbox';
 
 const filterCollapse = ({ open, onSubmit, values }) => {

@@ -16,7 +16,7 @@ export const CartProvider = ({ children }) => {
 
   const addCartItem = async (cartItem) => {
     const res = await axios.post(`/api/users/${user.id}/cart`, cartItem);
-    setCart(await res.data);
+    setCart(res.data);
   };
 
   const deleteCartContent = async () => {

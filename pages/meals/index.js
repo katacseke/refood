@@ -7,7 +7,7 @@ import mealService from '@services/mealService';
 
 import Layout from '@components/layout';
 import MealCard from '@components/cards/mealCard';
-import MealModal from '@components/mealModal';
+import MealModal from '@components/modals/mealModal';
 import FilterCollapse from '@components/filterCollapse';
 
 const MealsPage = ({ meals }) => {

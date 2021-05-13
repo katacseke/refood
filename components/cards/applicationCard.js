@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
 import { IoCall, IoMail, IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
 
-import styles from './applicationCard.module.scss';
+import styles from './shardsReactCard.module.scss';
 
 const ApplicationCard = ({ application }) => {
   const handleApplication = async (status) => {

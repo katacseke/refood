@@ -4,7 +4,7 @@ import { Button } from 'shards-react';
 import moment from 'moment';
 import 'twix';
 
-import styles from './card.module.scss';
+import styles from './customCard.module.scss';
 
 moment.locale('hu');
 

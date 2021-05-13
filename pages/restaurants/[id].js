@@ -15,8 +15,8 @@ import { mealService, restaurantService, userService } from '@server/services';
 
 import AuthContext from '@context/authContext';
 import MealCard from '@components/cards/mealCard';
-import MealModal from '@components/mealModal';
-import RestaurantModal from '@components/restaurantModal';
+import MealModal from '@components/modals/mealModal';
+import RestaurantModal from '@components/modals/restaurantModal';
 import Layout from '@components/layout';
 import styles from './restaurant.module.scss';
 

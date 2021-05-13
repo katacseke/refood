@@ -2,8 +2,9 @@ import { useContext } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { PopoverHeader, PopoverBody, ModalFooter } from 'shards-react';
+
+import CartContext from '@context/cartContext';
 import CartItem from '@components/cartItem';
-import CartContext from '../../context/cartContext';
 import styles from './cartPopover.module.scss';
 
 const CartPopover = () => {
@@ -19,7 +20,6 @@ const CartPopover = () => {
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
-
   const totalPrice = cart.items.reduce((acc, item) => acc + item.quantity * item.meal.price, 0);
 
   return (

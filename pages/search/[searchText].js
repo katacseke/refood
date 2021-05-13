@@ -6,7 +6,7 @@ import { mealService, restaurantService } from '@server/services';
 import Layout from '@components/layout';
 import MealCard from '@components/cards/mealCard';
 import RestaurantCard from '@components/cards/restaurantCard';
-import MealModal from '@components/mealModal';
+import MealModal from '@components/modals/mealModal';
 
 const SearchResultPage = ({ meals, restaurants, text }) => {
   const [modalOpen, setModalOpen] = useState(false);

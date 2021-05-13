@@ -6,7 +6,7 @@ import { Container, FormSelect, Button, Row, Col } from 'shards-react';
 import applicationService from '@services/applicationService';
 
 import Layout from '@components/layout';
-import ApplicationCard from '@components/applicationCard';
+import ApplicationCard from '@components/cards/applicationCard';
 import styles from './applications.module.scss';
 
 const ApplicationsPage = ({ applications }) => {

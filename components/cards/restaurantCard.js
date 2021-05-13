@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { IoCall, IoMail, IoLocationSharp } from 'react-icons/io5';
 
-import styles from './card.module.scss';
+import styles from './customCard.module.scss';
 
 const RestaurantInformation = ({ data }) => (
   <ul className={styles.moreInformation}>
