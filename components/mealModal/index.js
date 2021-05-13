@@ -61,6 +61,7 @@ const MealModal = ({ meal, open, setOpen }) => {
   }
 
   const timeRange = moment.twix(meal.startTime, meal.endTime);
+  const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
 
   return (
     <Modal
@@ -78,7 +79,7 @@ const MealModal = ({ meal, open, setOpen }) => {
         <div className={styles.content}>
           <h4 className="mb-0">{meal.name}</h4>
           <p className="mb-2">Restaurant name</p>
-          <h5 className="mb-2">{meal.price} lej</h5>
+          <h5 className="mb-2">{currencyFormatter.format(meal.price)}</h5>
 
           <ul className={styles.moreInformation}>
             <li className={styles.mealLi}>Adagok: {meal.portionNumber}</li>

@@ -1,33 +1,36 @@
-import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
-import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
-import toast from 'react-hot-toast';
 import { useContext } from 'react';
 import Router from 'next/router';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
+import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
+
+import AuthContext from '@context/authContext';
 import CartItem from '@components/cartItem';
 import styles from './orderCard.module.scss';
-import AuthContext from '../../context/authContext';
 
 const RestaurantOrderCard = ({ order }) => {
   const { user } = useContext(AuthContext);
 
   const handleOrder = async (status) => {
-    const res = await fetch(`/api/restaurants/${user.restaurantId}/orders/${order.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ status }),
-    });
+    try {
+      const promise = axios.patch(`/api/restaurants/${user.restaurantId}/orders/${order.id}`, {
+        status,
+      });
 
-    if (!res.ok) {
-      const err = await res.json();
-      toast.error(err.error || err.general.message);
+      await toast.promise(
+        promise,
+        {
+          loading: 'Rendelés állapotának frissítése folyamatban...',
+          success: `Rendelés ${status === 'finished' ? 'átadva' : 'elutasítva'}.`,
+          error: (err) =>
+            err.error || err.general.message || 'A rendelés állapotának frissítése sikertelen!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-      return;
-    }
-
-    toast.success(`Rendelés ${status === 'finished' ? 'átadva' : 'elutasítva'}.`);
-    Router.push('/restaurant/orders');
+      Router.replace('/restaurant/orders');
+    } catch (err) {}
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });

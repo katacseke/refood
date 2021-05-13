@@ -1,33 +1,36 @@
-import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
-import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
-import toast from 'react-hot-toast';
 import { useContext } from 'react';
 import Router from 'next/router';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
+import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
+
+import AuthContext from '@context/authContext';
 import CartItem from '@components/cartItem';
 import styles from './orderCard.module.scss';
-import AuthContext from '../../context/authContext';
 
 const UserOrderCard = ({ order }) => {
   const { user } = useContext(AuthContext);
 
   const handleCancel = async () => {
-    const res = await fetch(`/api/users/${user.id}/orders/${order.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ status: 'canceled' }),
-    });
+    try {
+      const promise = axios.patch(`/api/users/${user.id}/orders/${order.id}`, {
+        status: 'canceled',
+      });
 
-    if (!res.ok) {
-      const err = await res.json();
-      toast.error(err.error || err.general.message);
+      await toast.promise(
+        promise,
+        {
+          loading: 'Rendelés lemondása folyamatban...',
+          success: 'Rendelés lemondva.',
+          error: (err) =>
+            err.error || err.general.message || 'A rendelés lemondása frissítése sikertelen!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-      return;
-    }
-
-    toast.success('Rendelés lemondva.');
-    Router.push('/orders');
+      Router.replace('/orders');
+    } catch (err) {}
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });

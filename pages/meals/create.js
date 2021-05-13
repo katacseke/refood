@@ -101,7 +101,7 @@ const CreateMealPage = () => {
                   placeholder="Ár"
                 />
                 <InputGroupAddon type="append">
-                  <InputGroupText>lej</InputGroupText>
+                  <InputGroupText>RON</InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
               <FormFeedback>{errors?.price?.message}</FormFeedback>
