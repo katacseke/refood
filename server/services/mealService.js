@@ -134,6 +134,17 @@ const updateMeal = async (id, meal) => {
   return updatedMeal.toObject();
 };
 
+/**
+ * Delete meal.
+ *
+ * @param {String} id
+ */
+const deleteMeal = async (id) => {
+  await connectDb();
+
+  await Meal.findByIdAndDelete(id).exec();
+};
+
 export default {
   getMealById,
   getMeals,
@@ -141,4 +152,5 @@ export default {
   getCurrentMeals,
   createMeal,
   updateMeal,
+  deleteMeal,
 };

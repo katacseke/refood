@@ -13,12 +13,14 @@ import {
   ModalHeader,
   Tooltip,
 } from 'shards-react';
-import { IoCartOutline } from 'react-icons/io5';
+import { IoCartOutline, IoTrashOutline } from 'react-icons/io5';
 import moment from 'moment';
 import 'twix';
 
 import AuthContext from '@context/authContext';
 import CartContext from '@context/cartContext';
+import axios from 'axios';
+import { Router } from 'next/router';
 import styles from './modal.module.scss';
 
 moment.locale('hu');
@@ -65,6 +67,28 @@ const MealModal = ({ meal, open, setOpen }) => {
     } catch (err) {}
   };
 
+  const handleDelete = async () => {
+    try {
+      const promise = axios.delete(`/api/meals/${meal.id}`);
+
+      toast.promise(
+        promise,
+        {
+          loading: 'Étel törlése folyamatban...',
+          success: 'Étel törölve!',
+          error: (err) =>
+            err.response.data.error ||
+            err.response.data.general?.message ||
+            'Étel törlése sikertelen!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
+
+      // TODO: refresh by replace, but where are you?
+      setOpen(false);
+    } catch (err) {}
+  };
+
   if (!meal) {
     return <div />;
   }
@@ -106,41 +130,53 @@ const MealModal = ({ meal, open, setOpen }) => {
               </Badge>
             ))}
           </Container>
-
-          <label htmlFor="quantitiy">Mennyiség</label>
-          <Row>
-            <Col xs="4">
-              <FormInput
-                className="col"
-                type="number"
-                name="quantity"
-                id="quantity"
-                value={selectedPortions}
-                onChange={(e) => setSelectedPortions(parseInt(e.target.value, 10))}
-                min="1"
-                max={meal.portionNumber}
-              />
-            </Col>
-            <Col id="cartButton">
-              <Button
-                onClick={handleAddToCart}
-                className="col d-inline-flex align-items-center justify-content-center"
-                disabled={!user}
-              >
-                <IoCartOutline className="mr-1" />
-                Kosárba
-              </Button>
-              {!user && (
-                <Tooltip
-                  open={tooltipOpen}
-                  target="#cartButton"
-                  toggle={() => setTooltipOpen(!tooltipOpen)}
-                >
-                  Rendeléshez jelentkezz be!
-                </Tooltip>
-              )}
-            </Col>
-          </Row>
+          {user?.restaurantId === meal.restaurantId ? (
+            <Button
+              theme="danger"
+              title="Törlés"
+              className="d-flex align-items-center"
+              onClick={handleDelete}
+            >
+              <IoTrashOutline />
+            </Button>
+          ) : (
+            <>
+              <label htmlFor="quantitiy">Mennyiség</label>
+              <Row>
+                <Col xs="4">
+                  <FormInput
+                    className="col"
+                    type="number"
+                    name="quantity"
+                    id="quantity"
+                    value={selectedPortions}
+                    onChange={(e) => setSelectedPortions(parseInt(e.target.value, 10))}
+                    min="1"
+                    max={meal.portionNumber}
+                  />
+                </Col>
+                <Col id="cartButton">
+                  <Button
+                    onClick={handleAddToCart}
+                    className="col d-inline-flex align-items-center justify-content-center"
+                    disabled={!user}
+                  >
+                    <IoCartOutline className="mr-1" />
+                    Kosárba
+                  </Button>
+                  {!user && (
+                    <Tooltip
+                      open={tooltipOpen}
+                      target="#cartButton"
+                      toggle={() => setTooltipOpen(!tooltipOpen)}
+                    >
+                      Rendeléshez jelentkezz be!
+                    </Tooltip>
+                  )}
+                </Col>
+              </Row>
+            </>
+          )}
         </div>
       </ModalBody>
     </Modal>

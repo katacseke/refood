@@ -1,4 +1,4 @@
-import { orderService, userService } from '@server/services';
+import { mealService, orderService, userService } from '@server/services';
 
 // checks if a user has a certain role
 export const hasRole = (role) => (user) => user.role === role;
@@ -8,6 +8,13 @@ export const isSelf = () => (user, req) => user.id === req.query.id;
 
 // checks if the user's restaurant matches the one from the request
 export const isRestaurantOwner = () => (user, req) => user.restaurantId === req.query.id;
+
+// checks if the user's restaurant matches the one from the meal
+export const isMealOwner = () => async (user, req) => {
+  const mealResult = await mealService.getMealById(req.query.orderId);
+
+  return user.restaurantId === mealResult?.restaurant.toString();
+};
 
 // checks if the user's restaurant matches the restaurant of the order from the request
 export const isOrderRestaurantOwner = () => async (user, req) => {
