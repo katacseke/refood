@@ -65,11 +65,11 @@ const Registration = () => {
 
           <Form onSubmit={handleSubmit(onSubmit)}>
             <FormGroup>
-              <label htmlFor="email">Emailcím</label>
+              <label htmlFor="email">E-mail cím</label>
               <FormInput
                 id="email"
                 name="email"
-                placeholder="Emailcím"
+                placeholder="E-mail cím"
                 innerRef={register}
                 invalid={!!errors?.email}
               />

@@ -72,11 +72,11 @@ const Apply = () => {
             </FormGroup>
 
             <FormGroup>
-              <label htmlFor="email">Email-cím</label>
+              <label htmlFor="email">E-mail cím</label>
               <FormInput
                 id="email"
                 name="email"
-                placeholder="Email-cím"
+                placeholder="E-mail cím"
                 innerRef={register}
                 invalid={!!errors?.email}
               />
