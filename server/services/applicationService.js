@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import mailjet from 'node-mailjet';
 import { Application } from '../models';
 import connectDb from '../db';
