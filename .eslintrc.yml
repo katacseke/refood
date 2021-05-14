@@ -34,6 +34,7 @@ rules:
   react/jsx-filename-extension: 'off'
   jsx-a11y/label-has-associated-control: 'off'
   jsx-a11y/anchor-is-valid: 'off'
+  no-empty: 'off'
   no-console: 'off'
   no-underscore-dangle:
     - error

@@ -13,14 +13,14 @@ import {
   ModalHeader,
   Tooltip,
 } from 'shards-react';
-import { IoCartOutline, IoTrashOutline } from 'react-icons/io5';
+import { IoCartOutline, IoSettingsOutline, IoTrashOutline } from 'react-icons/io5';
+import axios from 'axios';
 import moment from 'moment';
 import 'twix';
 
 import AuthContext from '@context/authContext';
 import CartContext from '@context/cartContext';
-import axios from 'axios';
-import { Router } from 'next/router';
+import { ButtonGroup } from 'reactstrap';
 import styles from './modal.module.scss';
 
 moment.locale('hu');
@@ -130,15 +130,21 @@ const MealModal = ({ meal, open, setOpen }) => {
               </Badge>
             ))}
           </Container>
+
           {user?.restaurantId === meal.restaurantId ? (
-            <Button
-              theme="danger"
-              title="Törlés"
-              className="d-flex align-items-center"
-              onClick={handleDelete}
-            >
-              <IoTrashOutline />
-            </Button>
+            <ButtonGroup>
+              <Button
+                theme="danger"
+                title="Törlés"
+                className="d-flex align-items-center"
+                onClick={handleDelete}
+              >
+                <IoTrashOutline />
+              </Button>
+              <Button title="Szerkesztés" className="d-flex align-items-center">
+                <IoSettingsOutline />
+              </Button>
+            </ButtonGroup>
           ) : (
             <>
               <label htmlFor="quantitiy">Mennyiség</label>
