@@ -21,7 +21,7 @@ const getOrdersByUser = async (userId) => {
     .exec();
 
   if (!orders) {
-    throw new NotFoundError('Nem létezik felhasználó ezzel az azonosítóval');
+    throw new NotFoundError('Nem létezik felhasználó ezzel az azonosítóval.');
   }
   return orders.toObject().sort((a, b) => b.updatedAt - a.updatedAt);
 };

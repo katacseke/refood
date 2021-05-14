@@ -40,6 +40,7 @@ export const getServerSideProps = withAuthSSR(async ({ user }) => {
       },
     };
   } catch (err) {
+    console.error(err);
     return {
       notFound: true,
     };
