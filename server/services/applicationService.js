@@ -1,100 +1,108 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
+import mailjet from 'node-mailjet';
 import { Application } from '../models';
 import connectDb from '../db';
+import { NotFoundError } from './errors';
 
 /**
  * Get application by id.
- * @param {string} id
- * @returns {
- *   success: Boolean,
- *   ?application: Application,
- *   ?error: String,
- * } Returns an object containing the Application instance or an error message
+ *
+ * @param {String} id
+ * @returns {Object} Returns an object containing the application instance.
+ *
+ * @throws {NotFoundError} Throows NotFoundError when there is no application
+ *                         with the given id.
  */
 const getApplicationById = async (id) => {
   await connectDb();
 
-  const application = (await Application.findById(id).exec()).toObject();
+  const application = await Application.findById(id).exec();
 
-  return application
-    ? { success: true, data: application }
-    : { success: false, error: 'Application not found' };
+  if (!application) {
+    throw new NotFoundError('Nem létezik jelentkezés ezzel az azonosítóval.');
+  }
+  return application.toObject();
 };
 
 /**
  * Get accepted application by token.
+ *
  * @param {string} token
- * @returns {
- *   success: Boolean,
- *   ?application: Application,
- *   ?error: String,
- * } Returns an object containing the Application instance or an error message
+ * @returns {Object} Returns an object containing the Application instancn.
+ *
+ * @throws {NotFoundError} Throows NotFoundError when there is no application
+ *                         with the given credentials.
  */
 const getAcceptedApplicationByToken = async (token) => {
   await connectDb();
 
-  const application = (await Application.findOne({ token, status: 'accepted' }).exec()).toObject();
+  const application = await Application.findOne({ token, status: 'accepted' }).exec();
 
-  return application
-    ? { success: true, data: application }
-    : { success: false, error: 'Application not found' };
+  if (!application) {
+    throw new NotFoundError('Nem létezik jelentkezés ezzel az azonosítóval.');
+  }
+  return application.toObject();
 };
 
 /**
  * Get all applications.
- * @returns {Array} Array of all applications.
+ *
+ * @returns {Array<Object>} Array of all applications.
  */
-const getApplications = async () => {
+const getApplications = async (status = null) => {
   await connectDb();
 
-  const applications = (await Application.find({}).exec()).map((application) =>
-    application.toObject()
-  );
+  const filters = status ? { status } : {};
+  const applications = await Application.find(filters).sort({ createdAt: -1 }).exec();
 
-  return { success: true, data: applications };
-};
-
-/**
- * Get applications with a given status.
- * @returns {Array} Array of applications that match the criteria.
- */
-const getApplicationsWithStatus = async (status = null) => {
-  await connectDb();
-
-  if (status) {
-    const applications = (await Application.find({ status }).exec()).map((application) =>
-      application.toObject()
-    );
-
-    return { success: true, data: applications };
-  }
-
-  const applications = await (await Application.find({}).exec()).map((application) =>
-    application.toObject()
-  );
-  return { success: true, data: applications };
+  return applications.map((application) => application.toObject());
 };
 
 /**
  * Insert application.
- * @param {Application} application
- * @returns {Object} Returns an object with error message or success
+ *
+ * @param {Object} application
+ * @returns {Object} Returns an object with created application.
+ *
+ * @throws {Error} Throws Error when insertion failed.
  */
 const createApplication = async (application) => {
   await connectDb();
 
-  const result = (await Application.create({ ...application, status: 'pending' })).toObject();
+  const result = await Application.create({ ...application, status: 'pending' });
 
-  return result
-    ? { success: true, data: application }
-    : { success: false, error: 'Unable to insert data.' };
+  if (!result) {
+    throw new Error('Nem sikerült jelentkezni.');
+  }
+
+  return result.toObject();
+};
+
+const sendApplicationAcceptedEmail = async (name, email, token) => {
+  const emailClient = mailjet.connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE);
+
+  await emailClient.post('send', { version: 'v3.1' }).request({
+    Messages: [
+      {
+        From: { Email: 'katacseke@gmail.com', Name: 'Food' },
+        To: [{ Email: email, Name: name }],
+        TemplateID: 2734751,
+        TemplateLanguage: true,
+        Subject: 'Food - A jelentkezésed elfogadva',
+        Variables: { token },
+      },
+    ],
+  });
 };
 
 /**
  * Update application status.
+ *
  * @param {String} status
  * @param {String} id
- * @returns {Object} Returns an object with error message or success
+ * @returns {Object} Returns an object with updated application.
+ *
+ * @throws {Error} Throws Error when update failed.
  */
 const updateApplicationStatus = async (id, status) => {
   await connectDb();
@@ -102,20 +110,35 @@ const updateApplicationStatus = async (id, status) => {
   const applicationData =
     status === 'accepted' ? { status, token: await bcrypt.genSalt() } : { status };
 
-  const result = (
-    await Application.findByIdAndUpdate(id, applicationData, { new: true }).exec()
-  ).toObject();
+  const application = await Application.findByIdAndUpdate(id, applicationData, {
+    new: true,
+  }).exec();
 
-  return result
-    ? { success: true, data: result }
-    : { success: false, error: 'Unable to update data.' };
+  if (!application) {
+    throw new Error('Nem sikerült frissíteni a jelentkezést.');
+  }
+
+  if (status === 'accepted') {
+    try {
+      await sendApplicationAcceptedEmail(application.name, application.email, application.token);
+    } catch (err) {
+      await Application.findByIdAndUpdate(
+        id,
+        { status: 'pending', token: undefined },
+        { new: true }
+      ).exec();
+
+      throw new Error('Nem sikerült elküldeni a visszaigazoló e-mailt.');
+    }
+  }
+
+  return application.toObject();
 };
 
 export default {
   getApplicationById,
   getAcceptedApplicationByToken,
   getApplications,
-  getApplicationsWithStatus,
   createApplication,
   updateApplicationStatus,
 };

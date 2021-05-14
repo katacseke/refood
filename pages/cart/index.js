@@ -1,14 +1,17 @@
 import { useContext } from 'react';
-import { Button, Card, CardBody, CardTitle } from 'shards-react';
-import { IoCartOutline, IoClose } from 'react-icons/io5';
-import toast from 'react-hot-toast';
 import Router from 'next/router';
-import Layout from '../../components/layout';
-import CartContext from '../../context/cartContext';
-import withAuthSSR from '../../server/middleware/withAuthSSR';
-import QuantityChanger from '../../components/quantityChanger';
+import toast from 'react-hot-toast';
+import { Button, Card, CardBody, CardTitle } from 'shards-react';
+import { IoCartOutline } from 'react-icons/io5';
+
+import withAuthSSR, { hasRoleSSR } from '@middleware/withAuthSSR';
+
+import AuthContext from '@context/authContext';
+import Layout from '@components/layout';
+import CartContext from '@context/cartContext';
+import CartItem from '@components/cartItem';
+import axios from 'axios';
 import styles from './cart.module.scss';
-import AuthContext from '../../context/authContext';
 
 const CartPage = () => {
   const { cart, updateCartItem, deleteCartContent, refresh } = useContext(CartContext);
@@ -18,59 +21,50 @@ const CartPage = () => {
     try {
       await updateCartItem({ meal: mealId, quantity: newQuantity });
     } catch (err) {
-      toast.error(err.message);
+      const body = err.response.data;
+      toast.error(body.error || body.general.message);
     }
+  };
+
+  const handleDelete = async () => {
+    const promise = deleteCartContent();
+
+    toast.promise(
+      promise,
+      {
+        loading: 'Kosár ürítése...',
+        success: 'Kosár sikeresen kiürítve!',
+        error: 'Nem sikerült kiüríteni a kosarat!',
+      },
+      { style: { minWidth: '18rem' } }
+    );
   };
 
   const placeOrder = async () => {
-    const res = await fetch(`/api/users/${user.id}/orders`, {
-      method: 'POST',
-    });
+    try {
+      const promise = axios.post(`/api/users/${user.id}/orders`);
 
-    if (!res.ok) {
-      const err = await res.json();
-      toast.error(err.error || err.general.message);
-      return;
-    }
+      await toast.promise(
+        promise,
+        {
+          loading: 'Rendelés rögzítése...',
+          success: 'A rendelésedet rögzítettük.',
+          error: (err) => err.response.data.error || err.response.data.general.message,
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-    refresh();
-    toast.success('A rendelésedet rögzítettük.');
-    Router.push('/orders');
+      refresh(); // refresh cart model in Cart Context
+      Router.push('/orders');
+    } catch {}
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
-
   const totalPrice = cart.items?.reduce((acc, item) => acc + item.quantity * item.meal.price, 0);
-
-  const renderCartItem = (item) => (
-    <div key={item.meal.id}>
-      <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
-        <p className={styles.mealName}>{item.meal.name}</p>
-
-        <p className="pl-5 mb-1">{currencyFormatter.format(item.meal.price * item.quantity)}</p>
-      </div>
-      <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
-        <QuantityChanger
-          quantity={item.quantity}
-          onAdd={() => handleUpdate(item.meal.id, item.quantity + 1)}
-          onSubtract={() => handleUpdate(item.meal.id, item.quantity - 1)}
-          max={item.meal.portionNumber}
-        />
-        <Button
-          theme="light"
-          className={styles.closeButton}
-          onClick={() => updateCartItem({ meal: item.meal.id, quantity: 0 })}
-        >
-          <IoClose />
-        </Button>
-      </div>
-      <hr />
-    </div>
-  );
 
   return (
     <Layout requiresAuth>
-      <Card size="lg" className="m-2 mb-5">
+      <Card size="lg" className="mb-5">
         <CardBody>
           <CardTitle tag="h3" className="d-flex align-items-center">
             <IoCartOutline className="mr-1" />
@@ -80,7 +74,15 @@ const CartPage = () => {
           <>
             {cart.items?.length > 0 ? (
               <div>
-                {cart.items.map(renderCartItem)}
+                {cart.items.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    showRemoveButton
+                    showQuantityChanger
+                    onQuantityUpdate={handleUpdate}
+                  />
+                ))}
                 <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
                   <p className={styles.mealName}>Összesen</p>
 
@@ -90,7 +92,7 @@ const CartPage = () => {
                 </div>
                 <hr />
                 <div className="d-flex justify-content-end pt-2">
-                  <Button className={styles.removeAllButton} onClick={deleteCartContent}>
+                  <Button className={styles.removeAllButton} onClick={handleDelete}>
                     Kosár ürítése
                   </Button>
                   <Button onClick={placeOrder}>Rendelés leadása</Button>
@@ -106,8 +108,6 @@ const CartPage = () => {
   );
 };
 
-export const getServerSideProps = withAuthSSR(async () => ({
-  props: {},
-}));
+export const getServerSideProps = withAuthSSR(async () => ({ props: {} }), hasRoleSSR('user'));
 
 export default CartPage;

@@ -1,9 +1,10 @@
 import React from 'react';
+import Image from 'next/image';
 import { Button } from 'shards-react';
 import moment from 'moment';
 import 'twix';
-import Image from 'next/image';
-import styles from './card.module.scss';
+
+import styles from './customCard.module.scss';
 
 moment.locale('hu');
 
@@ -20,35 +21,39 @@ const MealInfromation = ({ data }) => {
   );
 };
 
-const MealCard = ({ data, onClick }) => (
-  <div className={styles.card}>
-    <div className={styles.imageContainer}>
-      <Image
-        src={data.image || '/default.svg'}
-        alt=""
-        width={300}
-        height={300}
-        layout="responsive"
-        objectFit="cover"
-      />
+const MealCard = ({ data, onClick }) => {
+  const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
 
-      <Button onClick={onClick} className={styles.button}>
-        Bővebben
-      </Button>
-    </div>
+  return (
+    <div className={styles.card}>
+      <div className={styles.imageContainer}>
+        <Image
+          src={data.image || '/default.svg'}
+          alt=""
+          width={300}
+          height={300}
+          layout="responsive"
+          objectFit="cover"
+        />
 
-    <div className={styles.alwaysVisible}>
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-      <span className={styles.title} onClick={onClick} role="button" tabIndex="-1">
-        {data.name}
-      </span>
-      <p>{data.price} lej</p>
-    </div>
+        <Button onClick={onClick} className={styles.button}>
+          Bővebben
+        </Button>
+      </div>
 
-    <div className={styles.sometimesVisible}>
-      <MealInfromation data={data} />
+      <div className={styles.alwaysVisible}>
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+        <span className={styles.title} onClick={onClick} role="button" tabIndex="-1">
+          {data.name}
+        </span>
+        <p>{currencyFormatter.format(data.price)}</p>
+      </div>
+
+      <div className={styles.sometimesVisible}>
+        <MealInfromation data={data} />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default MealCard;

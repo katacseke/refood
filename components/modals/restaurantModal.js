@@ -1,5 +1,9 @@
 import React, { useEffect } from 'react';
+import Router from 'next/router';
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 import {
   Button,
   Form,
@@ -11,14 +15,12 @@ import {
   ModalBody,
   ModalHeader,
 } from 'shards-react';
-import Router from 'next/router';
-import { yupResolver } from '@hookform/resolvers/yup';
-import toast from 'react-hot-toast';
 import moment from 'moment';
-import objectToFormData from '@helpers/objectToFormData';
-import restaurantUpdateSchema from '@validation/restaurantUpdateSchema';
 import 'twix';
-import styles from './restaurantModal.module.scss';
+
+import restaurantUpdateSchema from '@validation/restaurantUpdateSchema';
+import objectToFormData from '@helpers/objectToFormData';
+import styles from './modal.module.scss';
 
 moment.locale('hu');
 
@@ -42,26 +44,30 @@ const RestaurantModal = ({ restaurant, open, setOpen }) => {
       image: data.image.length === 0 ? null : data.image,
       ownerId: restaurant.ownerId,
     });
-    const res = await fetch(`/api/restaurants/${restaurant.id}`, {
-      method: 'PATCH',
-      body: formData,
-    });
 
-    if (!res.ok) {
-      const err = await res.json();
-      Object.keys(err)
+    try {
+      const promise = axios.patch(`/api/restaurants/${restaurant.id}`, formData);
+
+      toast.promise(
+        promise,
+        {
+          loading: 'Vendéglő adatainak frissítése...',
+          success: 'Adatok sikeresen módosítva!',
+          error: (err) =>
+            err.response.data.error ||
+            err.response.data.general.message ||
+            'A vendéglő adatainak frissítése sikertelen!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
+
+      setOpen(false);
+      Router.replace(`/restaurants/${restaurant.id}`);
+    } catch (err) {
+      Object.keys(err.response.data)
         .filter((field) => field !== 'general')
-        .forEach((field) => setError(field, { message: err[field].message }));
-
-      if (err.general) {
-        toast.error(err.general.message);
-      }
-      return;
+        .forEach((field) => setError(field, { message: err.response.data[field].message }));
     }
-
-    toast.success('Adatok sikeresen módosítva!');
-    setOpen(false);
-    Router.push(`/restaurants/${restaurant.id}`);
   };
 
   return (
@@ -73,6 +79,7 @@ const RestaurantModal = ({ restaurant, open, setOpen }) => {
       toggle={() => setOpen(!open)}
     >
       <ModalHeader toggle={() => setOpen(!open)} />
+
       <ModalBody className={styles.modalBody}>
         <div className={styles.content}>
           <Form onSubmit={handleSubmit(onSubmit)} className="d-flex flex-column">

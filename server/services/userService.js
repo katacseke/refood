@@ -1,193 +1,216 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-
-import { User } from '../models';
-import connectDb from '../db';
+import connectDb from '@server/db';
+import User from '@server/models/user';
+import { AuthenticationError, NotFoundError, ValidationError } from '@services/errors';
 
 const saltRounds = 10;
 
 /**
  * Get user ids.
- * @returns {Array} Array of user ids.
+ *
+ * @returns {Array<String>} Array of user ids.
  */
 const getUserIds = async () => {
   await connectDb();
 
-  const ids = (await User.find({}).select('_id').exec()).map((id) => id.toObject());
+  const users = await User.find({}).select('_id').exec();
 
-  return ids.map((restaurant) => restaurant.id.toString());
+  return users.map((user) => user.id.toString());
 };
 
 /**
  * Get user by id.
- * @param {string} id
- * @returns {
- *   success: Boolean,
- *   ?user: User,
- *   ?error: String,
- * } Returns an object containing the User instance or an error message
+ *
+ * @param {String} id
+ * @returns {Object} Returns the user instance.
+ *
+ * @throws {NotFoundError} Throws NotFoundError if no user with the respective
+ *  id was found.
  */
 const getUserById = async (id) => {
   await connectDb();
 
-  const user = (await User.findById(id)).toObject();
+  const user = await User.findById(id).exec();
 
-  return user
-    ? { success: true, data: { ...user, password: undefined } }
-    : { success: false, error: 'User not found' };
+  if (!user) {
+    throw new NotFoundError('Nem található felhasználó ezzel az azonosítóval.');
+  }
+  return { ...user.toObject(), password: undefined };
 };
 
 /**
  * Get user by email.
- * @param {string} email
- * @returns {
- *   success: Boolean,
- *   ?user: User,
- *   ?error: String,
- * } Returns an object containing the User instance or an error message
+ *
+ * @param {String} email
+ * @returns {Object} Returns an object containing the User instance.
+ *
+ * @throws {NotFoundError} Throws NotFoundError if no user with the respective
+ *  email was found.
  */
 const getUserByEmail = async (email) => {
   await connectDb();
 
-  const user = (await User.findOne({ email }).exec()).toObject();
+  const user = await User.findOne({ email }).exec();
 
-  return user ? { success: true, data: user } : { success: false, error: 'Ismeretlen email.' };
+  if (!user) {
+    throw new NotFoundError('Nem található felhasználó ezzel az e-mail címmel.');
+  }
+  return user.toObject();
 };
 
 /**
  * Get user by restaurant id.
- * @param {string} id restaurant id
- * @returns {
- *   success: Boolean,
- *   ?user: User,
- *   ?error: String,
- * } Returns an object containing the User instance or an error message
+ *
+ * @param {String} id The restaurant id.
+ * @returns {Object} Returns an object containing the user instance.
+ *
+ * @throws {NotFoundError} Throws NotFoundError if no user with the respective
+ *  restaurant id was found.
  */
 const getUserByRestaurantId = async (restaurantId) => {
   await connectDb();
 
   const user = await User.findOne({ restaurantId }).exec();
 
-  return user
-    ? { success: true, data: user.toObject() }
-    : { success: false, error: 'Ismeretlen email.' };
+  if (!user) {
+    throw new NotFoundError('Nem található felhasználó ezzel a vendéglő azonosítóval.');
+  }
+  return user.toObject();
 };
 
 /**
  * Get all users.
- * @returns {Array} Array of all users.
+ *
+ * @returns {Array<Object>} Array of all users.
  */
 const getUsers = async () => {
   await connectDb();
 
-  const users = (await User.find({}).exec()).map((user) => user.toObject());
+  const users = await User.find({}).exec();
 
-  return { success: true, data: users };
+  return users.map((user) => user.toObject());
 };
 
 /**
  * Insert user.
- * @param {User} user
- * @param {String} role The role of the user (admin, restaurant, user)
- * @returns {Object} Returns an object with error message or success
+ *
+ * @param {Object} user
+ * @param {String} role The role of the user (admin, restaurant, user).
+ * @returns {Object} Returns an object with the inserted user instance.
+ *
+ * @throws {ValidationError} Throws Error if a user with the same e-mail
+ *                           address if already registered.
  */
 const createUser = async (user, role = 'user') => {
   await connectDb();
 
-  const hash = await bcrypt.hash(user.password, saltRounds);
-  const result = await User.create({ ...user, password: hash, role });
-
-  return result
-    ? { success: true, data: { ...result.toObject(), password: undefined } }
-    : { success: false, error: 'Unable to insert data.' };
+  try {
+    const hash = await bcrypt.hash(user.password, saltRounds);
+    const createdUser = await User.create({ ...user, password: hash, role });
+    return createdUser.toObject();
+  } catch (err) {
+    // Duplication error
+    if (err.code === 11000) {
+      throw new ValidationError('Ez az e-mail cím már létezik a rendszerben!', 'email');
+    } else {
+      throw err;
+    }
+  }
 };
 
 /**
  * Update user.
- * @param {User} user
+ *
+ * @param {Object} user
  * @param {String} id
- * @returns {Object} Returns an object with error message or success
+ * @returns {Object} Returns an object with the updated user instance.
+ *
+ * @throws {Error} Throws Error if the update failed.
  */
 const updateUser = async (id, userData) => {
   await connectDb();
 
-  const user = { name: userData.name, email: userData.email };
+  const user = { ...userData };
   if (userData.password) {
-    const hash = await bcrypt.hash(user.password, saltRounds);
+    const hash = await bcrypt.hash(userData.password, saltRounds);
     user.password = hash;
   }
 
-  const result = await User.findByIdAndUpdate(id, user, { new: true }).exec();
+  const updatedUser = await User.findByIdAndUpdate(id, user, { new: true }).exec();
 
-  return result
-    ? { success: true, data: { ...result.toObject(), password: undefined } }
-    : { success: false, error: 'Unable to update data.' };
+  if (!updatedUser) {
+    throw new Error('Nem sikerült frissíteni a felhasználó adatait.');
+  }
+
+  return { ...updatedUser.toObject(), password: undefined };
 };
 
 /**
  * Delete user.
+ *
  * @param {String} id
- * @returns {Object} Returns an object with error message or success
  */
 const deleteUser = async (id) => {
   await connectDb();
 
-  const result = await User.findByIdAndDelete(id);
-
-  return result ? { success: true } : { success: false, error: 'Unable to delete data.' };
+  await User.findByIdAndDelete(id).exec();
 };
 
 /**
- * Check user password
- * @param {String} email email from login form
- * @param {String} password password from login form
- * @returns Returns an object with error message or success and user data
+ * Check user password.
+ *
+ * @param {String} email Email from login form.
+ * @param {String} password Password from login form.
+ * @returns {Object} Returns an object with user data.
+ *
+ * @throws {AuthenticationError} Throws AuthenticationError if the
+ * credentials are wrong.
  */
 const checkCredentials = async (email, password) => {
   const user = await getUserByEmail(email);
 
-  if (!user.success) {
-    return {
-      success: false,
-      error: 'Az email és jelszó páros nem talál!',
-    };
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    throw new AuthenticationError('Az email és jelszó páros nem talál!');
   }
 
-  const match = await bcrypt.compare(password, user.data.password);
-
-  return match
-    ? {
-        success: true,
-        data: { ...user.data, password: undefined, cart: undefined, orders: undefined },
-      }
-    : { success: false, error: 'Az email és jelszó páros nem talál!' };
+  return user;
 };
 
 /**
- * Generate jwt token
- * @param {User} user
- * @returns {String} jwt token
+ * Generate JWT token.
+ *
+ * @param {String} userId The id of the user.
+ * @returns {String} The JWT token.
+ *
+ * @throws {NotFoundError} Throws NotFoundError if no user with the respective
+ *  id was found.
  */
-const createToken = (user) => jwt.sign(user, process.env.SECRET, { expiresIn: '1h' });
+const createToken = async (userId) => {
+  const user = await getUserById(userId);
+  const { id, name, email, phone, role, restaurantId } = user;
+  const claims = { id, name, email, phone, role, restaurantId };
+
+  return jwt.sign(claims, process.env.SECRET, { expiresIn: '1h' });
+};
 
 /**
- * Verify jwt token
+ * Verify JWT token.
+ *
  * @param {String} token
- * @returns {Object} at success: object containing user infromation
- *                   when the token does not match: error message
+ * @returns {Object} Returns the user instance extracted from the token.
+ *
+ * @throws {AuthenticationError} Throws AuthenticationError if the JWT token is not valid.
  */
 const verifyToken = (token) => {
   try {
     const user = jwt.verify(token, process.env.SECRET);
-    return {
-      success: true,
-      data: user,
-    };
+
+    return user;
   } catch (err) {
-    return {
-      success: false,
-      error: err.message,
-    };
+    throw new AuthenticationError(err.message);
   }
 };
 

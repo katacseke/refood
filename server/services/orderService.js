@@ -1,12 +1,16 @@
-import { User } from '../models';
-import cartService from './cartService';
-import mealService from './mealService';
-import connectDb from '../db';
+import User from '@server/models/user';
+import connectDb from '@server/db';
+import cartService from '@server/services/cartService';
+import mealService from '@server/services/mealService';
+import { NotFoundError, ValidationError } from './errors';
 
 /**
- * Get all orders belonging to a certain user.
- * @param {String} userId id of the user
- * @returns Orders array containing order objects
+ * Get all orders belonging to a certain user, sorted desc by the updatedAt field.
+ *
+ * @param {String} userId The id of the user.
+ * @returns {Array<Object>} Orders array containing order objects.
+ *
+ * @throws {NotFoundError} Throws NotFoundError when user not found.
  */
 const getOrdersByUser = async (userId) => {
   await connectDb();
@@ -16,14 +20,20 @@ const getOrdersByUser = async (userId) => {
     .populate({ path: 'orders.restaurant', model: 'Restaurant' })
     .exec();
 
-  return { success: true, data: orders.toObject().sort((a, b) => b.updatedAt - a.updatedAt) };
+  if (!orders) {
+    throw new NotFoundError('Nem létezik felhasználó ezzel az azonosítóval.');
+  }
+  return orders.toObject().sort((a, b) => b.updatedAt - a.updatedAt);
 };
 
 /**
  * Get order with id, belonging to a certain user.
+ *
  * @param {String} userId Id of the user.
  * @param {String} orderId Id of the order.
- * @returns Order object or error message and success: false
+ * @returns {Object} Returns the order instance.
+ *
+ * @throws {NotFoundError} Throws NotFoundError if the user or order is not found.
  */
 const getOrderByUser = async (userId, orderId) => {
   await connectDb();
@@ -34,17 +44,17 @@ const getOrderByUser = async (userId, orderId) => {
     .exec();
 
   if (!user?.orders) {
-    return { success: false, error: 'Ez a rendelés nem létezik.' };
+    throw new NotFoundError('Ez a rendelés nem létezik.');
   }
 
-  const order = user.orders[0].toObject();
-  return { success: true, data: order };
+  return user.orders[0].toObject();
 };
 
 /**
- * Get orders that belong to a certain restaurant in an order from latest to oldest.
+ * Get orders that belong to a certain restaurant, sorted desc by the updatedAt field.
+ *
  * @param {String} restaurantId id of the restaurant the order is from.
- * @returns Orders or an object containing error message.
+ * @returns {Array<Object>} Returns an array of order instances.
  */
 const getOrdersByRestaurant = async (restaurantId) => {
   await connectDb();
@@ -58,162 +68,171 @@ const getOrdersByRestaurant = async (restaurantId) => {
     .flatMap((user) =>
       user.orders.map((order) => ({
         ...order.toObject(),
-        user: { name: user.name, email: user.email },
+        user: { name: user.name, email: user.email, phone: user.phone },
       }))
     )
     .sort((a, b) => b.updatedAt - a.updatedAt);
 
-  return { success: true, data: orders };
+  return orders;
 };
 
 /**
  * Get order with a given id.
+ *
  * @param {String} orderId Id of the order.
- * @returns Order or object with error message.
+ * @returns {Object} Returns the order instance.
+ *
+ * @throws {NotFoundError} Throws NotFoundError if the order was not found.
  */
 const getOrderById = async (orderId) => {
   await connectDb();
 
   const user = await User.findOne({ 'orders._id': orderId }).select('orders').exec();
-
   const order = user?.orders.id(orderId);
 
   if (!order) {
-    return { success: false, error: 'Ez a rendelés nem létezik.' };
+    throw new NotFoundError('Ez a rendelés nem létezik.');
   }
 
-  return { success: true, data: order.toObject() };
+  return order.toObject();
 };
 
 /**
  * Handles order process: creates an order from the content of the cart,
  * then clears the cart and updates the portion numbers of meals.
+ *
  * @param {String} userId id of the user the order belongs to
  * @returns Order object, or object containing error message.
+ *
+ * @throws {Error} Throws Error if insertion failed.
+ * @throws {NotFoundError} Throws NotFoundError if the user associated to the
+ *                         order cannot be found.
  */
 const createOrder = async (userId) => {
   const connection = await connectDb();
 
   let transactionResult;
-  try {
-    await connection.transaction(
-      async () => {
-        // Get the necessary data
-        const user = await User.findById(userId).exec();
+  await connection.transaction(
+    async () => {
+      // Get the necessary data
+      const user = await User.findById(userId).exec();
 
-        if (!user) {
-          throw new Error('Ez a felhasználó nem létezik.');
-        }
+      if (!user) {
+        throw new NotFoundError('Ez a felhasználó nem létezik.');
+      }
 
-        const { orders, cart } = user;
+      const { orders, cart } = user;
 
-        if (cart.items.length === 0) {
-          throw new Error('A kosár üres.');
-        }
+      if (cart.items.length === 0) {
+        throw new Error('A kosár üres.');
+      }
 
-        // Update meal quantities
-        const populatedCart = await cart
-          .populate({ path: 'items.meal', model: 'Meal' })
-          .execPopulate();
+      // Update meal quantities
+      const populatedCart = await cart
+        .populate({ path: 'items.meal', model: 'Meal' })
+        .execPopulate();
 
-        await Promise.all(
-          populatedCart.items.map(async (item) => {
-            const newPortionNumber = item.meal.portionNumber - item.quantity;
+      await Promise.all(
+        populatedCart.items.map(async (item) => {
+          const newPortionNumber = item.meal.portionNumber - item.quantity;
 
-            if (newPortionNumber < 0) {
-              throw new Error(`Nincs elegendő adag a(z) ${item.meal.name} nevű ételből.`);
-            }
+          if (newPortionNumber < 0) {
+            throw new Error(`Nincs elegendő adag a(z) ${item.meal.name} nevű ételből.`);
+          }
 
-            const result = await mealService.updateMeal(item.meal.id, {
-              portionNumber: newPortionNumber,
-            });
+          const result = await mealService.updateMeal(item.meal.id, {
+            portionNumber: newPortionNumber,
+          });
 
-            if (!result.success) {
-              throw new Error('Nem sikerült leadni a rendelést.');
-            }
-          })
-        );
+          if (!result) {
+            throw new Error('Nem sikerült leadni a rendelést.');
+          }
+        })
+      );
 
-        // Create the order
-        const orderContent = {
-          ...cart.toObject(),
-          status: 'active',
-        };
+      // Create the order
+      const orderContent = {
+        ...cart.toObject(),
+        status: 'active',
+      };
 
-        orders.push(orderContent);
-        await user.save();
+      orders.push(orderContent);
+      await user.save();
 
-        // Delete cart content
-        const cartResult = await cartService.deleteCartContent(userId);
+      // Delete cart content
+      await cartService.deleteCartContent(userId);
 
-        if (!cartResult.success) {
-          throw new Error(cartResult.error);
-        }
+      transactionResult = orderContent;
+    },
+    { readConcern: { level: 'snapshot' }, writeConcern: { w: 'majority' } }
+  );
 
-        transactionResult = orderContent;
-      },
-      { readConcern: { level: 'snapshot' }, writeConcern: { w: 'majority' } }
-    );
-
-    return { success: true, data: transactionResult };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
+  return transactionResult;
 };
 
 /**
- * Cancel order for user
- * @param {String} userId id of current user
- * @returns {Object} Order or error message and success: false
+ * Cancel order for user.
+ *
+ * @param {String} userId Id of current user.
+ * @returns {Object} Returns order object.
+ *
+ * @throws {Error} Throws Error if insertion failed.
+ * @throws {ValidationError} Throws ValidationError if the order cannot be canceled.
+ * @throws {NotFoundError} Throws NotFoundError if the order cannot be found.
  */
 const cancelOrder = async (orderId, newStatus = 'canceled') => {
   const connection = await connectDb();
 
   let transactionResult;
-  try {
-    await connection.transaction(async () => {
-      // Get the necessary data
-      const user = await User.findOne({ 'orders._id': orderId })
-        .populate({ path: 'orders.items.meal', model: 'Meal' })
-        .select('orders')
-        .exec();
+  await connection.transaction(async () => {
+    // Get the necessary data
+    const user = await User.findOne({ 'orders._id': orderId })
+      .populate({ path: 'orders.items.meal', model: 'Meal' })
+      .select('orders')
+      .exec();
 
-      const order = user?.orders.id(orderId);
+    const order = user?.orders.id(orderId);
 
-      if (!order) {
-        throw new Error('Ez a rendelés nem létezik.');
-      }
+    if (!order) {
+      throw new NotFoundError('Ez a rendelés nem létezik.');
+    }
 
-      // Update the order status
-      if (order.status !== 'active') {
-        throw new Error('A rendelést már nem lehet lemondani.');
-      }
+    // Update the order status
+    if (order.status !== 'active') {
+      throw new ValidationError('A rendelést már nem lehet lemondani.');
+    }
 
-      order.status = newStatus;
-      await user.save();
+    order.status = newStatus;
+    await user.save();
 
-      // Update the meal portion numbers
-      await Promise.all(
-        order.items.map(async (item) => {
-          const result = await mealService.updateMeal(item.meal.id, {
-            portionNumber: item.meal.portionNumber + item.quantity,
-          });
+    // Update the meal portion numbers
+    await Promise.all(
+      order.items.map(async (item) => {
+        const result = await mealService.updateMeal(item.meal.id, {
+          portionNumber: item.meal.portionNumber + item.quantity,
+        });
 
-          if (!result.success) {
-            throw new Error('Nem sikerült visszavonni a rendelést.');
-          }
-        })
-      );
+        if (!result) {
+          throw new Error('Nem sikerült visszavonni a rendelést.');
+        }
+      })
+    );
 
-      transactionResult = order.toObject();
-    });
+    transactionResult = order.toObject();
+  });
 
-    return { success: true, data: transactionResult };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
+  return transactionResult;
 };
 
+/**
+ * Changes the status of the order to finished.
+ *
+ * @param {String} orderId
+ * @returns Returns the finished order.
+ *
+ * @throws {ValidationError} Throws ValidationError if the order is already finished.
+ * @throws {NotFoundError} Throws NotFoundError if the order cannot be found.
+ */
 const finishOrder = async (orderId) => {
   await connectDb();
 
@@ -221,17 +240,17 @@ const finishOrder = async (orderId) => {
   const order = user?.orders.id(orderId);
 
   if (!order) {
-    return { success: false, error: 'Ez a rendelés nem létezik.' };
+    throw new NotFoundError('Ez a rendelés nem létezik.');
   }
 
   if (order.status !== 'active') {
-    return { success: false, error: 'A rendelés már lezárult.' };
+    throw new ValidationError('A rendelés már lezárult.');
   }
 
   order.status = 'finished';
   await user.save();
 
-  return { success: true, data: order.toObject() };
+  return order.toObject();
 };
 
 export default {

@@ -1,11 +1,17 @@
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { Container, FormSelect, Button, Row, Col } from 'shards-react';
-import { applicationService } from '../../../server/services';
-import Layout from '../../../components/layout';
-import ApplicationCard from '../../../components/applicationCard';
+
+import applicationService from '@services/applicationService';
+
+import Layout from '@components/layout';
+import ApplicationCard from '@components/cards/applicationCard';
 import styles from './applications.module.scss';
 
 const ApplicationsPage = ({ applications }) => {
-  const handleFiltering = () => {};
+  const { query } = useRouter();
+  const [status, setStatus] = useState(query.status);
 
   return (
     <Layout>
@@ -13,14 +19,22 @@ const ApplicationsPage = ({ applications }) => {
       <Container>
         <Row>
           <Col>
-            <FormSelect name="filterStatus">
+            <FormSelect
+              name="filterStatus"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="">Összes</option>
               <option value="pending">Függőben</option>
               <option value="accepted">Elfogadva</option>
               <option value="denied">Elutasítva</option>
+              <option value="registered">Regisztrálva</option>
             </FormSelect>
           </Col>
           <Col>
-            <Button onClick={() => handleFiltering()}>Szűrés</Button>
+            <Link href={`/restaurants/applications?status=${status}`}>
+              <Button as="a">Szűrés</Button>
+            </Link>
           </Col>
         </Row>
       </Container>
@@ -28,6 +42,9 @@ const ApplicationsPage = ({ applications }) => {
         {applications.map((application) => (
           <ApplicationCard key={application.id} application={application} />
         ))}
+        {applications.length === 0 && (
+          <p className="text-muted mt-3">Nem találhatók a feltételnek megfelelő jelentkezések.</p>
+        )}
       </Container>
     </Layout>
   );
@@ -35,12 +52,21 @@ const ApplicationsPage = ({ applications }) => {
 
 export default ApplicationsPage;
 
-export async function getStaticProps() {
-  const applications = await applicationService.getApplications();
+export async function getServerSideProps({ query }) {
+  const applications = await applicationService.getApplications(query.status);
+  applications.sort((a, b) => {
+    if (a.status === 'pending') {
+      return -1;
+    }
+    if (b.status === 'pending') {
+      return 1;
+    }
+    return 0;
+  });
 
   return {
     props: {
-      applications: JSON.parse(JSON.stringify(applications.data)),
+      applications: JSON.parse(JSON.stringify(applications)),
     },
   };
 }

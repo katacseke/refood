@@ -24,12 +24,7 @@ handler.patch(async (req, res) => {
     orders = await orderService.cancelOrder(req.query.orderId, 'denied');
   }
 
-  if (!orders.success) {
-    res.status(422).json({ general: { message: orders.error } });
-    return;
-  }
-
-  res.status(200).json(orders.data);
+  res.status(200).json(orders);
 });
 
 export default handler;

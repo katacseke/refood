@@ -1,11 +1,12 @@
-import { Button, Collapse, Container, Form, FormGroup, FormInput, Row, Col } from 'shards-react';
 import { useForm } from 'react-hook-form';
+import { Button, Collapse, Container, Form, FormGroup, FormInput, Row, Col } from 'shards-react';
+
 import Checkbox from '../checkbox';
 
 const filterCollapse = ({ open, onSubmit, values }) => {
   const defaultValues = {
     name: values.name || '',
-    beginTime: values.beginTime || '',
+    startTime: values.startTime || '',
     endTime: values.endTime || '',
     donatable: values.donatable === 'true',
     dailyMenu: values.dailyMenu === 'true',
@@ -33,11 +34,11 @@ const filterCollapse = ({ open, onSubmit, values }) => {
               </Col>
               <Col>
                 <FormGroup>
-                  <label htmlFor="beginTime">Elérhető ettől</label>
+                  <label htmlFor="startTime">Elérhető ettől</label>
                   <FormInput
                     type="datetime-local"
-                    name="beginTime"
-                    id="beginTime"
+                    name="startTime"
+                    id="startTime"
                     innerRef={register}
                   />
                 </FormGroup>

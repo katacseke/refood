@@ -1,8 +1,10 @@
 import { Container } from 'shards-react';
+
+import orderService from '@services/orderService';
+import withAuthSSR, { hasRoleSSR } from '@middleware/withAuthSSR';
+
 import Layout from '@components/layout';
 import RestaurantOrderCard from '@components/cards/restaurantOrderCard';
-import withAuthSSR, { hasRoleSSR } from '@middleware/withAuthSSR';
-import { orderService } from '@server/services';
 
 const RestaurantOrdersPage = ({ orders }) => {
   const activeOrders = orders.filter((order) => order.status === 'active');
@@ -29,10 +31,9 @@ const RestaurantOrdersPage = ({ orders }) => {
 
 export const getServerSideProps = withAuthSSR(async ({ user }) => {
   const orders = await orderService.getOrdersByRestaurant(user.restaurantId);
-
   return {
     props: {
-      orders: JSON.parse(JSON.stringify(orders.data)),
+      orders: JSON.parse(JSON.stringify(orders)),
     },
   };
 }, hasRoleSSR('restaurant'));

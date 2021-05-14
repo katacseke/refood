@@ -1,22 +1,17 @@
 import nextConnect from 'next-connect';
-import { userService } from '../../../server/services';
+import userService from '@services/userService';
+import handleErrors from '@middleware/handleErrors';
 
-const handler = nextConnect();
+const handler = nextConnect({ onError: handleErrors });
 
 handler.post(async (req, res) => {
   const { email, password } = req.body;
 
-  const match = await userService.checkCredentials(email, password);
+  const user = await userService.checkCredentials(email, password);
+  const token = await userService.createToken(user.id);
 
-  if (match.success) {
-    const token = userService.createToken(match.data);
-
-    res.setHeader('Set-Cookie', `access_token=${token}; Path=/; Max-Age=${60 * 60}; HttpOnly`);
-    res.status(200).json(match.data);
-    return;
-  }
-
-  res.status(401).json({ general: { message: match.error } });
+  res.setHeader('Set-Cookie', `access_token=${token}; Path=/; Max-Age=${60 * 60}; HttpOnly`);
+  res.status(200).json(user);
 });
 
 export default handler;

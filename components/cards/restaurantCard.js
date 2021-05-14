@@ -1,8 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-import { IoCall, IoMail, IoLocationSharp } from 'react-icons/io5';
 import Image from 'next/image';
-import styles from './card.module.scss';
+import { IoCall, IoMail, IoLocationSharp } from 'react-icons/io5';
+
+import styles from './customCard.module.scss';
 
 const RestaurantInformation = ({ data }) => (
   <ul className={styles.moreInformation}>

@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Router from 'next/router';
 import { useForm } from 'react-hook-form';
 import {
-  Alert,
   Form,
   FormInput,
   FormGroup,
@@ -16,59 +15,52 @@ import {
   CardTitle,
 } from 'shards-react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import objectToFormData from '../../helpers/objectToFormData';
-import mealCreationSchema from '../../validation/mealCreationSchema';
-import Layout from '../../components/layout';
-import styles from './create.module.scss';
-import Togllebox from '../../components/togglebox';
-import ChipInput from '../../components/chipInput';
+
+import mealCreationSchema from '@validation/mealCreationSchema';
+import objectToFormData from '@helpers/objectToFormData';
+
+import Layout from '@components/layout';
+import Togllebox from '@components/togglebox';
+import ChipInput from '@components/chipInput';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const CreateMealPage = () => {
-  const [isAlertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-
   const { register, handleSubmit, errors, setError, control } = useForm({
     resolver: yupResolver(mealCreationSchema),
   });
 
   const onSubmit = async (data) => {
-    setAlertVisible(false);
-    const formData = objectToFormData(data);
+    try {
+      const formData = objectToFormData(data);
+      const promise = axios.post('/api/meals', formData);
 
-    const res = await fetch('/api/meals', {
-      method: 'POST',
-      body: formData,
-    });
+      await toast.promise(
+        promise,
+        {
+          loading: 'Feltöltés folyamatban...',
+          success: 'Étel sikeresen létrehozva!',
+          error: (err) =>
+            err.response.data.error ||
+            err.response.data.general ||
+            'Nem sikerült létrehozni az ételt!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-    if (!res.ok) {
-      const err = await res.json();
-      Object.keys(err)
-        .filter((field) => field !== 'general')
-        .forEach((field) => setError(field, { message: err[field].message }));
-
-      if (err.general) {
-        setAlertMessage(err.general.message);
-        setAlertVisible(true);
-      }
-      return;
+      Router.push('/meals');
+    } catch (err) {
+      Object.keys(err.response.data)
+        .filter((field) => field !== 'general' && field !== 'error')
+        .forEach((field) => setError(field, { message: err.response.data[field].message }));
     }
-
-    Router.push('/');
   };
 
   return (
     <Layout>
-      <Card className={styles.card}>
+      <Card>
         <CardBody>
           <CardTitle>Étel létrehozása</CardTitle>
-          <Alert
-            className="mb-3"
-            dismissible={() => setAlertVisible(false)}
-            open={isAlertVisible}
-            theme="danger"
-          >
-            {alertMessage}
-          </Alert>
 
           <Form onSubmit={handleSubmit(onSubmit)}>
             <FormGroup>
@@ -109,7 +101,7 @@ const CreateMealPage = () => {
                   placeholder="Ár"
                 />
                 <InputGroupAddon type="append">
-                  <InputGroupText>lej</InputGroupText>
+                  <InputGroupText>RON</InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
               <FormFeedback>{errors?.price?.message}</FormFeedback>

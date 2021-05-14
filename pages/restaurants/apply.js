@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
+import Router from 'next/router';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
+import { yupResolver } from '@hookform/resolvers/yup';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 import {
-  Alert,
   Form,
   FormInput,
   FormGroup,
@@ -12,47 +14,38 @@ import {
   CardTitle,
   FormTextarea,
 } from 'shards-react';
-import { yupResolver } from '@hookform/resolvers/yup';
-import Router from 'next/router';
-import FormCard from '../../components/formCard';
-import restaurantApplicationSchema from '../../validation/restaurantApplicationSchema';
-import Layout from '../../components/layout';
+
+import restaurantApplicationSchema from '@validation/restaurantApplicationSchema';
+
+import FormCard from '@components/formCard';
+import Layout from '@components/layout';
 
 const Apply = () => {
-  const [isAlertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-
   const { register, handleSubmit, errors, setError } = useForm({
     resolver: yupResolver(restaurantApplicationSchema),
   });
+
   const onSubmit = async (data) => {
-    setAlertVisible(false);
+    try {
+      const promise = axios.post('/api/restaurants/applications', data);
 
-    const res = await fetch('/api/restaurants/applications', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+      await toast.promise(
+        promise,
+        {
+          loading: 'Jelentkezés köldése folyamatban...',
+          success: 'A jekentkezésedet rögzítettük. Hamarosan kapcsolatba lépünk veled.',
+          error: (err) =>
+            err.response.data.error || err.response.data.general || 'A jelentkezés sikertelen!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-    if (!res.ok) {
-      const err = await res.json();
-      Object.keys(err)
+      Router.push('/');
+    } catch (err) {
+      Object.keys(err.response.data)
         .filter((field) => field !== 'general')
-        .forEach((field) => setError(field, { message: err[field].message }));
-
-      if (err.general) {
-        setAlertMessage(err.general.message);
-        setAlertVisible(true);
-      }
-      return;
+        .forEach((field) => setError(field, { message: err.response.data[field].message }));
     }
-
-    toast.success('A kérésedet rögzítettük. Hamarosan kapcsolatba lépünk veled.', {
-      duration: 5000,
-    });
-    Router.push('/');
   };
 
   return (
@@ -60,15 +53,6 @@ const Apply = () => {
       <FormCard>
         <CardBody>
           <CardTitle>Vendéglátó helyiség regisztrálása</CardTitle>
-
-          <Alert
-            className="mb-3"
-            dismissible={() => setAlertVisible(false)}
-            open={isAlertVisible}
-            theme="danger"
-          >
-            {alertMessage}
-          </Alert>
 
           <p>
             Kérlek adj meg egy pár adatot a vállalkozásodról, hogy felvehessük veled a kapcsolatot!
@@ -88,11 +72,11 @@ const Apply = () => {
             </FormGroup>
 
             <FormGroup>
-              <label htmlFor="email">Email-cím</label>
+              <label htmlFor="email">E-mail cím</label>
               <FormInput
                 id="email"
                 name="email"
-                placeholder="Email-cím"
+                placeholder="E-mail cím"
                 innerRef={register}
                 invalid={!!errors?.email}
               />

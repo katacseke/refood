@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button, Card, CardBody, CardTitle, Container } from 'shards-react';
 import {
   IoCall,
@@ -9,13 +10,14 @@ import {
   IoAdd,
   IoSettingsOutline,
 } from 'react-icons/io5';
-import Link from 'next/link';
-import MealCard from '../../components/cards/mealCard';
-import MealModal from '../../components/mealModal';
-import RestaurantModal from '../../components/restaurantModal';
-import Layout from '../../components/layout';
-import { mealService, restaurantService, userService } from '../../server/services';
-import AuthContext from '../../context/authContext';
+
+import { mealService, restaurantService, userService } from '@server/services';
+
+import AuthContext from '@context/authContext';
+import MealCard from '@components/cards/mealCard';
+import MealModal from '@components/modals/mealModal';
+import RestaurantModal from '@components/modals/restaurantModal';
+import Layout from '@components/layout';
 import styles from './restaurant.module.scss';
 
 const RestauantPage = ({ restaurant, meals }) => {
@@ -39,7 +41,7 @@ const RestauantPage = ({ restaurant, meals }) => {
         setOpen={setRestaurantModalOpen}
       />
 
-      <Card size="lg" className="m-2 mb-5">
+      <Card size="lg" className="m-2 mb-5 w-100">
         <CardBody className={styles.mainContainer}>
           <div className={styles.image}>
             <Image
@@ -125,28 +127,21 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const { id } = params;
-  const restaurant = await restaurantService.getRestaurantById(id);
 
-  if (!restaurant.success) {
+  try {
+    const restaurant = await restaurantService.getRestaurantById(id);
+    const user = await userService.getUserByRestaurantId(id);
+    const meals = await mealService.getCurrentMealsByRestaurant(id);
+
+    return {
+      props: {
+        restaurant: JSON.parse(JSON.stringify({ ...restaurant, loginEmail: user.email })),
+        meals: JSON.parse(JSON.stringify(meals)),
+      },
+    };
+  } catch (err) {
     return {
       notFound: true,
     };
   }
-
-  const user = await userService.getUserByRestaurantId(id);
-
-  if (!user.success) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const meals = await mealService.getCurrentMealsByRestaurant(id);
-
-  return {
-    props: {
-      restaurant: JSON.parse(JSON.stringify({ ...restaurant.data, loginEmail: user.data.email })),
-      meals: JSON.parse(JSON.stringify(meals.data)),
-    },
-  };
 }

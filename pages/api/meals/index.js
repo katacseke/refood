@@ -1,7 +1,7 @@
 import nextConnect from 'next-connect';
-import { uploadImage, validateResource } from '@server/middleware';
-import authorize, { hasRole } from '@middleware/authorize';
 import mealService from '@services/mealService';
+import { handleErrors, uploadImage, validateResource } from '@server/middleware';
+import authorize, { hasRole } from '@middleware/authorize';
 import mealCreationSchema from '@validation/mealCreationSchema';
 
 const imageUploadMiddleware = nextConnect().post('/api/meals', uploadImage('image'));
@@ -11,17 +11,15 @@ const authorization = nextConnect().post(
   authorize(hasRole('restaurant'), hasRole('admin'))
 );
 
-const handler = nextConnect().use(authorization).use(imageUploadMiddleware).use(validation);
+const handler = nextConnect({ onError: handleErrors })
+  .use(authorization)
+  .use(imageUploadMiddleware)
+  .use(validation);
 
 handler.get(async (req, res) => {
   const meals = await mealService.getMeals();
 
-  if (!meals.success) {
-    res.status(500).json({ error: meals.error });
-    return;
-  }
-
-  res.status(200).json(meals.data);
+  res.status(200).json(meals);
 });
 
 handler.post(async (req, res) => {
@@ -30,12 +28,7 @@ handler.post(async (req, res) => {
     restaurantId: req.user.id,
   });
 
-  if (!meal.success) {
-    res.status(500).json({ general: { message: meal.error } });
-    return;
-  }
-
-  res.status(201).json(meal.data);
+  res.status(201).json(meal);
 });
 
 export default handler;

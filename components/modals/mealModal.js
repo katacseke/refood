@@ -1,4 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
+import Image from 'next/image';
+import toast from 'react-hot-toast';
 import {
   Container,
   Badge,
@@ -12,14 +14,12 @@ import {
   Tooltip,
 } from 'shards-react';
 import { IoCartOutline } from 'react-icons/io5';
-import Image from 'next/image';
-
 import moment from 'moment';
 import 'twix';
-import toast from 'react-hot-toast';
-import AuthContext from '../../context/authContext';
-import styles from './mealModal.module.scss';
-import CartContext from '../../context/cartContext';
+
+import AuthContext from '@context/authContext';
+import CartContext from '@context/cartContext';
+import styles from './modal.module.scss';
 
 moment.locale('hu');
 
@@ -46,13 +46,23 @@ const MealModal = ({ meal, open, setOpen }) => {
     };
 
     try {
-      await addCartItem(cartItem);
+      const promise = addCartItem(cartItem);
+
+      toast.promise(
+        promise,
+        {
+          loading: 'Kosár frissítése...',
+          success: 'Kosárba tetted!',
+          error: (err) =>
+            err.response.data.error ||
+            err.response.data.general?.message ||
+            'A kosár frissítése sikertelen!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
       setOpen(false);
-      toast.success('Kosárba tetted!');
-    } catch (err) {
-      toast.error(err.message);
-    }
+    } catch (err) {}
   };
 
   if (!meal) {
@@ -60,6 +70,7 @@ const MealModal = ({ meal, open, setOpen }) => {
   }
 
   const timeRange = moment.twix(meal.startTime, meal.endTime);
+  const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
 
   return (
     <Modal
@@ -70,14 +81,16 @@ const MealModal = ({ meal, open, setOpen }) => {
       toggle={() => setOpen(!open)}
     >
       <ModalHeader toggle={() => setOpen(!open)} />
+
       <ModalBody className={styles.modalBody}>
         <div style={{ position: 'relative', height: '18rem' }}>
           <Image src={meal.image || '/default.svg'} alt="" layout="fill" objectFit="cover" />
         </div>
+
         <div className={styles.content}>
           <h4 className="mb-0">{meal.name}</h4>
           <p className="mb-2">Restaurant name</p>
-          <h5 className="mb-2">{meal.price} lej</h5>
+          <h5 className="mb-2">{currencyFormatter.format(meal.price)}</h5>
 
           <ul className={styles.moreInformation}>
             <li className={styles.mealLi}>Adagok: {meal.portionNumber}</li>

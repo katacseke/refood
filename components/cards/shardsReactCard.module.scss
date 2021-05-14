@@ -3,13 +3,18 @@ $secondary-color: rgb(94, 91, 89);
 .card {
     margin: .75rem;
     width: 350px;
-
-    .mealName {
-        font-size: 1rem;
-        font-weight: bold;
-        margin-bottom: 0;
-    }
     
+    .moreInformation {
+        margin: 1rem 0;
+        font-size: .85rem;
+        color: $secondary-color;
+        list-style: none;
+        padding: 0;
+    }
+
+    .description {
+        color: $secondary-color;
+    }
 
     .footer {
         padding: .3rem 0;
@@ -17,6 +22,12 @@ $secondary-color: rgb(94, 91, 89);
         align-items: center;
         justify-content: stretch;
         flex-wrap: wrap;
+
+        p {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
         .button {
             margin: .2rem .5rem;
