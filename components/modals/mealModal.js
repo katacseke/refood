@@ -21,11 +21,13 @@ import 'twix';
 import AuthContext from '@context/authContext';
 import CartContext from '@context/cartContext';
 import { ButtonGroup } from 'reactstrap';
+import { useRouter } from 'next/router';
 import styles from './modal.module.scss';
 
 moment.locale('hu');
 
 const MealModal = ({ meal, open, setOpen }) => {
+  const router = useRouter();
   const { user } = useContext(AuthContext);
   const { addCartItem } = useContext(CartContext);
   const [selectedPortions, setSelectedPortions] = useState(1);
@@ -84,8 +86,8 @@ const MealModal = ({ meal, open, setOpen }) => {
         { style: { minWidth: '18rem' } }
       );
 
-      // TODO: refresh by replace, but where are you?
       setOpen(false);
+      router.replace(router.pathname);
     } catch (err) {}
   };
 
