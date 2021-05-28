@@ -37,6 +37,10 @@ $secondary-color: rgb(94, 91, 89);
             line-height: 0;
             align-items: center;
             justify-content: center;
+
+            button {
+                width: 100%;
+            }
         }
     }
 }

@@ -13,10 +13,10 @@ import NotFoundError from './errors/NotFoundError';
 const getMealById = async (id) => {
   await connectDb();
 
-  const meal = await Meal.findById(id).exec();
+  const meal = await Meal.findOneWithDeleted({ _id: id }).exec();
 
   if (!meal) {
-    throw new NotFoundError('Meal not found.');
+    throw new NotFoundError('Az étel nem található.');
   }
 
   return meal.toObject();
@@ -142,7 +142,7 @@ const updateMeal = async (id, meal) => {
 const deleteMeal = async (id) => {
   await connectDb();
 
-  await Meal.findByIdAndDelete(id).exec();
+  await Meal.deleteById(id).exec();
 };
 
 export default {

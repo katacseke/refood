@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongooseDlete from 'mongoose-delete';
 
 const mealSchema = new mongoose.Schema({
   name: String,
@@ -14,6 +15,7 @@ const mealSchema = new mongoose.Schema({
 });
 
 mealSchema.set('toObject', { getters: true });
+mealSchema.plugin(mongooseDlete, { deletedAt: true, overrideMethods: true });
 mealSchema.index(
   { name: 'text', tags: 'text' },
   { name: 'text_search_index', weights: { name: 2, tags: 1 }, default_language: 'hu' }

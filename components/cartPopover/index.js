@@ -20,7 +20,9 @@ const CartPopover = () => {
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
-  const totalPrice = cart.items.reduce((acc, item) => acc + item.quantity * item.meal.price, 0);
+  const totalPrice = cart.items
+    ?.filter((item) => !item.meal.deleted)
+    .reduce((acc, item) => acc + item.quantity * item.meal.price, 0);
 
   return (
     <>

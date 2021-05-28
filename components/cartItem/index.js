@@ -6,17 +6,22 @@ import styles from './cartItem.module.scss';
 
 const CartItem = ({ item, showRemoveButton, showQuantityChanger, onQuantityUpdate }) => {
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
+  const itemPrice = `${item.quantity} x ${currencyFormatter.format(item.meal.price)}`;
+  const isDeleted = item.meal.deleted;
+
   return (
     <div>
-      <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
+      <div
+        className={`d-flex flex-nowrap align-items-baseline justify-content-between ${
+          isDeleted && styles.deleted
+        }`}
+      >
         <p className={styles.mealName}>{item.meal.name}</p>
 
-        <p className="pl-2 mb-1 text-right">
-          {item.quantity} x {currencyFormatter.format(item.meal.price)}
-        </p>
+        <p className="pl-2 mb-1 text-right">{isDeleted ? 'Nem elérhető' : itemPrice}</p>
       </div>
       <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
-        {showQuantityChanger && (
+        {showQuantityChanger && !isDeleted && (
           <QuantityChanger
             quantity={item.quantity}
             onAdd={() => onQuantityUpdate(item.meal.id, item.quantity + 1)}

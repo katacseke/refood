@@ -15,7 +15,7 @@ const getCart = async (userId) => {
   await connectDb();
 
   const { cart } = await User.findById(userId)
-    .populate({ path: 'cart.items.meal', model: 'Meal' })
+    .populate({ path: 'cart.items.meal', model: 'Meal', options: { withDeleted: true } })
     .populate({ path: 'cart.restaurant', model: 'Restaurant' })
     .exec();
 
@@ -75,7 +75,7 @@ const upsertCartItem = async (userId, newItem, quantityStrategy) => {
   await user.save();
 
   const updatedCart = await cart
-    .populate({ path: 'items.meal', model: 'Meal' })
+    .populate({ path: 'items.meal', model: 'Meal', options: { withDeleted: true } })
     .populate({ path: 'restaurant', model: 'Restaurant' })
     .execPopulate();
 

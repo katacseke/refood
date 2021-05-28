@@ -1,7 +1,7 @@
 import nextConnect from 'next-connect';
 import orderService from '@services/orderService';
 import authorize, { hasRole, isOrderRestaurantOwner } from '@middleware/authorize';
-import validateResource from '@middleware/validateResource';
+import { handleErrors, validateResource } from '@server/middleware';
 import orderUpdateByRestaurantSchema from '@validation/orderUpdateByRestaurantSchema';
 
 const authorization = nextConnect().patch(
@@ -14,7 +14,7 @@ const validation = nextConnect().patch(
   validateResource(orderUpdateByRestaurantSchema)
 );
 
-const handler = nextConnect().use(authorization).use(validation);
+const handler = nextConnect({ onError: handleErrors }).use(authorization).use(validation);
 
 handler.patch(async (req, res) => {
   let orders;

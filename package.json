@@ -20,6 +20,7 @@
     "modularscale-sass": "^3.0.10",
     "moment": "^2.29.1",
     "mongoose": "^5.12.4",
+    "mongoose-delete": "^0.5.3",
     "multer": "^1.4.2",
     "next": "10.1.2",
     "next-connect": "^0.10.0",
