@@ -23,7 +23,10 @@ handler.get(async (req, res) => {
 });
 
 handler.patch(async (req, res) => {
-  const updatedRestaurant = await restaurantService.updateRestaurant(req.query.id, req.body);
+  const updatedRestaurant = await restaurantService.updateRestaurant(req.query.id, {
+    ...req.body,
+    ownerId: req.user.id,
+  });
 
   res.status(200).json(updatedRestaurant);
 });

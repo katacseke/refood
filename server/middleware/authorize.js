@@ -11,9 +11,9 @@ export const isRestaurantOwner = () => (user, req) => user.restaurantId === req.
 
 // checks if the user's restaurant matches the one from the meal
 export const isMealOwner = () => async (user, req) => {
-  const mealResult = await mealService.getMealById(req.query.orderId);
+  const mealResult = await mealService.getMealById(req.query.id);
 
-  return user.restaurantId === mealResult?.restaurant.toString();
+  return user.restaurantId === mealResult?.restaurantId;
 };
 
 // checks if the user's restaurant matches the restaurant of the order from the request

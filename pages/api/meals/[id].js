@@ -5,10 +5,10 @@ import authorize, { isMealOwner } from '@server/middleware/authorize';
 import mealUpdateSchema from '@validation/mealUpdateSchema';
 
 const authorization = nextConnect()
-  .get('/api/meals/:id', authorize(isMealOwner))
-  .patch('/api/meals/:id', authorize(isMealOwner));
-const imageUploadMiddleware = nextConnect().patch('/api/restaurants/:id', uploadImage('image'));
-const validation = nextConnect().patch('/api/restaurants/:id', validateResource(mealUpdateSchema));
+  .get('/api/meals/:id', authorize(isMealOwner()))
+  .patch('/api/meals/:id', authorize(isMealOwner()));
+const imageUploadMiddleware = nextConnect().patch('/api/meals/:id', uploadImage('image'));
+const validation = nextConnect().patch('/api/meals/:id', validateResource(mealUpdateSchema));
 
 const handler = nextConnect({ onError: handleErrors })
   .use(authorization)

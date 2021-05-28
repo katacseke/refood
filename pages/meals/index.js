@@ -13,10 +13,10 @@ import FilterCollapse from '@components/filterCollapse';
 const MealsPage = ({ meals }) => {
   const [collapseOpen, setCollapseOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedMeal, setSelectedMeal] = useState();
+  const [selectedMealId, setSelectedMealId] = useState();
 
-  const showMeal = (meal) => {
-    setSelectedMeal(meal);
+  const showMeal = (mealId) => {
+    setSelectedMealId(mealId);
     setModalOpen(true);
   };
 
@@ -28,7 +28,11 @@ const MealsPage = ({ meals }) => {
   const defaultFilters = useRouter().query;
   return (
     <Layout>
-      <MealModal meal={selectedMeal} open={modalOpen} setOpen={setModalOpen} />
+      <MealModal
+        meal={meals.find((meal) => meal.id === selectedMealId)}
+        open={modalOpen}
+        setOpen={setModalOpen}
+      />
       <h1 className="mb-3">
         {Object.keys(defaultFilters).length === 0 ? 'Jelenleg elérhető ajánlatok' : 'Ajánlatok'}
       </h1>
@@ -45,7 +49,7 @@ const MealsPage = ({ meals }) => {
 
       <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
         {meals.map((meal) => (
-          <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal)} />
+          <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal.id)} />
         ))}
       </Container>
       {meals.length === 0 && (

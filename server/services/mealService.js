@@ -1,3 +1,4 @@
+import fs from 'fs';
 import connectDb from '@server/db';
 import Meal from '@server/models/meal';
 import NotFoundError from './errors/NotFoundError';
@@ -123,8 +124,21 @@ const createMeal = async (meal) => {
  *
  * @throws {Error} Throws error if the update failed.
  */
-const updateMeal = async (id, meal) => {
+const updateMeal = async (id, mealData) => {
   await connectDb();
+
+  const { image } = mealData;
+  const meal = { ...mealData };
+  delete meal.image;
+
+  if (image) {
+    const mealResult = await Meal.findById(id).exec();
+
+    if (fs.existsSync(`public/${mealResult?.image}`)) {
+      fs.unlinkSync(`public/${mealResult?.image}`);
+    }
+    meal.image = image;
+  }
 
   const updatedMeal = await Meal.findByIdAndUpdate(id, meal, { new: true }).exec();
 

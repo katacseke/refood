@@ -14,6 +14,7 @@ export default Yup.object({
   price: Yup.number()
     .positive('Az ár pozitív szám kell legyen.')
     .required('Az ár megadása kötelező.'),
+  tags: Yup.array().of(Yup.string()),
   donatable: Yup.boolean(),
   dailyMenu: Yup.boolean(),
   image: Yup.mixed(),
