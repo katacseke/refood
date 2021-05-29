@@ -14,22 +14,16 @@ import {
 import { mealService, restaurantService, userService } from '@server/services';
 
 import AuthContext from '@context/authContext';
+import MealModalContext from '@context/mealModalContext';
 import MealCard from '@components/cards/mealCard';
-import MealModal from '@components/modals/mealModal';
 import RestaurantModal from '@components/modals/restaurantModal';
 import Layout from '@components/layout';
 import styles from './restaurant.module.scss';
 
 const RestauantPage = ({ restaurant, meals }) => {
   const { user } = useContext(AuthContext);
-  const [mealModalOpen, setMealModalOpen] = useState(false);
+  const { showMeal } = useContext(MealModalContext);
   const [restaurantModalOpen, setRestaurantModalOpen] = useState(false);
-  const [selectedMeal, setSelectedMeal] = useState();
-
-  const showMeal = (meal) => {
-    setSelectedMeal(meal);
-    setMealModalOpen(true);
-  };
 
   const getArticle = (word) => ('aeiouöüóőúűéáí'.includes(word.toLowerCase()[0]) ? 'Az' : 'A');
 
@@ -86,7 +80,6 @@ const RestauantPage = ({ restaurant, meals }) => {
         </CardBody>
       </Card>
 
-      <MealModal meal={selectedMeal} open={mealModalOpen} setOpen={setMealModalOpen} />
       <div className="d-flex justify-content-between mx-2 align-items-baseline">
         <h3>
           {getArticle(restaurant.name)} {restaurant.name} ajánlatai

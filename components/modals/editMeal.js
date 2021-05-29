@@ -162,9 +162,12 @@ const EditMeal = ({ meal, onTabChange, onMealChange }) => {
           </Togllebox>
         </FormGroup>
 
-        <Button type="submit" className="ml-auto mr-0">
-          Módosítás
-        </Button>
+        <div className="d-flex justify-content-end">
+          <Button type="button" theme="secondary" className="ml-auto mr-1" onClick={onTabChange}>
+            Mégse
+          </Button>
+          <Button type="submit">Módosítás</Button>
+        </div>
       </Form>
     </div>
   );

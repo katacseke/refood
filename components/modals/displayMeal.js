@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Container, Badge, Button, FormInput, Row, Col, Tooltip } from 'shards-react';
 import { IoCartOutline, IoSettingsOutline, IoTrashOutline } from 'react-icons/io5';
@@ -6,20 +6,75 @@ import moment from 'moment';
 import 'twix';
 
 import AuthContext from '@context/authContext';
+import { useRouter } from 'next/router';
+import CartContext from '@context/cartContext';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 import styles from './modal.module.scss';
 
 moment.locale('hu');
 
-const DisplayMeal = ({
-  meal,
-  onAddToCart,
-  onDelete,
-  selectedPortions,
-  setSelectedPortions,
-  onTabChange,
-}) => {
+const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
+  const router = useRouter();
   const { user } = useContext(AuthContext);
+  const { addCartItem } = useContext(CartContext);
+  const [selectedPortions, setSelectedPortions] = useState(1);
   const [tooltipOpen, setTooltipOpen] = useState(false);
+
+  useEffect(() => setSelectedPortions(1), [meal]);
+
+  const handleAddToCart = async () => {
+    if (selectedPortions > meal.portionNumber || selectedPortions < 1) {
+      toast.error('Ez a mennyiség nem rendelhető meg!');
+      return;
+    }
+
+    const cartItem = {
+      meal: meal.id,
+      quantity: selectedPortions,
+    };
+
+    try {
+      const promise = addCartItem(cartItem);
+
+      await toast.promise(
+        promise,
+        {
+          loading: 'Kosár frissítése...',
+          success: 'Kosárba tetted!',
+          error: (err) =>
+            err.response.data.error ||
+            err.response.data.general?.message ||
+            'A kosár frissítése sikertelen!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
+
+      toggleOpen(false);
+    } catch (err) {}
+  };
+
+  const handleDelete = async () => {
+    try {
+      const promise = axios.delete(`/api/meals/${meal.id}`);
+
+      await toast.promise(
+        promise,
+        {
+          loading: 'Étel törlése folyamatban...',
+          success: 'Étel törölve!',
+          error: (err) =>
+            err.response.data.error ||
+            err.response.data.general?.message ||
+            'Étel törlése sikertelen!',
+        },
+        { style: { minWidth: '18rem' } }
+      );
+
+      toggleOpen(false);
+      router.replace(router.pathname);
+    } catch (err) {}
+  };
 
   const timeRange = moment.twix(meal.startTime, meal.endTime);
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
@@ -56,7 +111,7 @@ const DisplayMeal = ({
               theme="danger"
               title="Törlés"
               className="d-flex align-items-cente mr-1"
-              onClick={onDelete}
+              onClick={handleDelete}
             >
               <IoTrashOutline />
             </Button>
@@ -82,7 +137,7 @@ const DisplayMeal = ({
               </Col>
               <Col id="cartButton">
                 <Button
-                  onClick={onAddToCart}
+                  onClick={handleAddToCart}
                   className="col d-inline-flex align-items-center justify-content-center"
                   disabled={!user}
                 >
