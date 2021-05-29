@@ -18,8 +18,12 @@ const mealSchema = new mongoose.Schema({
 mealSchema.set('toObject', { getters: true });
 mealSchema.plugin(mongooseDlete, { deletedAt: true, overrideMethods: true });
 mealSchema.index(
-  { name: 'text', tags: 'text' },
-  { name: 'text_search_index', weights: { name: 2, tags: 1 }, default_language: 'hu' }
+  { name: 'text', tags: 'text', restaurantName: 'text' },
+  {
+    name: 'text_search_index',
+    weights: { name: 3, tags: 2, restaurantName: 1 },
+    default_language: 'hu',
+  }
 );
 
 const Meal = mongoose.models.Meal || mongoose.model('Meal', mealSchema);
