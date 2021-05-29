@@ -176,7 +176,7 @@ const RestaurantRegistration = ({ application, token }) => {
 
 export default RestaurantRegistration;
 
-export async function getServerSideProps({ params }) {
+export const getServerSideProps = async ({ params }) => {
   const { token } = params;
   try {
     const application = await applicationService.getAcceptedApplicationByToken(token);
@@ -189,4 +189,4 @@ export async function getServerSideProps({ params }) {
       notFound: true,
     };
   }
-}
+};

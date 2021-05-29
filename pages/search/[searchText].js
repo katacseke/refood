@@ -27,9 +27,10 @@ const SearchResultPage = ({ meals, restaurants, text }) => {
     </Layout>
   );
 };
+
 export default SearchResultPage;
 
-export async function getServerSideProps({ params }) {
+export const getServerSideProps = async ({ params }) => {
   const { searchText } = params;
 
   const meals = await mealService.getMeals({ name: searchText });
@@ -42,4 +43,4 @@ export async function getServerSideProps({ params }) {
       restaurants: JSON.parse(JSON.stringify(restaurants)),
     },
   };
-}
+};

@@ -93,7 +93,7 @@ const Home = ({ mainPlaceholderSrc, featurePlaceholderSrc }) => (
 
 export default Home;
 
-export async function getStaticProps() {
+export const getStaticProps = async () => {
   const mainImg = await getImage('/hermes-rivera-Ww8eQWjMJWk-unsplash.jpg');
   const featureImg = await getImage('/vegleges.jpg');
 
@@ -106,4 +106,4 @@ export async function getStaticProps() {
       featurePlaceholderSrc,
     },
   };
-}
+};

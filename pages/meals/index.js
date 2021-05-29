@@ -52,7 +52,7 @@ const MealsPage = ({ meals }) => {
 
 export default MealsPage;
 
-export async function getServerSideProps(context) {
+export const getServerSideProps = async (context) => {
   const filters = {
     startTime: Date.now(),
     endTime: Date.now(),
@@ -65,4 +65,4 @@ export async function getServerSideProps(context) {
   return {
     props: { meals: JSON.parse(JSON.stringify(meals)) },
   };
-}
+};
