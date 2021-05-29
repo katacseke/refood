@@ -16,7 +16,7 @@ const DisplayMeal = ({
   onDelete,
   selectedPortions,
   setSelectedPortions,
-  onChange,
+  onTabChange,
 }) => {
   const { user } = useContext(AuthContext);
   const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -60,7 +60,7 @@ const DisplayMeal = ({
             >
               <IoTrashOutline />
             </Button>
-            <Button title="Szerkesztés" className="d-flex align-items-center" onClick={onChange}>
+            <Button title="Szerkesztés" className="d-flex align-items-center" onClick={onTabChange}>
               <IoSettingsOutline />
             </Button>
           </div>

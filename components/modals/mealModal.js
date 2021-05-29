@@ -9,7 +9,7 @@ import styles from './modal.module.scss';
 import DisplayMeal from './displayMeal';
 import EditMeal from './editMeal';
 
-const MealModal = ({ meal, open, setOpen }) => {
+const MealModal = ({ meal, open, toggle, onMealChange }) => {
   const router = useRouter();
   const { addCartItem } = useContext(CartContext);
   const [selectedPortions, setSelectedPortions] = useState(1);
@@ -47,7 +47,7 @@ const MealModal = ({ meal, open, setOpen }) => {
         { style: { minWidth: '18rem' } }
       );
 
-      setOpen(false);
+      toggle(false);
     } catch (err) {}
   };
 
@@ -68,7 +68,7 @@ const MealModal = ({ meal, open, setOpen }) => {
         { style: { minWidth: '18rem' } }
       );
 
-      setOpen(false);
+      toggle(false);
       router.replace(router.pathname);
     } catch (err) {}
   };
@@ -78,18 +78,12 @@ const MealModal = ({ meal, open, setOpen }) => {
   }
 
   return (
-    <Modal
-      centered
-      size="md"
-      className="modal-dialog-scrollable"
-      open={open}
-      toggle={() => setOpen(!open)}
-    >
-      <ModalHeader toggle={() => setOpen(!open)} />
+    <Modal centered size="md" className="modal-dialog-scrollable" open={open} toggle={toggle}>
+      <ModalHeader toggle={toggle} />
 
       <ModalBody className={styles.modalBody}>
         {edit ? (
-          <EditMeal meal={meal} onChange={() => setEdit(!edit)} />
+          <EditMeal meal={meal} onTabChange={() => setEdit(!edit)} onMealChange={onMealChange} />
         ) : (
           <DisplayMeal
             meal={meal}
@@ -97,7 +91,7 @@ const MealModal = ({ meal, open, setOpen }) => {
             onAddToCart={handleAddToCart}
             selectedPortions={selectedPortions}
             setSelectedPortions={setSelectedPortions}
-            onChange={() => setEdit(!edit)}
+            onTabChange={() => setEdit(!edit)}
           />
         )}
       </ModalBody>

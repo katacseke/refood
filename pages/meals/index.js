@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Router, { useRouter } from 'next/router';
 import { Container, Button } from 'shards-react';
 import { IoFilter } from 'react-icons/io5';
@@ -7,18 +7,12 @@ import mealService from '@services/mealService';
 
 import Layout from '@components/layout';
 import MealCard from '@components/cards/mealCard';
-import MealModal from '@components/modals/mealModal';
 import FilterCollapse from '@components/filterCollapse';
+import MealModalContext from '@context/mealModalContext';
 
 const MealsPage = ({ meals }) => {
   const [collapseOpen, setCollapseOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedMealId, setSelectedMealId] = useState();
-
-  const showMeal = (mealId) => {
-    setSelectedMealId(mealId);
-    setModalOpen(true);
-  };
+  const { showMeal } = useContext(MealModalContext);
 
   const onFilter = (data) => {
     const queryString = new URLSearchParams(data).toString();
@@ -28,11 +22,6 @@ const MealsPage = ({ meals }) => {
   const defaultFilters = useRouter().query;
   return (
     <Layout>
-      <MealModal
-        meal={meals.find((meal) => meal.id === selectedMealId)}
-        open={modalOpen}
-        setOpen={setModalOpen}
-      />
       <h1 className="mb-3">
         {Object.keys(defaultFilters).length === 0 ? 'Jelenleg elérhető ajánlatok' : 'Ajánlatok'}
       </h1>
@@ -49,7 +38,7 @@ const MealsPage = ({ meals }) => {
 
       <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
         {meals.map((meal) => (
-          <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal.id)} />
+          <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal)} />
         ))}
       </Container>
       {meals.length === 0 && (

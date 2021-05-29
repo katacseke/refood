@@ -22,7 +22,7 @@ import Togllebox from '@components/togglebox';
 import ChipInput from '@components/chipInput';
 import styles from './modal.module.scss';
 
-const EditMeal = ({ meal, onChange }) => {
+const EditMeal = ({ meal, onTabChange, onMealChange }) => {
   const router = useRouter();
   const { register, handleSubmit, errors, setError, control } = useForm({
     resolver: yupResolver(mealUpdateSchema),
@@ -42,7 +42,7 @@ const EditMeal = ({ meal, onChange }) => {
       });
       const promise = axios.patch(`/api/meals/${meal.id}`, formData);
 
-      await toast.promise(
+      const response = await toast.promise(
         promise,
         {
           loading: 'Frissítés folyamatban...',
@@ -55,7 +55,8 @@ const EditMeal = ({ meal, onChange }) => {
         { style: { minWidth: '18rem' } }
       );
 
-      onChange();
+      onMealChange(response.data);
+      onTabChange();
       router.push(router.pathname);
     } catch (err) {
       Object.keys(err.response.data)
