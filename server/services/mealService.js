@@ -81,7 +81,7 @@ const getMeals = async (filters = {}) => {
  * @returns {Array<Object>} Returns list of meals that fit the criteria.
  */
 const getMealsByRestaurant = async (id, filters = {}) => {
-  const meals = await getMeals({ restaurantId: id, ...filters });
+  const meals = await getMeals({ ...filters, restaurantId: id });
 
   return meals;
 };

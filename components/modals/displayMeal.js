@@ -78,11 +78,19 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
 
   const timeRange = moment.twix(meal.startTime, meal.endTime);
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
+  const notAvailable = !(Date.now() > meal.startTime && Date.now() < meal.endTime);
 
   return (
     <>
-      <div style={{ position: 'relative', height: '18rem' }}>
-        <Image src={meal.image || '/default.svg'} alt="" layout="fill" objectFit="cover" />
+      <div className={styles.imageContainer}>
+        <h3>{notAvailable && 'Nem elérhető'}</h3>
+        <Image
+          className={notAvailable && styles.notAvailable}
+          src={meal.image || '/default.svg'}
+          alt=""
+          layout="fill"
+          objectFit="cover"
+        />
       </div>
 
       <div className={styles.content}>

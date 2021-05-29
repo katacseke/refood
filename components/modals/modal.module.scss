@@ -29,3 +29,16 @@ $secondary-color: rgb(94, 91, 89);
       margin-left: -1em; 
     }
 }
+
+.imageContainer {
+    position: relative;
+    height: 18rem;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.notAvailable {
+    opacity: .5;
+    background-color: rebeccapurple;
+}

@@ -17,7 +17,7 @@ const RestaurantMealsPage = ({ meals }) => {
 
   const onFilter = (data) => {
     const queryString = new URLSearchParams(data).toString();
-    Router.push(`/meals?${queryString}`);
+    Router.push(`/restaurant/meals?${queryString}`);
   };
 
   const defaultFilters = useRouter().query;
