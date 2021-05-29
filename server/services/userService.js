@@ -131,8 +131,11 @@ const createUser = async (user, role = 'user') => {
 const updateUser = async (id, userData) => {
   await connectDb();
 
-  const user = { ...userData };
-  if (userData.password) {
+  const user = Object.fromEntries(
+    Object.entries(userData).filter(([, value]) => value !== undefined)
+  );
+
+  if (user.password) {
     const hash = await bcrypt.hash(userData.password, saltRounds);
     user.password = hash;
   }
