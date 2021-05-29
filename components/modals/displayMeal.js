@@ -87,7 +87,7 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
 
       <div className={styles.content}>
         <h4 className="mb-0">{meal.name}</h4>
-        <p className="mb-2">Restaurant name</p>
+        <p className="mb-2">{meal?.restaurantName}</p>
         <h5 className="mb-2">{currencyFormatter.format(meal.price)}</h5>
 
         <ul className={styles.moreInformation}>

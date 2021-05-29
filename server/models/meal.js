@@ -5,6 +5,7 @@ const mealSchema = new mongoose.Schema({
   name: String,
   portionNumber: Number,
   restaurantId: String,
+  restaurantName: String,
   startTime: Date,
   endTime: Date,
   price: Number,

@@ -46,6 +46,7 @@ const MealCard = ({ data, onClick }) => {
         <span className={styles.title} onClick={onClick} role="button" tabIndex="-1">
           {data.name}
         </span>
+        <p className="mt-n2 mb-2">{data?.restaurantName}</p>
         <p>{currencyFormatter.format(data.price)}</p>
       </div>
 

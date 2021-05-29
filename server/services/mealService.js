@@ -2,6 +2,7 @@ import fs from 'fs';
 import connectDb from '@server/db';
 import Meal from '@server/models/meal';
 import NotFoundError from './errors/NotFoundError';
+import restaurantService from './restaurantService';
 
 /**
  * Get meal by id.
@@ -70,6 +71,7 @@ const getMeals = async (filters = {}) => {
     meals = await Meal.find(mongoFilters).exec();
   }
 
+  console.log(meals);
   return meals.map((meal) => meal.toObject());
 };
 
@@ -107,7 +109,12 @@ const getCurrentMeals = async () => {
 const createMeal = async (meal) => {
   await connectDb();
 
-  const savedMeal = await Meal.create(meal);
+  const restaurant = await restaurantService.getRestaurantById(meal.restaurantId);
+
+  const savedMeal = await Meal.create({
+    ...meal,
+    restaurantName: restaurant.name,
+  });
 
   if (!savedMeal) {
     throw new Error('Nem sikerült létrehozni az ételt.');
