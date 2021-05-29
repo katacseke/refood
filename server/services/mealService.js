@@ -71,7 +71,6 @@ const getMeals = async (filters = {}) => {
     meals = await Meal.find(mongoFilters).exec();
   }
 
-  console.log(meals);
   return meals.map((meal) => meal.toObject());
 };
 
@@ -81,8 +80,8 @@ const getMeals = async (filters = {}) => {
  * @param {String} id The id of the restaurant.
  * @returns {Array<Object>} Returns list of meals that fit the criteria.
  */
-const getCurrentMealsByRestaurant = async (id) => {
-  const meals = await getMeals({ restaurantId: id, startTime: Date.now(), endTime: Date.now() });
+const getMealsByRestaurant = async (id, filters = {}) => {
+  const meals = await getMeals({ restaurantId: id, ...filters });
 
   return meals;
 };
@@ -169,7 +168,7 @@ const deleteMeal = async (id) => {
 export default {
   getMealById,
   getMeals,
-  getCurrentMealsByRestaurant,
+  getMealsByRestaurant,
   getCurrentMeals,
   createMeal,
   updateMeal,

@@ -48,7 +48,7 @@ const CreateMealPage = () => {
         { style: { minWidth: '18rem' } }
       );
 
-      Router.push('/meals');
+      Router.push('/restaurant/meals');
     } catch (err) {
       Object.keys(err.response.data)
         .filter((field) => field !== 'general' && field !== 'error')

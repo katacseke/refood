@@ -153,9 +153,7 @@ const RestaurantSection = ({ logout, user }) => {
           <Link href={`/restaurants/${user.restaurantId}`}>
             <DropdownItem>Saját oldal</DropdownItem>
           </Link>
-          <Link
-            href={`/meals?restaurantId=${user.restaurantId}&startTime=&endTime=&minPortionNumber=0`}
-          >
+          <Link href="/restaurant/meals">
             <DropdownItem>Saját ajánlatok</DropdownItem>
           </Link>
           <DropdownItem className="text-danger d-flex align-items-center" onClick={logout}>
