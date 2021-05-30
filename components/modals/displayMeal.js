@@ -78,19 +78,27 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
 
   const timeRange = moment.twix(meal.startTime, meal.endTime);
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
-  const notAvailable = !(Date.now() > meal.startTime && Date.now() < meal.endTime);
+  const notAvailable =
+    !(moment() > moment(meal.startTime) && moment() < moment(meal.endTime)) ||
+    meal.portionNumber === 0;
+  const isOver = moment() > moment(meal.endTime) || meal.portionNumber === 0;
+  const timeDifference = moment(meal.startTime).diff(moment(), 'hours', true);
+  const isPreorderable = timeDifference > 0 && timeDifference <= 24 && !isOver;
+
+  let displayMealState;
+  if (isPreorderable) {
+    displayMealState = 'Előrendelhető';
+  } else if (notAvailable) {
+    displayMealState = 'Nem elérhető';
+  } else {
+    displayMealState = '';
+  }
 
   return (
     <>
-      <div className={styles.imageContainer}>
-        <h3>{notAvailable && 'Nem elérhető'}</h3>
-        <Image
-          className={notAvailable && styles.notAvailable}
-          src={meal.image || '/default.svg'}
-          alt=""
-          layout="fill"
-          objectFit="cover"
-        />
+      <div className={`${styles.imageContainer} ${notAvailable && styles.notAvailable}`}>
+        <span className={styles.notAvailableText}>{displayMealState}</span>
+        <Image src={meal.image || '/default.svg'} alt="" layout="fill" objectFit="cover" />
       </div>
 
       <div className={styles.content}>
@@ -147,7 +155,7 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
                 <Button
                   onClick={handleAddToCart}
                   className="col d-inline-flex align-items-center justify-content-center"
-                  disabled={!user}
+                  disabled={!user || isOver}
                 >
                   <IoCartOutline className="mr-1" />
                   Kosárba
@@ -159,6 +167,15 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
                     toggle={() => setTooltipOpen(!tooltipOpen)}
                   >
                     Rendeléshez jelentkezz be!
+                  </Tooltip>
+                )}
+                {isOver && (
+                  <Tooltip
+                    open={tooltipOpen}
+                    target="#cartButton"
+                    toggle={() => setTooltipOpen(!tooltipOpen)}
+                  >
+                    Ez az ajánlat már nem elérhető, kérlek válassz valami mást!
                   </Tooltip>
                 )}
               </Col>

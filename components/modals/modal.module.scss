@@ -1,4 +1,6 @@
 $secondary-color: rgb(94, 91, 89);
+$tag-color: #e4e1e1;
+$transition-duration: .3s;
 
 .modalBody {
     padding: 0;
@@ -36,9 +38,31 @@ $secondary-color: rgb(94, 91, 89);
     justify-content: center;
     align-items: center;
     display: flex;
-}
 
-.notAvailable {
-    opacity: .5;
-    background-color: rebeccapurple;
+    &.notAvailable {
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            transition: $transition-duration;
+            z-index: 1;
+            background: rgba(31, 30, 30, 0.6);
+        }
+    }
+        
+      
+    .notAvailableText {
+        position: absolute;
+        z-index: 2;
+        top: 50%;
+        left: 50%;
+        color: $tag-color;
+        font-size: ms(1);
+        transform: translateX(-50%);
+        transition: all $transition-duration;
+    }
 }
