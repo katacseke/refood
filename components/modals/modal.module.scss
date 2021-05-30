@@ -66,3 +66,20 @@ $transition-duration: .3s;
         transition: all $transition-duration;
     }
 }
+
+.buttonContainer {
+    display: flex;
+    flex-wrap: wrap;
+
+    div {
+        flex: 1;
+        margin: 0 .5rem .5rem .5rem;
+
+        &:first-of-type {
+          flex: 0 0 5rem;  
+        }
+        &:nth-of-type(2) {
+            flex-grow: 10;
+        }
+    }
+}

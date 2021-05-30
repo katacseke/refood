@@ -54,7 +54,9 @@ const upsertCartItem = async (userId, newItem, quantityStrategy) => {
     throw new ValidationError('Egyszerre csak egy vendéglőtől rendelhetők termékek!');
   }
 
-  const cartItem = cart.items.find((item) => item.meal.toString() === newItem.meal);
+  const cartItem = cart.items.find(
+    (item) => item.meal.toString() === newItem.meal && item.donation === newItem.donation
+  );
 
   if (cartItem) {
     cartItem.quantity =

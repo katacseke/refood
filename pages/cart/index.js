@@ -18,9 +18,9 @@ const CartPage = () => {
   const { cart, updateCartItem, deleteCartContent, refresh } = useContext(CartContext);
   const { user } = useContext(AuthContext);
 
-  const handleUpdate = async (mealId, newQuantity) => {
+  const handleUpdate = async (mealId, donation, newQuantity) => {
     try {
-      await updateCartItem({ meal: mealId, quantity: newQuantity });
+      await updateCartItem({ meal: mealId, quantity: newQuantity, donation });
     } catch (err) {
       const body = err.response.data;
       toast.error(body.error || body.general.message);
@@ -80,7 +80,7 @@ const CartPage = () => {
               <div>
                 {cart.items.map((item) => (
                   <CartItem
-                    key={item.id}
+                    key={item._id}
                     item={item}
                     showRemoveButton
                     showQuantityChanger

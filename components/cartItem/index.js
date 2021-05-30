@@ -10,7 +10,7 @@ const CartItem = ({ item, showRemoveButton, showQuantityChanger, onQuantityUpdat
   const isDeleted = item.meal.deleted;
 
   return (
-    <div>
+    <div className={item?.donation && styles.donation}>
       <div
         className={`d-flex flex-nowrap align-items-baseline justify-content-between ${
           isDeleted && styles.deleted
@@ -24,8 +24,8 @@ const CartItem = ({ item, showRemoveButton, showQuantityChanger, onQuantityUpdat
         {showQuantityChanger && !isDeleted && (
           <QuantityChanger
             quantity={item.quantity}
-            onAdd={() => onQuantityUpdate(item.meal.id, item.quantity + 1)}
-            onSubtract={() => onQuantityUpdate(item.meal.id, item.quantity - 1)}
+            onAdd={() => onQuantityUpdate(item.meal.id, item.donation, item.quantity + 1)}
+            onSubtract={() => onQuantityUpdate(item.meal.id, item.donation, item.quantity - 1)}
             max={item.meal.portionNumber}
           />
         )}
@@ -34,7 +34,7 @@ const CartItem = ({ item, showRemoveButton, showQuantityChanger, onQuantityUpdat
           <Button
             theme="light"
             className={styles.closeButton}
-            onClick={() => onQuantityUpdate(item.meal.id, 0)}
+            onClick={() => onQuantityUpdate(item.meal.id, item.donation, 0)}
           >
             <IoClose />
           </Button>

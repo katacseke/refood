@@ -140,8 +140,18 @@ const createOrder = async (userId) => {
         );
       }
 
+      const cartObject = populatedCart.items.reduce((acc, item) => {
+        if (acc[item.meal.id]) {
+          acc[item.meal.id].quantity += item.quantity;
+        } else {
+          acc[item.meal.id] = item.toObject();
+        }
+
+        return acc;
+      }, {});
+
       await Promise.all(
-        populatedCart.items.map(async (item) => {
+        Object.values(cartObject).map(async (item) => {
           const newPortionNumber = item.meal.portionNumber - item.quantity;
 
           if (newPortionNumber < 0) {
@@ -217,7 +227,7 @@ const cancelOrder = async (orderId, newStatus = 'canceled') => {
     await Promise.all(
       order.items.map(async (item) => {
         const result = await mealService.updateMeal(item.meal.id, {
-          portionNumber: item.meal.portionNumber + item.quantity,
+          $inc: { portionNumber: item.quantity },
         });
 
         if (!result) {

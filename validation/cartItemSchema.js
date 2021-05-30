@@ -11,4 +11,5 @@ export default Yup.object({
     .integer('A mennyiség egész szám kell legyen.')
     .moreThan(-1, 'A mennyiség pozitív szám kell legyen.')
     .required('Mennyiség megadása kötelező.'),
+  donation: Yup.boolean(),
 });

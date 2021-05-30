@@ -10,9 +10,9 @@ import styles from './cartPopover.module.scss';
 const CartPopover = () => {
   const { cart, updateCartItem } = useContext(CartContext);
 
-  const handleUpdate = async (mealId, newQuantity) => {
+  const handleUpdate = async (mealId, donation = false, newQuantity) => {
     try {
-      await updateCartItem({ meal: mealId, quantity: newQuantity });
+      await updateCartItem({ meal: mealId, quantity: newQuantity, donation });
     } catch (err) {
       const body = err.response.data;
       toast.error(body.error || body.general.message);
@@ -41,7 +41,7 @@ const CartPopover = () => {
           <>
             {cart.items.map((item) => (
               <CartItem
-                key={item.id}
+                key={item._id}
                 item={item}
                 showQuantityChanger
                 onQuantityUpdate={handleUpdate}

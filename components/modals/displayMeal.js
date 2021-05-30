@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Container, Badge, Button, FormInput, Row, Col, Tooltip } from 'shards-react';
-import { IoCartOutline, IoSettingsOutline, IoTrashOutline } from 'react-icons/io5';
+import { Container, Badge, Button, FormInput, Tooltip } from 'shards-react';
+import { IoCartOutline, IoHeart, IoSettingsOutline, IoTrashOutline } from 'react-icons/io5';
 import moment from 'moment';
 import 'twix';
 
@@ -23,7 +23,7 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
 
   useEffect(() => setSelectedPortions(1), [meal]);
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (donation = false) => {
     if (selectedPortions > meal.portionNumber || selectedPortions < 1) {
       toast.error('Ez a mennyiség nem rendelhető meg!');
       return;
@@ -32,6 +32,7 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
     const cartItem = {
       meal: meal.id,
       quantity: selectedPortions,
+      donation,
     };
 
     try {
@@ -138,10 +139,9 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
         ) : (
           <>
             <label htmlFor="quantitiy">Mennyiség</label>
-            <Row>
-              <Col xs="4">
+            <div className={styles.buttonContainer}>
+              <div>
                 <FormInput
-                  className="col"
                   type="number"
                   name="quantity"
                   id="quantity"
@@ -150,10 +150,10 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
                   min="1"
                   max={meal.portionNumber}
                 />
-              </Col>
-              <Col id="cartButton">
+              </div>
+              <div id="cartButton">
                 <Button
-                  onClick={handleAddToCart}
+                  onClick={() => handleAddToCart()}
                   className="col d-inline-flex align-items-center justify-content-center"
                   disabled={!user || isOver}
                 >
@@ -178,8 +178,39 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
                     Ez az ajánlat már nem elérhető, kérlek válassz valami mást!
                   </Tooltip>
                 )}
-              </Col>
-            </Row>
+              </div>
+              {meal.donatable && (
+                <div id="donateButton">
+                  <Button
+                    theme="success"
+                    onClick={() => handleAddToCart(true)}
+                    className="col d-inline-flex align-items-center justify-content-center"
+                    disabled={!user || isOver}
+                  >
+                    <IoHeart className="mr-1" />
+                    Adományozás
+                  </Button>
+                  {!user && (
+                    <Tooltip
+                      open={tooltipOpen}
+                      target="#donateButton"
+                      toggle={() => setTooltipOpen(!tooltipOpen)}
+                    >
+                      Adományozáshoz jelentkezz be!
+                    </Tooltip>
+                  )}
+                  {isOver && (
+                    <Tooltip
+                      open={tooltipOpen}
+                      target="#donateButton"
+                      toggle={() => setTooltipOpen(!tooltipOpen)}
+                    >
+                      Ez az ajánlat már nem elérhető, kérlek válassz valami mást!
+                    </Tooltip>
+                  )}
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
