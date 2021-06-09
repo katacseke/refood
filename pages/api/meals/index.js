@@ -25,7 +25,7 @@ handler.get(async (req, res) => {
 handler.post(async (req, res) => {
   const meal = await mealService.createMeal({
     ...req.body,
-    restaurantId: req.user.id,
+    restaurantId: req.user.restaurantId,
   });
 
   res.status(201).json(meal);

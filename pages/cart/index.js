@@ -1,7 +1,7 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import Router from 'next/router';
 import toast from 'react-hot-toast';
-import { Button, Card, CardBody, CardTitle } from 'shards-react';
+import { Button, Card, CardBody, CardTitle, Tooltip } from 'shards-react';
 import { IoCartOutline } from 'react-icons/io5';
 
 import withAuthSSR, { hasRoleSSR } from '@middleware/withAuthSSR';
@@ -14,12 +14,13 @@ import axios from 'axios';
 import styles from './cart.module.scss';
 
 const CartPage = () => {
+  const [tooltipOpen, setTooltipOpen] = useState(false);
   const { cart, updateCartItem, deleteCartContent, refresh } = useContext(CartContext);
   const { user } = useContext(AuthContext);
 
-  const handleUpdate = async (mealId, newQuantity) => {
+  const handleUpdate = async (mealId, donation, newQuantity) => {
     try {
-      await updateCartItem({ meal: mealId, quantity: newQuantity });
+      await updateCartItem({ meal: mealId, quantity: newQuantity, donation });
     } catch (err) {
       const body = err.response.data;
       toast.error(body.error || body.general.message);
@@ -60,7 +61,10 @@ const CartPage = () => {
   };
 
   const currencyFormatter = new Intl.NumberFormat('hu-HU', { style: 'currency', currency: 'RON' });
-  const totalPrice = cart.items?.reduce((acc, item) => acc + item.quantity * item.meal.price, 0);
+  const totalPrice = cart.items
+    ?.filter((item) => !item.meal.deleted)
+    .reduce((acc, item) => acc + item.quantity * item.meal.price, 0);
+  const deletedItem = cart.items.find((item) => item.meal.deleted);
 
   return (
     <Layout requiresAuth>
@@ -76,7 +80,7 @@ const CartPage = () => {
               <div>
                 {cart.items.map((item) => (
                   <CartItem
-                    key={item.id}
+                    key={item._id}
                     item={item}
                     showRemoveButton
                     showQuantityChanger
@@ -95,7 +99,20 @@ const CartPage = () => {
                   <Button className={styles.removeAllButton} onClick={handleDelete}>
                     Kosár ürítése
                   </Button>
-                  <Button onClick={placeOrder}>Rendelés leadása</Button>
+                  <div id="placeOrderButton">
+                    <Button onClick={placeOrder} disabled={deletedItem}>
+                      Rendelés leadása
+                    </Button>
+                    {deletedItem && (
+                      <Tooltip
+                        open={tooltipOpen}
+                        target="#placeOrderButton"
+                        toggle={() => setTooltipOpen(!tooltipOpen)}
+                      >
+                        {`A ${deletedItem.meal.name} étel nem elérhető, kérlek vedd ki a kosaradból.`}
+                      </Tooltip>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (

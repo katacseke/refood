@@ -1,25 +1,18 @@
-import { useState } from 'react';
+import { useContext } from 'react';
 import { Container } from 'shards-react';
 
 import { mealService, restaurantService } from '@server/services';
 
+import MealModalContext from '@context/mealModalContext';
 import Layout from '@components/layout';
 import MealCard from '@components/cards/mealCard';
 import RestaurantCard from '@components/cards/restaurantCard';
-import MealModal from '@components/modals/mealModal';
 
 const SearchResultPage = ({ meals, restaurants, text }) => {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedMeal, setSelectedMeal] = useState();
-
-  const showMeal = (meal) => {
-    setSelectedMeal(meal);
-    setModalOpen(true);
-  };
+  const { showMeal } = useContext(MealModalContext);
 
   return (
     <Layout>
-      <MealModal meal={selectedMeal} open={modalOpen} setOpen={setModalOpen} />
       <h1>Találatok a következőre: {text}</h1>
       <Container className="d-flex flex-wrap align-content-md-stretch">
         {meals.map((meal) => (
@@ -34,9 +27,10 @@ const SearchResultPage = ({ meals, restaurants, text }) => {
     </Layout>
   );
 };
+
 export default SearchResultPage;
 
-export async function getServerSideProps({ params }) {
+export const getServerSideProps = async ({ params }) => {
   const { searchText } = params;
 
   const meals = await mealService.getMeals({ name: searchText });
@@ -49,4 +43,4 @@ export async function getServerSideProps({ params }) {
       restaurants: JSON.parse(JSON.stringify(restaurants)),
     },
   };
-}
+};

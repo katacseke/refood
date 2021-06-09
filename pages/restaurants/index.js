@@ -20,10 +20,10 @@ const RestaurantsPage = ({ restaurants }) => (
 );
 export default RestaurantsPage;
 
-export async function getStaticProps() {
+export const getStaticProps = async () => {
   const restaurants = await restaurantService.getRestaurants();
 
   return {
     props: { restaurants: JSON.parse(JSON.stringify(restaurants)) },
   };
-}
+};

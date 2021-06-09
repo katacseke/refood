@@ -16,14 +16,15 @@ const getOrdersByUser = async (userId) => {
   await connectDb();
 
   const { orders } = await User.findById(userId)
-    .populate({ path: 'orders.items.meal', model: 'Meal' })
+    .populate({ path: 'orders.items.meal', model: 'Meal', options: { withDeleted: true } })
     .populate({ path: 'orders.restaurant', model: 'Restaurant' })
     .exec();
 
   if (!orders) {
     throw new NotFoundError('Nem létezik felhasználó ezzel az azonosítóval.');
   }
-  return orders.toObject().sort((a, b) => b.updatedAt - a.updatedAt);
+
+  return orders.map((order) => order.toObject()).sort((a, b) => b.updatedAt - a.updatedAt);
 };
 
 /**
@@ -39,7 +40,7 @@ const getOrderByUser = async (userId, orderId) => {
   await connectDb();
 
   const user = User.findOne({ _id: userId, 'orders.id': orderId })
-    .populate({ path: 'orders.items.meal', model: 'Meal' })
+    .populate({ path: 'orders.items.meal', model: 'Meal', options: { withDeleted: true } })
     .populate({ path: 'orders.restaurant', model: 'Restaurant' })
     .exec();
 
@@ -60,7 +61,7 @@ const getOrdersByRestaurant = async (restaurantId) => {
   await connectDb();
 
   const users = await User.find({ 'orders.restaurant': restaurantId })
-    .populate({ path: 'orders.items.meal', model: 'Meal' })
+    .populate({ path: 'orders.items.meal', model: 'Meal', options: { withDeleted: true } })
     .populate({ path: 'orders.restaurant', model: 'Restaurant' })
     .exec();
 
@@ -129,11 +130,28 @@ const createOrder = async (userId) => {
 
       // Update meal quantities
       const populatedCart = await cart
-        .populate({ path: 'items.meal', model: 'Meal' })
+        .populate({ path: 'items.meal', model: 'Meal', options: { withDeleted: true } })
         .execPopulate();
 
+      const deletedItem = populatedCart.items.find((item) => item.meal.deleted === true);
+      if (deletedItem) {
+        throw new ValidationError(
+          `A ${deletedItem.meal.name} étel már nem elérhető. Kérlek vedd ki a kosaradból.`
+        );
+      }
+
+      const cartObject = populatedCart.items.reduce((acc, item) => {
+        if (acc[item.meal.id]) {
+          acc[item.meal.id].quantity += item.quantity;
+        } else {
+          acc[item.meal.id] = item.toObject();
+        }
+
+        return acc;
+      }, {});
+
       await Promise.all(
-        populatedCart.items.map(async (item) => {
+        Object.values(cartObject).map(async (item) => {
           const newPortionNumber = item.meal.portionNumber - item.quantity;
 
           if (newPortionNumber < 0) {
@@ -187,7 +205,7 @@ const cancelOrder = async (orderId, newStatus = 'canceled') => {
   await connection.transaction(async () => {
     // Get the necessary data
     const user = await User.findOne({ 'orders._id': orderId })
-      .populate({ path: 'orders.items.meal', model: 'Meal' })
+      .populate({ path: 'orders.items.meal', model: 'Meal', options: { withDeleted: true } })
       .select('orders')
       .exec();
 
@@ -209,7 +227,7 @@ const cancelOrder = async (orderId, newStatus = 'canceled') => {
     await Promise.all(
       order.items.map(async (item) => {
         const result = await mealService.updateMeal(item.meal.id, {
-          portionNumber: item.meal.portionNumber + item.quantity,
+          $inc: { portionNumber: item.quantity },
         });
 
         if (!result) {
@@ -236,7 +254,10 @@ const cancelOrder = async (orderId, newStatus = 'canceled') => {
 const finishOrder = async (orderId) => {
   await connectDb();
 
-  const user = await User.findOne({ 'orders._id': orderId }).select('orders').exec();
+  const user = await User.findOne({ 'orders._id': orderId })
+    .select('orders')
+    .populate({ path: 'orders.items.meal', model: 'Meal', options: { withDeleted: true } })
+    .exec();
   const order = user?.orders.id(orderId);
 
   if (!order) {
@@ -245,6 +266,13 @@ const finishOrder = async (orderId) => {
 
   if (order.status !== 'active') {
     throw new ValidationError('A rendelés már lezárult.');
+  }
+
+  const deletedItem = order.items.find((item) => item.meal.deleted === true);
+  if (deletedItem) {
+    throw new ValidationError(
+      `A ${deletedItem.meal.name} étel már nem elérhető, ezért a rendelést nem lehet teljesíteni.`
+    );
   }
 
   order.status = 'finished';

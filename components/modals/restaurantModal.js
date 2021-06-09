@@ -42,13 +42,12 @@ const RestaurantModal = ({ restaurant, open, setOpen }) => {
     const formData = objectToFormData({
       ...data,
       image: data.image.length === 0 ? null : data.image,
-      ownerId: restaurant.ownerId,
     });
 
     try {
       const promise = axios.patch(`/api/restaurants/${restaurant.id}`, formData);
 
-      toast.promise(
+      await toast.promise(
         promise,
         {
           loading: 'Vendéglő adatainak frissítése...',

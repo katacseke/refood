@@ -52,7 +52,7 @@ const ApplicationsPage = ({ applications }) => {
 
 export default ApplicationsPage;
 
-export async function getServerSideProps({ query }) {
+export const getServerSideProps = async ({ query }) => {
   const applications = await applicationService.getApplications(query.status);
   applications.sort((a, b) => {
     if (a.status === 'pending') {
@@ -69,4 +69,4 @@ export async function getServerSideProps({ query }) {
       applications: JSON.parse(JSON.stringify(applications)),
     },
   };
-}
+};

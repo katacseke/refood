@@ -12,7 +12,12 @@ const filterCollapse = ({ open, onSubmit, values }) => {
     dailyMenu: values.dailyMenu === 'true',
     restaurantId: values.restaurantId || '',
   };
-  const { register, handleSubmit } = useForm({ defaultValues });
+  const { register, handleSubmit, reset } = useForm({ defaultValues });
+
+  const handleClearFilters = () => {
+    onSubmit({});
+    reset();
+  };
 
   return (
     <Collapse open={open}>
@@ -65,7 +70,12 @@ const filterCollapse = ({ open, onSubmit, values }) => {
                 </Checkbox>
               </Col>
               <Col className="d-flex justify-content-end">
-                <Button type="submit">Szűrés</Button>
+                <Button theme="secondary" type="button" onClick={handleClearFilters}>
+                  Szűrők eltávolítása
+                </Button>
+                <Button type="submit" className="ml-1">
+                  Szűrés
+                </Button>
               </Col>
             </Row>
           </Container>

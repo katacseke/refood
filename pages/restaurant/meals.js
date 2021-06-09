@@ -5,26 +5,25 @@ import { IoFilter } from 'react-icons/io5';
 
 import mealService from '@services/mealService';
 
+import withAuthSSR, { hasRoleSSR } from '@server/middleware/withAuthSSR';
 import Layout from '@components/layout';
 import MealCard from '@components/cards/mealCard';
 import FilterCollapse from '@components/filterCollapse';
 import MealModalContext from '@context/mealModalContext';
 
-const MealsPage = ({ meals }) => {
+const RestaurantMealsPage = ({ meals }) => {
   const [collapseOpen, setCollapseOpen] = useState(false);
   const { showMeal } = useContext(MealModalContext);
 
   const onFilter = (data) => {
     const queryString = new URLSearchParams(data).toString();
-    Router.push(`/meals?${queryString}`);
+    Router.push(`/restaurant/meals?${queryString}`);
   };
 
   const defaultFilters = useRouter().query;
   return (
     <Layout>
-      <h1 className="mb-3">
-        {Object.keys(defaultFilters).length === 0 ? 'Jelenleg elérhető ajánlatok' : 'Ajánlatok'}
-      </h1>
+      <h1 className="mb-3">Saját ajánlatok</h1>
       <div className="mb-2">
         <Button
           className="d-flex justify-content-center"
@@ -41,28 +40,20 @@ const MealsPage = ({ meals }) => {
           <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal)} />
         ))}
       </Container>
-      {meals.length === 0 && (
-        <p className="mt-3">
-          Nincsenek a keresési feltételnek megfelelő ajánlatok, gyere vissza később!
-        </p>
-      )}
+      {meals.length === 0 && <p className="mt-3">Nincsenek még saját ajánlatok!</p>}
     </Layout>
   );
 };
 
-export default MealsPage;
+export default RestaurantMealsPage;
 
-export const getServerSideProps = async (context) => {
+export const getServerSideProps = withAuthSSR(async ({ user, query }) => {
   const filters = {
-    startTime: Date.now(),
-    endTime: Date.now(),
-    minPortionNumber: 1,
-    ...context.query,
+    ...query,
   };
-
-  const meals = await mealService.getMeals(filters);
+  const meals = await mealService.getMealsByRestaurant(user.restaurantId, filters);
 
   return {
     props: { meals: JSON.parse(JSON.stringify(meals)) },
   };
-};
+}, hasRoleSSR('restaurant'));

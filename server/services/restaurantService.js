@@ -1,7 +1,7 @@
 import fs from 'fs';
 import userService from './userService';
 import applicationService from './applicationService';
-import { Restaurant } from '../models';
+import { Meal, Restaurant } from '../models';
 import connectDb from '../db';
 import { NotFoundError } from './errors';
 
@@ -175,6 +175,9 @@ const updateRestaurant = async (id, restaurantData) => {
   await connection.transaction(async () => {
     // Update the user
     await userService.updateUser(ownerId, user);
+
+    // Update restaurant names at meals
+    await Meal.updateMany({ restaurantId: id }, { restaurantName: name });
 
     // Update the restaurant associated with the user
     const restaurant = {

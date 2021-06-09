@@ -14,6 +14,7 @@ const orderSchema = new mongoose.Schema({
           ref: 'Meal',
         },
         quantity: Number,
+        donation: { type: Boolean, default: false },
       },
     ],
     default: [],
@@ -44,6 +45,10 @@ const userSchema = new mongoose.Schema({
             ref: 'Meal',
           },
           quantity: Number,
+          donation: {
+            type: Boolean,
+            default: false,
+          },
         },
       ],
       default: [],

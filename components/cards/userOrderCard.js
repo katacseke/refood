@@ -43,7 +43,7 @@ const UserOrderCard = ({ order }) => {
       <CardBody>
         <CardTitle>Rendelés innen: {order.restaurant.name}</CardTitle>
         {order.items.map((item) => (
-          <CartItem key={item.key} item={item} />
+          <CartItem key={item._id} item={item} />
         ))}
 
         <div className="d-flex flex-nowrap align-items-baseline justify-content-between">
