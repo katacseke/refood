@@ -10,7 +10,7 @@ const CartItem = ({ item, showRemoveButton, showQuantityChanger, onQuantityUpdat
   const isDeleted = item.meal.deleted;
 
   return (
-    <div className={item?.donation && styles.donation}>
+    <div className={item.donation ? styles.donation : undefined}>
       <div
         className={`d-flex flex-nowrap align-items-baseline justify-content-between ${
           isDeleted && styles.deleted
