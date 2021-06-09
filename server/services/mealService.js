@@ -118,6 +118,7 @@ const createMeal = async (meal) => {
   if (!savedMeal) {
     throw new Error('Nem sikerült létrehozni az ételt.');
   }
+
   return savedMeal.toObject();
 };
 
