@@ -86,7 +86,7 @@ describe('getMeals', () => {
       exec: sinon.stub().returns(fakeMeals),
     });
 
-    await mealService.getMeals({ donatable: 'false' });
+    await mealService.getMeals({ donatable: 'false', dailyMenu: 'true', minPortionNumber: 4 });
 
     expect(fakeFind.neverCalledWithMatch((filter) => Object.keys(filter).includes('donatable'))).to
       .be.true;
@@ -190,6 +190,27 @@ describe('createMeal', () => {
     expect(result).to.be.an('object');
     expect(Object.values(result)).to.include('Cake').and.include(7);
   });
+  it('should throw error when creation unsuccessful', async () => {
+    const meal = {
+      name: 'Cake',
+      donatable: false,
+      dailyMenu: true,
+      portionNumber: 7,
+      startTime: '2021-06-10T13:00:00.000+00:00',
+      endTime: '2021-06-15T13:00:00.000+00:00',
+      restaurantId: '604a18c3a4781a3cf9794ba9',
+    };
+    const restaurant = new Restaurant({
+      name: 'Restaurant',
+    });
+
+    sinon.stub(Meal, 'create').resolves(null);
+    sinon.stub(Restaurant, 'findById').returns({
+      exec: sinon.stub().resolves(restaurant),
+    });
+
+    expect(mealService.createMeal(meal)).to.be.rejectedWith(Error);
+  });
 });
 
 describe('updateMeal', () => {
@@ -221,5 +242,16 @@ describe('updateMeal', () => {
 
     expect(result).to.be.an('object');
     expect(Object.values(result)).to.include('Pie').and.include(4);
+  });
+});
+
+describe('deleteMeal', () => {
+  it('should not return error', async () => {
+    const deleted = sinon.stub(Meal, 'deleteById').returns({
+      exec: sinon.stub().resolves(null),
+    });
+
+    await mealService.deleteMeal('123');
+    expect(deleted.calledWith('123')).to.be.true;
   });
 });
