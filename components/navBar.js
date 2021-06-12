@@ -266,7 +266,7 @@ const NavBar = () => {
     <Navbar type="dark" theme="primary" expand="md">
       <Link href="/">
         <span>
-          <NavbarBrand style={{ cursor: 'pointer' }}>Project name</NavbarBrand>
+          <NavbarBrand style={{ cursor: 'pointer' }}>ReFood</NavbarBrand>
         </span>
       </Link>
       <NavbarToggler onClick={() => setNavbarOpen(!navbarOpen)} />
