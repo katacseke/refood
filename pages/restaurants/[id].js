@@ -112,10 +112,7 @@ export async function getStaticPaths() {
   const ids = await restaurantService.getRestaurantIds();
   const paths = ids.map((id) => ({ params: { id } }));
 
-  return {
-    paths,
-    fallback: false,
-  };
+  return { paths, fallback: false };
 }
 
 export const getStaticProps = async ({ params }) => {
@@ -125,7 +122,7 @@ export const getStaticProps = async ({ params }) => {
     const restaurant = await restaurantService.getRestaurantById(id);
     const user = await userService.getUserByRestaurantId(id);
     const meals = await mealService.getMealsByRestaurant(id, {
-      tartTime: Date.now(),
+      startTime: Date.now(),
       endTime: Date.now(),
     });
 
@@ -136,8 +133,6 @@ export const getStaticProps = async ({ params }) => {
       },
     };
   } catch (err) {
-    return {
-      notFound: true,
-    };
+    return { notFound: true };
   }
 };
