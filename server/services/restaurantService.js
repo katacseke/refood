@@ -1,4 +1,4 @@
-import fs from 'fs';
+import cloudinary from 'cloudinary';
 import userService from './userService';
 import applicationService from './applicationService';
 import { Meal, Restaurant } from '../models';
@@ -194,7 +194,7 @@ const updateRestaurant = async (id, restaurantData) => {
       };
       if (image) {
         const restaurantResult = await Restaurant.findById(id).exec();
-        fs.unlinkSync(`public/${restaurantResult?.image}`);
+        cloudinary.v2.uploader.destroy(restaurantResult?.image?.replace('.png', ''));
         restaurant.image = image;
       }
       const updatedRestaurant = await Restaurant.findByIdAndUpdate(id, restaurant, {

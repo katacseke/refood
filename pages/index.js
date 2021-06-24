@@ -8,10 +8,8 @@ import {
   IoRestaurantOutline,
   IoWalkOutline,
 } from 'react-icons/io5';
-import { getImage } from '@plaiceholder/next';
-import { getBase64 } from '@plaiceholder/base64';
 import NavBar from '@components/navBar';
-import LoadImage from '@components/loadImage';
+import Image from 'next/image';
 import styles from './home.module.scss';
 
 const Feature = ({ icon, children }) => (
@@ -21,18 +19,11 @@ const Feature = ({ icon, children }) => (
   </li>
 );
 
-const Home = ({ mainPlaceholderSrc, featurePlaceholderSrc }) => (
+const Home = () => (
   <>
     <NavBar />
     <div className={styles.topContainer}>
-      <LoadImage
-        placeholderSrc={mainPlaceholderSrc}
-        src="/hermes-rivera-Ww8eQWjMJWk-unsplash.jpg"
-        alt=""
-        width={5465}
-        height={2285}
-        layout="responsive"
-      />
+      <Image src="/refood/static/bowl.jpg" alt="" width={5465} height={2285} layout="responsive" />
       <div className={styles.aboveLeft}>
         <h1 className={styles.title}>
           <strong>Éhes vagy?</strong> <br />
@@ -52,9 +43,8 @@ const Home = ({ mainPlaceholderSrc, featurePlaceholderSrc }) => (
     </div>
 
     <div className={styles.centerContainer}>
-      <LoadImage
-        placeholderSrc={featurePlaceholderSrc}
-        src="/vegleges.jpg"
+      <Image
+        src="/refood/static/vegetables.jpg"
         alt=""
         width={2400}
         height={1000}
@@ -92,18 +82,3 @@ const Home = ({ mainPlaceholderSrc, featurePlaceholderSrc }) => (
 );
 
 export default Home;
-
-export const getStaticProps = async () => {
-  const mainImg = await getImage('/hermes-rivera-Ww8eQWjMJWk-unsplash.jpg');
-  const featureImg = await getImage('/vegleges.jpg');
-
-  const mainPlaceholderSrc = await getBase64(mainImg);
-  const featurePlaceholderSrc = await getBase64(featureImg);
-
-  return {
-    props: {
-      mainPlaceholderSrc,
-      featurePlaceholderSrc,
-    },
-  };
-};

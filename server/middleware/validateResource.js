@@ -1,4 +1,4 @@
-import fs from 'fs';
+import cloudinary from 'cloudinary';
 
 /**
  * Middleware that validates the data in the request body against
@@ -18,7 +18,7 @@ const validateResource = (resourceSchema) => async (req, res, next) => {
   } catch (e) {
     // delete the previously uploaded file if validation failed
     if (req.file?.path) {
-      fs.unlinkSync(req.file.path);
+      cloudinary.v2.uploader.destroy(req.file.filename);
     }
     res.status(422).json({ [e.path]: { message: e.errors.join(' ') } });
   }
