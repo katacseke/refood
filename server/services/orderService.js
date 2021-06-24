@@ -202,42 +202,45 @@ const cancelOrder = async (orderId, newStatus = 'canceled') => {
   const connection = await connectDb();
 
   let transactionResult;
-  await connection.transaction(async () => {
-    // Get the necessary data
-    const user = await User.findOne({ 'orders._id': orderId })
-      .populate({ path: 'orders.items.meal', model: 'Meal', options: { withDeleted: true } })
-      .select('orders')
-      .exec();
+  await connection.transaction(
+    async () => {
+      // Get the necessary data
+      const user = await User.findOne({ 'orders._id': orderId })
+        .populate({ path: 'orders.items.meal', model: 'Meal', options: { withDeleted: true } })
+        .select('orders')
+        .exec();
 
-    const order = user?.orders.id(orderId);
+      const order = user?.orders.id(orderId);
 
-    if (!order) {
-      throw new NotFoundError('Ez a rendelés nem létezik.');
-    }
+      if (!order) {
+        throw new NotFoundError('Ez a rendelés nem létezik.');
+      }
 
-    // Update the order status
-    if (order.status !== 'active') {
-      throw new ValidationError('A rendelést már nem lehet lemondani.');
-    }
+      // Update the order status
+      if (order.status !== 'active') {
+        throw new ValidationError('A rendelést már nem lehet lemondani.');
+      }
 
-    order.status = newStatus;
-    await user.save();
+      order.status = newStatus;
+      await user.save();
 
-    // Update the meal portion numbers
-    await Promise.all(
-      order.items.map(async (item) => {
-        const result = await mealService.updateMeal(item.meal.id, {
-          $inc: { portionNumber: item.quantity },
-        });
+      // Update the meal portion numbers
+      await Promise.all(
+        order.items.map(async (item) => {
+          const result = await mealService.updateMeal(item.meal.id, {
+            $inc: { portionNumber: item.quantity },
+          });
 
-        if (!result) {
-          throw new Error('Nem sikerült visszavonni a rendelést.');
-        }
-      })
-    );
+          if (!result) {
+            throw new Error('Nem sikerült visszavonni a rendelést.');
+          }
+        })
+      );
 
-    transactionResult = order.toObject();
-  });
+      transactionResult = order.toObject();
+    },
+    { readConcern: { level: 'snapshot' }, writeConcern: { w: 'majority' } }
+  );
 
   return transactionResult;
 };

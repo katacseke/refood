@@ -38,7 +38,7 @@ const Login = () => {
     try {
       const promise = login(data);
 
-      await toast.promise(
+      const response = await toast.promise(
         promise,
         {
           loading: 'Bejelentkezés folyamatban...',
@@ -48,7 +48,12 @@ const Login = () => {
         { style: { minWidth: '18rem' } }
       );
 
-      router.push(router.query.next || '/');
+      const nextRoute =
+        response.data.role === 'restaurant'
+          ? `/restaurants/${response.data.restaurantId}`
+          : router.query.next || '/';
+
+      router.push(nextRoute);
     } catch (err) {}
   };
 

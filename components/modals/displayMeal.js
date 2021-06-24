@@ -190,24 +190,6 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
                     <IoHeart className="mr-1" />
                     Adományozás
                   </Button>
-                  {!user && (
-                    <Tooltip
-                      open={tooltipOpen}
-                      target="#donateButton"
-                      toggle={() => setTooltipOpen(!tooltipOpen)}
-                    >
-                      Adományozáshoz jelentkezz be!
-                    </Tooltip>
-                  )}
-                  {isOver && (
-                    <Tooltip
-                      open={tooltipOpen}
-                      target="#donateButton"
-                      toggle={() => setTooltipOpen(!tooltipOpen)}
-                    >
-                      Ez az ajánlat már nem elérhető, kérlek válassz valami mást!
-                    </Tooltip>
-                  )}
                 </div>
               )}
             </div>

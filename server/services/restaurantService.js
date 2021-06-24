@@ -110,37 +110,40 @@ const createRestaurant = async (restaurantData, application) => {
   const user = { name, email: loginEmail, phone, password };
 
   let transactionResult;
-  await connection.transaction(async () => {
-    // Create the user
-    let userResult = await userService.createUser(user, 'restaurant');
+  await connection.transaction(
+    async () => {
+      // Create the user
+      let userResult = await userService.createUser(user, 'restaurant');
 
-    // Create the restaurant associated with the user
-    const restaurant = {
-      name,
-      email,
-      phone,
-      url,
-      description,
-      address,
-      ownerId: userResult.id,
-      image,
-    };
-    const restaurantResult = await Restaurant.create(restaurant);
+      // Create the restaurant associated with the user
+      const restaurant = {
+        name,
+        email,
+        phone,
+        url,
+        description,
+        address,
+        ownerId: userResult.id,
+        image,
+      };
+      const restaurantResult = await Restaurant.create(restaurant);
 
-    if (!restaurantResult) {
-      throw new Error('Nem sikerült létrehozni a vendéglőt');
-    }
+      if (!restaurantResult) {
+        throw new Error('Nem sikerült létrehozni a vendéglőt');
+      }
 
-    // Bind the restaurant to the user
-    userResult = await userService.updateUser(userResult.id, {
-      restaurantId: restaurantResult.id,
-    });
+      // Bind the restaurant to the user
+      userResult = await userService.updateUser(userResult.id, {
+        restaurantId: restaurantResult.id,
+      });
 
-    // Set the application status to registered
-    await applicationService.updateApplicationStatus(application.id, 'registered');
+      // Set the application status to registered
+      await applicationService.updateApplicationStatus(application.id, 'registered');
 
-    transactionResult = restaurantResult.toObject();
-  });
+      transactionResult = restaurantResult.toObject();
+    },
+    { readConcern: { level: 'snapshot' }, writeConcern: { w: 'majority' } }
+  );
 
   return transactionResult;
 };
@@ -172,33 +175,36 @@ const updateRestaurant = async (id, restaurantData) => {
   const user = { name, email: loginEmail, phone, password };
 
   let transactionResult;
-  await connection.transaction(async () => {
-    // Update the user
-    await userService.updateUser(ownerId, user);
+  await connection.transaction(
+    async () => {
+      // Update the user
+      await userService.updateUser(ownerId, user);
 
-    // Update restaurant names at meals
-    await Meal.updateMany({ restaurantId: id }, { restaurantName: name });
+      // Update restaurant names at meals
+      await Meal.updateMany({ restaurantId: id }, { restaurantName: name });
 
-    // Update the restaurant associated with the user
-    const restaurant = {
-      name,
-      email,
-      phone,
-      url,
-      description,
-      address,
-    };
-    if (image) {
-      const restaurantResult = await Restaurant.findById(id).exec();
-      fs.unlinkSync(`public/${restaurantResult?.image}`);
-      restaurant.image = image;
-    }
-    const updatedRestaurant = await Restaurant.findByIdAndUpdate(id, restaurant, {
-      new: true,
-    }).exec();
+      // Update the restaurant associated with the user
+      const restaurant = {
+        name,
+        email,
+        phone,
+        url,
+        description,
+        address,
+      };
+      if (image) {
+        const restaurantResult = await Restaurant.findById(id).exec();
+        fs.unlinkSync(`public/${restaurantResult?.image}`);
+        restaurant.image = image;
+      }
+      const updatedRestaurant = await Restaurant.findByIdAndUpdate(id, restaurant, {
+        new: true,
+      }).exec();
 
-    transactionResult = updatedRestaurant.toObject();
-  });
+      transactionResult = updatedRestaurant.toObject();
+    },
+    { readConcern: { level: 'snapshot' }, writeConcern: { w: 'majority' } }
+  );
 
   return transactionResult;
 };

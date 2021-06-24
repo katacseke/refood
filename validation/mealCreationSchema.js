@@ -6,7 +6,10 @@ export default Yup.object({
     .positive('Az adagok száma pozitív kell legyen.')
     .required('Az adagok számának megadása kötelező.'),
   startTime: Yup.date()
-    .min(new Date(), 'Az ajánlat kezdési ideje egy jövőbeli dátum kell legyen.')
+    .min(
+      new Date(Date.now() - 10 * 60 * 1000),
+      'Az ajánlat kezdési ideje egy jövőbeli dátum kell legyen.'
+    )
     .required('Az ajánlat kezdési idejének megadása kötelező.'),
   endTime: Yup.date()
     .min(Yup.ref('startTime'), 'A lejárati dátum a kezdési dátum után kell legyen.')
