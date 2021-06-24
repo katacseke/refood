@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "lint": "next lint",
     "test": "mocha --recursive --watch",
     "test-coverage": "nyc --reporter=html mocha --recursive"
   },
@@ -52,6 +53,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^7.21.0",
     "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-next": "^11.0.1",
     "eslint-config-prettier": "^8.1.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.22.1",
