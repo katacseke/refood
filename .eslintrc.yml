@@ -12,10 +12,12 @@ settings:
         - ['@services', './server/services']
         - ['@middleware', './server/middleware']
         - ['@validation', './validation']
+        - ['@helpers', './helpers']
 env:
   browser: true
   es2021: true
   node: true
+  mocha: true
 extends:
   - airbnb
   - prettier  
@@ -33,6 +35,7 @@ rules:
   react/jsx-filename-extension: 'off'
   jsx-a11y/label-has-associated-control: 'off'
   jsx-a11y/anchor-is-valid: 'off'
+  no-empty: 'off'
   no-console: 'off'
   no-underscore-dangle:
     - error

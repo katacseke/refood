@@ -1,47 +1,33 @@
 import nextConnect from 'next-connect';
-import { userService } from '../../../../server/services';
-import authorize, { hasRole, isSelf } from '../../../../server/middleware/authorize';
+import userService from '@services/userService';
+import { handleErrors, validateResource } from '@server/middleware';
+import authorize, { hasRole, isSelf } from '@middleware/authorize';
+import userUpdateSchema from '@validation/userUpdateSchema';
 
 const authorization = nextConnect()
   .get('/api/users/:id', authorize(hasRole('admin'), isSelf()))
   .delete('/api/users/:id', authorize(hasRole('admin'), isSelf()))
   .patch('/api/users/:id', authorize(isSelf()));
 
-const handler = nextConnect().use(authorization);
+const validation = nextConnect().patch('/api/users/:id', validateResource(userUpdateSchema));
+
+const handler = nextConnect({ onError: handleErrors }).use(authorization).use(validation);
 
 handler.get(async (req, res) => {
   const user = await userService.getUserById(req.query.id);
 
-  if (!user.success) {
-    res.status(404).json({ error: user.error });
-    return;
-  }
-
-  res.status(200).json(user.data);
+  res.status(200).json(user);
 });
 
 handler.delete(async (req, res) => {
-  const result = await userService.deleteUser(req.query.id);
+  await userService.deleteUser(req.query.id);
 
-  if (!result.success) {
-    res.status(404).json({ general: { message: result.error } });
-    return;
-  }
-
-  res.status(200).json(result.data);
+  res.status(204).send();
 });
 
 handler.patch(async (req, res) => {
-  const { id } = req.query;
-
-  const updatedUser = await userService.updateUser(id, req.body);
-
-  if (!updatedUser.success) {
-    res.status(500).json({ general: { message: updatedUser.error } });
-    return;
-  }
-
-  res.status(200).json(updatedUser.data);
+  const updatedUser = await userService.updateUser(req.query.id, req.body);
+  res.status(200).json(updatedUser);
 });
 
 export default handler;

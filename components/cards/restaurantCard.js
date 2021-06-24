@@ -1,7 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { IoCall, IoMail, IoLocationSharp } from 'react-icons/io5';
-import styles from './card.module.scss';
+
+import styles from './customCard.module.scss';
 
 const RestaurantInformation = ({ data }) => (
   <ul className={styles.moreInformation}>
@@ -20,10 +22,13 @@ const RestaurantInformation = ({ data }) => (
 const RestaurantCard = ({ data }) => (
   <div className={styles.card}>
     <div className={styles.imageContainer}>
-      <img
-        className={styles.image}
-        src="https://discovernative.org/wp-content/uploads/2020/05/food.jpg"
+      <Image
+        src={data.image || '/default.svg'}
         alt=""
+        width={300}
+        height={300}
+        layout="responsive"
+        objectFit="cover"
       />
       <Link href={`/restaurants/${data.id}`}>
         <a className={styles.button}>Bővebben</a>

@@ -1,17 +1,23 @@
-import { Button, Collapse, Container, Form, FormGroup, FormInput, Row, Col } from 'shards-react';
 import { useForm } from 'react-hook-form';
+import { Button, Collapse, Container, Form, FormGroup, FormInput, Row, Col } from 'shards-react';
+
 import Checkbox from '../checkbox';
 
 const filterCollapse = ({ open, onSubmit, values }) => {
   const defaultValues = {
     name: values.name || '',
-    beginTime: values.beginTime || '',
+    startTime: values.startTime || '',
     endTime: values.endTime || '',
     donatable: values.donatable === 'true',
     dailyMenu: values.dailyMenu === 'true',
     restaurantId: values.restaurantId || '',
   };
-  const { register, handleSubmit } = useForm({ defaultValues });
+  const { register, handleSubmit, reset } = useForm({ defaultValues });
+
+  const handleClearFilters = () => {
+    onSubmit({});
+    reset();
+  };
 
   return (
     <Collapse open={open}>
@@ -33,11 +39,11 @@ const filterCollapse = ({ open, onSubmit, values }) => {
               </Col>
               <Col>
                 <FormGroup>
-                  <label htmlFor="beginTime">Elérhető ettől</label>
+                  <label htmlFor="startTime">Elérhető ettől</label>
                   <FormInput
                     type="datetime-local"
-                    name="beginTime"
-                    id="beginTime"
+                    name="startTime"
+                    id="startTime"
                     innerRef={register}
                   />
                 </FormGroup>
@@ -64,7 +70,12 @@ const filterCollapse = ({ open, onSubmit, values }) => {
                 </Checkbox>
               </Col>
               <Col className="d-flex justify-content-end">
-                <Button type="submit">Szűrés</Button>
+                <Button theme="secondary" type="button" onClick={handleClearFilters}>
+                  Szűrők eltávolítása
+                </Button>
+                <Button type="submit" className="ml-1">
+                  Szűrés
+                </Button>
               </Col>
             </Row>
           </Container>

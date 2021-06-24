@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import '@server/models';
 
 export default async () => {
   if (mongoose.connections[0].readyState) {

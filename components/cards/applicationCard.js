@@ -1,28 +1,29 @@
+import Router from 'next/router';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import { Button, Card, CardBody, CardFooter, CardTitle } from 'shards-react';
 import { IoCall, IoMail, IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
-import Router from 'next/router';
-import toast from 'react-hot-toast';
-import styles from './applicationCard.module.scss';
+
+import styles from './shardsReactCard.module.scss';
 
 const ApplicationCard = ({ application }) => {
   const handleApplication = async (status) => {
-    const res = await fetch(`/api/restaurants/applications/${application.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ status }),
-    });
+    const promise = axios.patch(`/api/restaurants/applications/${application.id}`, { status });
+    try {
+      await toast.promise(
+        promise,
+        {
+          loading: 'Jelentkezés frissítése...',
+          success: 'Jelentkezés sikeresen frissítve!',
+          error: (err) => err.response.data.error,
+        },
+        { style: { minWidth: '18rem' } }
+      );
 
-    if (!res.ok) {
-      const err = await res.json();
-      toast.error(err.message);
-
-      return;
-    }
-
-    Router.push('/restaurants/applications');
+      Router.replace('/restaurants/applications');
+    } catch (err) {}
   };
+
   return (
     <Card className={styles.card}>
       <CardBody>

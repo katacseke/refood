@@ -1,22 +1,18 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import Router, { useRouter } from 'next/router';
 import { Container, Button } from 'shards-react';
 import { IoFilter } from 'react-icons/io5';
-import Router, { useRouter } from 'next/router';
-import Layout from '../../components/layout';
-import MealCard from '../../components/cards/mealCard';
-import MealModal from '../../components/mealModal';
-import FilterCollapse from '../../components/filterCollapse';
-import { mealService } from '../../server/services';
+
+import mealService from '@services/mealService';
+
+import Layout from '@components/layout';
+import MealCard from '@components/cards/mealCard';
+import FilterCollapse from '@components/filterCollapse';
+import MealModalContext from '@context/mealModalContext';
 
 const MealsPage = ({ meals }) => {
-  const [modalOpen, setModalOpen] = useState(false);
   const [collapseOpen, setCollapseOpen] = useState(false);
-  const [selectedMeal, setSelectedMeal] = useState();
-
-  const showMeal = (meal) => {
-    setSelectedMeal(meal);
-    setModalOpen(true);
-  };
+  const { showMeal } = useContext(MealModalContext);
 
   const onFilter = (data) => {
     const queryString = new URLSearchParams(data).toString();
@@ -26,8 +22,9 @@ const MealsPage = ({ meals }) => {
   const defaultFilters = useRouter().query;
   return (
     <Layout>
-      <MealModal meal={selectedMeal} open={modalOpen} setOpen={setModalOpen} />
-      <h1 className="mb-3">Jelenleg elérhető ajánlatok</h1>
+      <h1 className="mb-3">
+        {Object.keys(defaultFilters).length === 0 ? 'Jelenleg elérhető ajánlatok' : 'Ajánlatok'}
+      </h1>
       <div className="mb-2">
         <Button
           className="d-flex justify-content-center"
@@ -39,14 +36,15 @@ const MealsPage = ({ meals }) => {
         <FilterCollapse open={collapseOpen} onSubmit={onFilter} values={defaultFilters} />
       </div>
 
-      {meals.length ? (
-        <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
-          {meals.map((meal) => (
-            <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal)} />
-          ))}
-        </Container>
-      ) : (
-        <p>Jelenleg nincsenek elérhető ajánlatok, gyere vissza később!</p>
+      <Container className="m-0 p-0 d-flex flex-wrap w-100 justify-content-center">
+        {meals.map((meal) => (
+          <MealCard key={meal.id} data={meal} onClick={() => showMeal(meal)} />
+        ))}
+      </Container>
+      {meals.length === 0 && (
+        <p className="mt-3">
+          Nincsenek a keresési feltételnek megfelelő ajánlatok, gyere vissza később!
+        </p>
       )}
     </Layout>
   );
@@ -54,16 +52,17 @@ const MealsPage = ({ meals }) => {
 
 export default MealsPage;
 
-export async function getServerSideProps(context) {
+export const getServerSideProps = async (context) => {
   const filters = {
     startTime: Date.now(),
     endTime: Date.now(),
+    minPortionNumber: 1,
     ...context.query,
   };
 
   const meals = await mealService.getMeals(filters);
 
   return {
-    props: { meals: JSON.parse(JSON.stringify(meals.data)) },
+    props: { meals: JSON.parse(JSON.stringify(meals)) },
   };
-}
+};

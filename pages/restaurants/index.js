@@ -1,7 +1,8 @@
 import { Container } from 'shards-react';
-import Layout from '../../components/layout';
-import RestaurantCard from '../../components/cards/restaurantCard';
-import { restaurantService } from '../../server/services';
+
+import restaurantService from '@services/restaurantService';
+import Layout from '@components/layout';
+import RestaurantCard from '@components/cards/restaurantCard';
 
 const RestaurantsPage = ({ restaurants }) => (
   <Layout>
@@ -19,10 +20,10 @@ const RestaurantsPage = ({ restaurants }) => (
 );
 export default RestaurantsPage;
 
-export async function getStaticProps() {
+export const getStaticProps = async () => {
   const restaurants = await restaurantService.getRestaurants();
 
   return {
-    props: { restaurants: JSON.parse(JSON.stringify(restaurants.data)) },
+    props: { restaurants: JSON.parse(JSON.stringify(restaurants)) },
   };
-}
+};

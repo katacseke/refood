@@ -1,60 +1,27 @@
 import React, { useEffect, useState, useContext } from 'react';
+import axios from 'axios';
+
 import AuthContext from './authContext';
 
 const CartContext = React.createContext();
 
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState({ items: [] });
 
   const updateCartItem = async (cartItem) => {
-    const res = await fetch(`/api/users/${user.id}/cart`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(cartItem),
-    });
-
-    if (res.ok) {
-      setCart(await res.json());
-      return;
-    }
-
-    const err = await res.json();
-    throw new Error(err);
+    const res = await axios.patch(`/api/users/${user.id}/cart`, cartItem);
+    setCart(res.data);
   };
 
   const addCartItem = async (cartItem) => {
-    const res = await fetch(`/api/users/${user.id}/cart`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(cartItem),
-    });
-
-    if (res.ok) {
-      setCart(await res.json());
-      return;
-    }
-
-    const err = await res.json();
-    throw new Error(err.general.message);
+    const res = await axios.post(`/api/users/${user.id}/cart`, cartItem);
+    setCart(res.data);
   };
 
   const deleteCartContent = async () => {
-    const res = await fetch(`/api/users/${user.id}/cart`, {
-      method: 'DELETE',
-    });
-
-    if (res.ok) {
-      setCart(await res.json());
-      return;
-    }
-
-    const err = await res.json();
-    throw new Error(err);
+    await axios.delete(`/api/users/${user.id}/cart`);
+    setCart({ items: [] });
   };
 
   const refresh = async () => {
@@ -62,14 +29,12 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    const res = await fetch(`/api/users/${user.id}/cart`);
+    const res = await axios.get(`/api/users/${user.id}/cart`);
 
-    if (res.ok) {
-      setCart(await res.json());
-    }
+    setCart(res.data);
   };
 
-  useEffect(refresh, [user]);
+  useEffect(refresh, [user]); // refresh cart content when user logs in or out
 
   return (
     <CartContext.Provider value={{ cart, updateCartItem, addCartItem, deleteCartContent, refresh }}>
