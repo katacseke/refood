@@ -1,4 +1,4 @@
-import fs from 'fs';
+import cloudinary from 'cloudinary';
 import connectDb from '@server/db';
 import Meal from '@server/models/meal';
 import NotFoundError from './errors/NotFoundError';
@@ -141,8 +141,8 @@ const updateMeal = async (id, mealData) => {
   if (image) {
     const mealResult = await Meal.findById(id).exec();
 
-    if (fs.existsSync(`public/${mealResult?.image}`)) {
-      fs.unlinkSync(`public/${mealResult?.image}`);
+    if (mealResult?.image) {
+      cloudinary.v2.uploader.destroy(mealResult.image.replace('.png', ''));
     }
     meal.image = image;
   }

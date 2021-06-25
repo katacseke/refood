@@ -25,5 +25,6 @@ export const getStaticProps = async () => {
 
   return {
     props: { restaurants: JSON.parse(JSON.stringify(restaurants)) },
+    revalidate: 60,
   };
 };

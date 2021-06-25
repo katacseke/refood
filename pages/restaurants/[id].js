@@ -131,6 +131,7 @@ export const getStaticProps = async ({ params }) => {
         restaurant: JSON.parse(JSON.stringify({ ...restaurant, loginEmail: user.email })),
         meals: JSON.parse(JSON.stringify(meals)),
       },
+      revalidate: 60,
     };
   } catch (err) {
     return { notFound: true };

@@ -2,6 +2,7 @@ require('sharp');
 
 module.exports = {
   images: {
-    domains: ['interactive-examples.mdn.mozilla.net'],
+    loader: 'cloudinary',
+    path: 'https://res.cloudinary.com/dcbp0mrww/image/upload/',
   },
 };
