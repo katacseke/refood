@@ -29,13 +29,9 @@ const RestaurantModal = ({ restaurant, open, setOpen }) => {
     document.body.classList.toggle('modal-open', open);
   }, [open]);
 
-  if (!restaurant) {
-    return <div />;
-  }
-
   const { register, handleSubmit, errors, setError } = useForm({
     resolver: yupResolver(restaurantUpdateSchema),
-    defaultValues: { ...restaurant, image: '' },
+    defaultValues: { ...(restaurant ?? {}), image: '' },
   });
 
   const onSubmit = async (data) => {
@@ -45,7 +41,7 @@ const RestaurantModal = ({ restaurant, open, setOpen }) => {
     });
 
     try {
-      const promise = axios.patch(`/api/restaurants/${restaurant.id}`, formData);
+      const promise = axios.patch(`/api/restaurants/${restaurant?.id}`, formData);
 
       await toast.promise(
         promise,
@@ -61,13 +57,17 @@ const RestaurantModal = ({ restaurant, open, setOpen }) => {
       );
 
       setOpen(false);
-      Router.replace(`/restaurants/${restaurant.id}`);
+      Router.replace(`/restaurants/${restaurant?.id}`);
     } catch (err) {
       Object.keys(err.response.data)
         .filter((field) => field !== 'general')
         .forEach((field) => setError(field, { message: err.response.data[field].message }));
     }
   };
+
+  if (!restaurant) {
+    return <div />;
+  }
 
   return (
     <Modal
