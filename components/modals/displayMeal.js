@@ -86,13 +86,12 @@ const DisplayMeal = ({ meal, onTabChange, toggleOpen }) => {
   const timeDifference = moment(meal.startTime).diff(moment(), 'hours', true);
   const isPreorderable = timeDifference > 0 && timeDifference <= 24 && !isOver;
 
-  let displayMealState;
+  let displayMealState = '';
+
   if (isPreorderable) {
     displayMealState = 'Előrendelhető';
   } else if (notAvailable) {
     displayMealState = 'Nem elérhető';
-  } else {
-    displayMealState = '';
   }
 
   return (

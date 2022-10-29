@@ -17,7 +17,6 @@ $transition-duration: .3s;
 
 .moreInformation {
     margin: 1rem .5rem;
-    font-size: .85rem;
     color: $secondary-color;
     list-style: none;
     padding: initial 1rem;
@@ -47,7 +46,6 @@ $transition-duration: .3s;
             left: 0;
             right: 0;
             bottom: 0;
-            background: transparent;
             transition: $transition-duration;
             z-index: 1;
             background: rgba(31, 30, 30, 0.6);

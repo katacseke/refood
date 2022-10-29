@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import restaurantService from '@services/restaurantService';
-import { Restaurant } from '@server/models';
+import { Restaurant, User } from '@server/models';
 import { NotFoundError } from '@server/services/errors';
 
 chai.use(chaiAsPromised);
@@ -107,8 +107,7 @@ describe('getRestaurantsWithName', () => {
   });
 });
 
-/*
-describe('createRestaurant', () => {
+describe.skip('createRestaurant', () => {
   it('should return new restaurant object', async () => {
     const restaurant = {
       name: 'Green',
@@ -173,4 +172,3 @@ describe('createRestaurant', () => {
     expect(restaurantService.createRestaurant(restaurant)).to.be.rejectedWith(Error);
   });
 });
-*/

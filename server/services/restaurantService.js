@@ -113,7 +113,7 @@ const createRestaurant = async (restaurantData, application) => {
   await connection.transaction(
     async () => {
       // Create the user
-      let userResult = await userService.createUser(user, 'restaurant');
+      const userResult = await userService.createUser(user, 'restaurant');
 
       // Create the restaurant associated with the user
       const restaurant = {
@@ -133,7 +133,7 @@ const createRestaurant = async (restaurantData, application) => {
       }
 
       // Bind the restaurant to the user
-      userResult = await userService.updateUser(userResult.id, {
+      await userService.updateUser(userResult.id, {
         restaurantId: restaurantResult.id,
       });
 
